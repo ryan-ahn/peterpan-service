@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 피터팬 재단 웹
 
-## Getting Started
+Next.js App Router로 만든 피터팬 재단 소개 사이트.
 
-First, run the development server:
+작성 규칙은 [`CONVENTIONS.md`](CONVENTIONS.md).
+
+## 요구 사항
+
+Node.js 24. [`.tool-versions`](.tool-versions) 와 같다.
+
+## 실행
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+브라우저에서 [http://localhost:3000](http://localhost:3000) 을 연다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 스크립트
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| 명령            | 하는 일        |
+| --------------- | -------------- |
+| `npm run dev`   | 개발 서버      |
+| `npm run build` | 프로덕션 빌드  |
+| `npm run start` | 빌드 결과 실행 |
+| `npm run lint`  | ESLint         |
 
-## Learn More
+## 디렉터리
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| 경로          | 내용                                  |
+| ------------- | ------------------------------------- |
+| `app/`        | 라우트, 루트 레이아웃, 전역 CSS 변수  |
+| `components/` | 버튼, 텍스트, 아이콘, 헤더            |
+| `assets/`     | 페이지에서 `next/image`로 쓰는 이미지 |

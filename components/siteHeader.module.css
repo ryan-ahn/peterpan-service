@@ -1,0 +1,165 @@
+.header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 40;
+  color: var(--white);
+  transition:
+    transform 0.35s ease,
+    background 0.3s ease,
+    color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.hidden {
+  transform: translateY(-100%);
+}
+
+.light {
+  background: linear-gradient(
+    180deg,
+    rgba(6, 28, 58, 0.42),
+    rgba(6, 28, 58, 0)
+  );
+}
+
+.solid {
+  background: rgba(247, 241, 230, 0.94);
+  color: var(--ink);
+  box-shadow: 0 1px 0 rgba(42, 36, 28, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  height: var(--header-height);
+  padding: 0 28px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(196, 163, 106, 0.2);
+  color: #e7cb8d;
+}
+
+.solid .mark {
+  background: rgba(141, 106, 58, 0.12);
+  color: var(--gold-deep);
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.brandName {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.brandEn {
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  opacity: 0.72;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+}
+
+.link {
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  opacity: 0.82;
+}
+
+.link:hover,
+.active {
+  opacity: 1;
+}
+
+.active {
+  font-weight: 600;
+}
+
+.menuButton {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.menu {
+  display: none;
+}
+
+@media (max-width: 1180px) {
+  .nav,
+  .join {
+    display: none;
+  }
+
+  .menuButton {
+    display: inline-flex;
+  }
+
+  .menu {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 4px 20px 18px;
+    background: var(--cream);
+    color: var(--ink);
+  }
+
+  .menu[hidden] {
+    display: none;
+  }
+
+  .menuLink {
+    padding: 12px 4px;
+    border-bottom: 1px solid rgba(42, 36, 28, 0.08);
+    font-size: 16px;
+  }
+
+  .menuJoin {
+    margin-top: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header {
+    transition: none;
+  }
+}
