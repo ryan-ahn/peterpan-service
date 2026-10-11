@@ -6,14 +6,14 @@ import "./globals.css";
 const notoSans = Noto_Sans_KR({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-sans",
+  variable: "--font-noto-sans",
   display: "swap",
 });
 
 const notoSerif = Noto_Serif_KR({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-serif",
+  variable: "--font-noto-serif",
   display: "swap",
 });
 

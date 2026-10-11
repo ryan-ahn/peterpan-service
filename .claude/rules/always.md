@@ -58,7 +58,7 @@ imports → /** constants */ → /** types */ → /** actions */ → /** pre-roo
 7. `// effects`
 8. `// render`
 
-스타일은 `*.module.css`다. 컴포넌트 안에 스타일 객체를 두지 않는다.
+스타일은 Tailwind 클래스다. 컴포넌트 안에 스타일 객체를 두지 않는다.
 
 ## 서버와 클라이언트
 
@@ -68,9 +68,9 @@ imports → /** constants */ → /** types */ → /** actions */ → /** pre-roo
 
 ## 스타일
 
-- 반복 색·글꼴·헤더 높이는 `app/globals.css`의 `:root`.
-- 글꼴은 `app/layout.tsx`의 `next/font`.
-- 클래스 이름은 camelCase. 배치는 `flex`, `grid`, `gap`.
+- 토큰은 `theme/tailwind.css`. 간격 4px, 글자·줄간격 2px 번호. 화면은 `sm` `md` `lg` `xl`.
+- 글꼴은 `app/layout.tsx`의 `next/font`. 변형은 `tv`, 조합은 `cn`.
+- 배치는 `flex`, `grid`, `gap`. 모바일 기본, 커질 때 `md:` `lg:` `xl:`.
 - 글자는 `Text`의 `variant`·`color`, 버튼은 `Button`의 `variant`·`size`.
 - 로컬 이미지는 `@assets`와 `next/image`.
 

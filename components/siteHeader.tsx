@@ -4,8 +4,7 @@ import { useEffect, useRef, useState, type MouseEvent } from "react";
 
 import Button from "@components/button";
 import Icon from "@components/icon";
-
-import styles from "./siteHeader.module.css";
+import cn from "@utils/cn";
 
 /**
  * constants
@@ -20,12 +19,6 @@ const NAV_ITEMS = [
 
 const HEADER_HEIGHT = 76;
 const SCROLL_DELTA = 8;
-
-/**
- * pre-root utils
- */
-const joinClassNames = (names: Array<string | false>): string =>
-  names.filter(Boolean).join(" ");
 
 /**
  * 상단 탭
@@ -121,29 +114,46 @@ const SiteHeader = () => {
   // render
   return (
     <header
-      className={joinClassNames([
-        styles.header,
-        isSolid ? styles.solid : styles.light,
-        isHidden && styles.hidden,
-      ])}>
-      <div className={styles.bar}>
-        <a className={styles.brand} href="#top" onClick={handleAnchorClick}>
-          <span className={styles.mark}>
+      className={cn(
+        "fixed inset-x-0 top-0 z-40 text-ivory transition duration-300 motion-reduce:transition-none",
+        isSolid
+          ? "bg-cream/95 text-ink shadow-header backdrop-blur-[14px]"
+          : "bg-[linear-gradient(180deg,rgba(6,28,58,0.42),rgba(6,28,58,0))]",
+        isHidden && "-translate-y-full",
+      )}>
+      <div className="flex h-19 items-center justify-between gap-5 px-5 md:px-7">
+        <a
+          className="flex shrink-0 items-center gap-2.5"
+          href="#top"
+          onClick={handleAnchorClick}>
+          <span
+            className={cn(
+              "grid size-8.5 place-items-center rounded-full",
+              isSolid
+                ? "bg-gold-deep/10 text-gold-deep"
+                : "bg-gold/20 text-gold-light",
+            )}>
             <Icon name="star" size={16} />
           </span>
-          <span className={styles.brandText}>
-            <span className={styles.brandName}>피터팬 재단</span>
-            <span className={styles.brandEn}>PETER PAN FOUNDATION</span>
+          <span className="flex flex-col gap-0.5">
+            <span className="font-serif text-5 leading-none font-semibold tracking-[-0.03em]">
+              피터팬 재단
+            </span>
+            <span className="text-2 leading-none font-medium tracking-[0.16em] opacity-70">
+              PETER PAN FOUNDATION
+            </span>
           </span>
         </a>
-        <nav className={styles.nav} aria-label="주요 메뉴">
+        <nav
+          className="hidden items-center gap-6.5 xl:flex"
+          aria-label="주요 메뉴">
           {NAV_ITEMS.map(item => (
             <a
               key={item.id}
-              className={joinClassNames([
-                styles.link,
-                activeId === item.id && styles.active,
-              ])}
+              className={cn(
+                "text-4 font-normal tracking-[-0.02em] opacity-80 hover:opacity-100",
+                activeId === item.id && "font-semibold opacity-100",
+              )}
               href={`#${item.id}`}
               aria-current={activeId === item.id ? "true" : undefined}
               onClick={handleAnchorClick}>
@@ -151,11 +161,11 @@ const SiteHeader = () => {
             </a>
           ))}
         </nav>
-        <div className={styles.join}>
+        <div className="hidden xl:block">
           <Button variant="gold" size="small" text="함께하기" />
         </div>
         <button
-          className={styles.menuButton}
+          className="inline-flex size-10 items-center justify-center rounded-full border-0 bg-transparent p-0 text-inherit xl:hidden"
           type="button"
           aria-label={isMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
           aria-expanded={isMenuOpen}
@@ -164,19 +174,21 @@ const SiteHeader = () => {
         </button>
       </div>
       <nav
-        className={styles.menu}
-        hidden={!isMenuOpen}
+        className={cn(
+          "flex flex-col gap-1.5 bg-cream px-5 pt-1 pb-4.5 text-ink xl:hidden",
+          !isMenuOpen && "hidden",
+        )}
         aria-label="모바일 메뉴">
         {NAV_ITEMS.map(item => (
           <a
             key={item.id}
-            className={styles.menuLink}
+            className="border-b border-ink/10 px-1 py-3 text-5"
             href={`#${item.id}`}
             onClick={handleAnchorClick}>
             {item.label}
           </a>
         ))}
-        <div className={styles.menuJoin}>
+        <div className="mt-2">
           <Button variant="gold" size="medium" text="함께하기" />
         </div>
       </nav>

@@ -1,6 +1,6 @@
 # 코드 작성 규칙
 
-피터팬 재단 웹. Next.js App Router, React, CSS Modules.
+피터팬 재단 웹. Next.js App Router, React, Tailwind CSS.
 
 실행·빌드는 [`README.md`](README.md).
 
@@ -19,8 +19,9 @@
 
 | 경로                                    | 역할                                                                              |
 | --------------------------------------- | --------------------------------------------------------------------------------- |
-| `app/`                                  | 라우트. `layout.tsx`, `page.tsx`, `globals.css`, 페이지 CSS 모듈                  |
-| `components/`                           | 여러 곳에서 쓰는 UI, 그리고 자체 상태·스타일을 가진 헤더. 파일마다 `*.module.css` |
+| `app/`                                  | 라우트. `layout.tsx`, `page.tsx`, `globals.css`                                   |
+| `components/`                           | 여러 곳에서 쓰는 UI, 그리고 자체 상태·스타일을 가진 헤더                          |
+| `theme/`                                | Tailwind 디자인 토큰. 간격·글자·색·모서리                                         |
 | `assets/`                               | `next/image`로 가져오는 이미지                                                    |
 | `hooks/` `utils/` `types/` `constants/` | 두 파일 이상에서 공유할 때만 만든다                                               |
 
@@ -37,7 +38,7 @@
 | `@theme/*`      | `theme/`      |
 | `@utils/*`      | `utils/`      |
 
-- 다른 폴더의 코드는 별칭으로 가져온다. 상대 경로는 같은 폴더의 CSS 모듈에만 쓴다.
+- 다른 폴더의 코드는 별칭으로 가져온다.
 - `types/`에서 가져올 때는 `import type`만 쓴다.
 
 ---
@@ -47,8 +48,7 @@
 파일 첫 줄에 `"use client"`가 필요하면 그것만 두고, 아래 순서로 가져온다. 그룹 사이에는 빈 줄을 둔다.
 
 1. `react`, `next`
-2. `@assets`, `@components`, `@app`, `@constants`, `@hooks`, `@utils`
-3. 같은 폴더의 `*.module.css`
+2. `@assets`, `@components`, `@app`, `@constants`, `@hooks`, `@theme`, `@utils`
 
 ```tsx
 "use client";
@@ -56,8 +56,7 @@
 import { useState } from "react";
 
 import Button from "@components/button";
-
-import styles from "./siteHeader.module.css";
+import cn from "@utils/cn";
 ```
 
 ---
@@ -146,7 +145,7 @@ export default HomeScreen;
 7. `// effects` — `useEffect`
 8. `// render` — JSX와 early return
 
-`// fetch`, `// routes`처럼 목록 밖 이름은 만들지 않는다. 스타일은 CSS 모듈이므로 컴포넌트 안에 스타일 블록을 두지 않는다.
+`// fetch`, `// routes`처럼 목록 밖 이름은 만들지 않는다. 스타일은 Tailwind 클래스다. 컴포넌트 안에 스타일 객체를 두지 않는다.
 
 - 블록 주석 바로 다음에 코드를 둔다. 주석과 코드 사이, 블록과 블록 사이에 빈 줄을 넣지 않는다.
 - 같은 블록의 함수도 빈 줄 없이 이어 쓴다.
@@ -173,10 +172,12 @@ export default HomeScreen;
 
 ## 스타일
 
-- 반복되는 색, 글꼴, 헤더 높이는 `app/globals.css`의 `:root` 변수다. `--ink`, `--gold`, `--font-sans`, `--header-height`.
-- 글꼴 파일은 `app/layout.tsx`의 `next/font`로 불러 CSS 변수에 연결한다.
-- 컴포넌트·페이지 스타일은 같은 이름의 `*.module.css`다. 클래스 이름은 camelCase다.
-- 배치는 `flex`, `grid`, `gap`으로 잡는다. 박스 안쪽 여백은 `padding`, 가운데 정렬 너비는 `margin-inline: auto`다.
+- 색, 간격, 글자 크기, 줄간격, 자간, 모서리는 `theme/tailwind.css`의 `@theme` 토큰이다. 간격은 4px 단위(`p-4` = 16px, `h-19` = 76px), 글자·줄간격은 2px 단위 번호(`text-15` = 36px, `leading-19` = 48px)다.
+- 화면 크기는 `sm` 640, `md` 768, `lg` 1024, `xl` 1280, `2xl` 1536이다. 모바일 스타일을 기본으로 두고, 커질 때만 `md:` `lg:` `xl:`을 붙인다.
+- 글꼴 파일은 `app/layout.tsx`의 `next/font`로 불러 `--font-noto-sans`, `--font-noto-serif`에 연결한다. 화면에서는 `font-sans`, `font-serif`를 쓴다.
+- 변형이 있는 UI는 `tailwind-variants`의 `tv`로 묶고, 클래스 조합은 `@utils/cn`을 쓴다.
+- 찢긴 종이처럼 계산이 긴 장식만 `app/globals.css`의 `@layer components`에 둔다.
+- 배치는 `flex`, `grid`, `gap` 유틸리티로 잡는다. 박스 안쪽 여백은 `p-*`, 가운데 정렬 너비는 `mx-auto`다.
 - 글자 모양은 `Text`의 `variant`·`color`, 버튼 모양은 `Button`의 `variant`·`size`로 고른다.
 - 로컬 이미지는 `@assets`에서 가져와 `next/image`에 넘긴다.
 - 원격 이미지는 `next.config.ts`의 `images.remotePatterns`에 호스트를 추가한 뒤 `next/image`로 쓴다.
@@ -191,7 +192,7 @@ export default HomeScreen;
 
 ## 네이밍
 
-- **파일·폴더:** camelCase. `siteHeader.tsx`, `home.module.css`. 라우트 그룹만 `(group)` 형태.
+- **파일·폴더:** camelCase. `siteHeader.tsx`, `theme/tailwind.css`. 라우트 그룹만 `(group)` 형태.
 - **라우트 파일:** `page.tsx`, `layout.tsx`.
 - **컴포넌트:** PascalCase. 페이지는 `*Screen`, 본문 단위는 `*Section`. `HomeScreen`, `HeroSection`, `SiteHeader`.
 - **이미지:** kebab-case, 용도가 드러나게. `section-1.png`, `section-4-flower.png`.

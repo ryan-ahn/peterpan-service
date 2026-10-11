@@ -19,8 +19,6 @@ import Icon from "@components/icon";
 import SiteHeader from "@components/siteHeader";
 import Text from "@components/text";
 
-import styles from "./home.module.css";
-
 /**
  * constants
  */
@@ -129,7 +127,7 @@ const HomeScreen = async () => {
   // render
   return (
     <>
-      <div className={styles.sky} aria-hidden="true">
+      <div className="fixed inset-0 z-0 bg-sky" aria-hidden="true">
         <Image
           src={heroBackground}
           alt=""
@@ -137,12 +135,12 @@ const HomeScreen = async () => {
           priority
           quality={90}
           sizes="100vw"
-          className={styles.skyImage}
+          className="object-cover"
         />
       </div>
-      <div className={styles.page}>
+      <div className="relative z-1 max-w-full overflow-x-hidden">
         <SiteHeader />
-        <main>
+        <main className="max-w-full overflow-x-clip">
           <HeroSection />
           <FilmSection />
           <StorySection />
@@ -163,10 +161,12 @@ const HomeScreen = async () => {
 const HeroSection = () => {
   // render
   return (
-    <section className={styles.hero} id="top">
-      <div className={styles.heroShade} />
-      <div className={styles.heroGrid}>
-        <div className={styles.stack}>
+    <section
+      className="relative flex min-h-dvh flex-col justify-center px-5 pt-[calc(var(--header-height)+24px)] pb-22 md:px-8"
+      id="top">
+      <div className="hero-shade" />
+      <div className="relative grid w-full max-w-[1120px] grid-cols-1 items-end gap-10 lg:mx-auto lg:grid-cols-[minmax(0,1.15fr)_minmax(220px,0.7fr)]">
+        <div className="flex flex-col gap-4.5">
           <Text as="h1" variant="display" color="white">
             어른이 되어서도,
             <br />
@@ -177,30 +177,33 @@ const HeroSection = () => {
             <br />
             이제 우리가 함께 이어갑니다.
           </Text>
-          <div className={styles.actions}>
+          <div className="flex flex-wrap gap-2.5">
             <Button variant="solid" text="피터팬즈 이야기" hasChevron />
             <Button variant="ghostLight" text="우리 재단 함께하기" hasChevron />
           </div>
         </div>
-        <div className={styles.heroQuote}>
+        <div className="max-w-none text-left lg:max-w-70 lg:justify-self-end lg:text-right">
           <Text as="p" variant="quote" color="white">
             “꿈을 꾸는 사람은
             <br />
             결코 혼자가 아니니까”
           </Text>
-          <p className={styles.quoteBy}>
+          <p className="mt-2.5">
             <Text as="span" variant="caption" color="whiteSoft">
               — 꼭두
             </Text>
           </p>
         </div>
       </div>
-      <p className={styles.heroNote}>
+      <p className="static mt-7 max-w-60 text-left lg:absolute lg:right-[max(32px,calc((100%-1120px)/2))] lg:bottom-7 lg:mt-0 lg:text-right">
         <Text as="span" variant="caption" color="whiteSoft">
           꿈을 잃지 않도록, 어른이 된 우리가 네버랜드를 지키는 밤
         </Text>
       </p>
-      <a className={styles.scrollCue} href="#film" aria-label="다음 이야기">
+      <a
+        className="absolute bottom-7 left-1/2 hidden size-10.5 -translate-x-1/2 place-items-center rounded-full border border-ivory/45 text-ivory md:grid"
+        href="#film"
+        aria-label="다음 이야기">
         <Icon name="chevron-down" size={18} />
       </a>
     </section>
@@ -210,9 +213,13 @@ const HeroSection = () => {
 const FilmSection = () => {
   // render
   return (
-    <section className={styles.film} id="film" aria-label="영상">
-      <div className={styles.player}>
+    <section
+      className="relative z-0 flex min-h-[78vh] items-center justify-center px-4 pt-12 pb-18 md:min-h-dvh md:px-5 md:pt-18 md:pb-24"
+      id="film"
+      aria-label="영상">
+      <div className="aspect-video w-full max-w-[960px] overflow-hidden rounded-sheet border border-ivory/30 bg-sea shadow-player">
         <iframe
+          className="size-full border-0"
           src={YOUTUBE_EMBED_URL}
           title="피터팬 재단 영상"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -228,15 +235,15 @@ const StorySection = () => {
   // render
   return (
     <section
-      className={`${styles.sheet} ${styles.story} ${styles.anchor}`}
+      className="sheet-story relative z-1 scroll-mt-19 overflow-x-clip overflow-y-visible bg-paper px-0 pt-21 pb-16 lg:min-h-dvh lg:pt-27 lg:pb-24"
       id="story">
       <SheetBackdrop
         src={storyBackground}
-        backdropClassName={styles.sheetBackdropStory}
+        backdropClassName="sheet-backdrop-story"
         priority
       />
-      <div className={`${styles.body} ${styles.wrap} ${styles.storyGrid}`}>
-        <div className={styles.stack}>
+      <div className="relative z-2 mx-auto grid w-[min(1120px,calc(100%-32px))] items-center gap-7 md:w-[min(1120px,calc(100%-40px))] lg:grid-cols-[minmax(0,1fr)_minmax(260px,480px)]">
+        <div className="flex flex-col gap-4.5">
           <Text as="p" variant="label" color="gold">
             Our Story
           </Text>
@@ -258,8 +265,8 @@ const StorySection = () => {
         <Image
           src={bookDeco}
           alt="안녕, 피터팬 책과 사진"
-          className={styles.book}
-          sizes="(min-width: 980px) 480px, 90vw"
+          className="h-auto w-full"
+          sizes="(min-width: 1024px) 480px, 90vw"
         />
       </div>
     </section>
@@ -270,30 +277,30 @@ const NeverlandSection = () => {
   // render
   return (
     <section
-      className={`${styles.sheet} ${styles.neverland} ${styles.anchor}`}
+      className="sheet-neverland relative z-1 scroll-mt-19 overflow-x-clip overflow-y-visible bg-forest pt-21 lg:pt-27"
       id="neverland">
       <SheetBackdrop
         src={neverlandBackground}
-        backdropClassName={styles.sheetBackdropNeverland}
+        backdropClassName="sheet-backdrop-neverland"
       />
       <Image
         src={neverlandLeaf}
         alt=""
-        className={`${styles.deco} ${styles.leaf}`}
+        className="pointer-events-none absolute top-0 left-0 z-3 h-auto w-17 opacity-85 select-none lg:w-[clamp(72px,10vw,152px)] lg:opacity-100"
       />
       <Image
         src={neverlandBloom}
         alt=""
-        className={`${styles.deco} ${styles.bloom}`}
+        className="pointer-events-none absolute bottom-0 left-0 z-3 h-auto w-12 select-none lg:w-[clamp(54px,7.5vw,107px)]"
       />
       <Image
         src={neverlandStar}
         alt=""
-        className={`${styles.deco} ${styles.floatingStar}`}
+        className="pointer-events-none absolute top-[14%] right-[6%] z-3 hidden h-auto w-[clamp(28px,3.2vw,48px)] select-none md:block"
       />
-      <div className={`${styles.body} ${styles.wrap}`}>
-        <div className={styles.neverlandHead}>
-          <div className={styles.stack}>
+      <div className="relative z-2 mx-auto w-[min(1120px,calc(100%-32px))] pb-10 md:w-[min(1120px,calc(100%-40px))] lg:pb-16">
+        <div className="grid items-end gap-9 lg:grid-cols-[minmax(0,1.2fr)_minmax(220px,0.7fr)]">
+          <div className="flex flex-col gap-4.5">
             <Text as="p" variant="label" color="goldLight">
               Our Neverland
             </Text>
@@ -305,22 +312,22 @@ const NeverlandSection = () => {
               포기하지 않도록 서로의 등불이 되어 연결하는 일을 합니다.
             </Text>
           </div>
-          <div className={styles.neverlandQuote}>
+          <div className="text-left lg:text-right">
             <Text as="p" variant="quote" color="cream">
               “좋은 나는 늘 사람이 있어
               <br />
               시작되고, 함께 만들어갑니다.”
             </Text>
-            <p className={styles.quoteBy}>
+            <p className="mt-2.5">
               <Text as="span" variant="caption" color="creamSoft">
                 — 피터팬 재단
               </Text>
             </p>
           </div>
         </div>
-        <div className={styles.cards}>
+        <div className="mt-12 grid grid-cols-1 gap-5.5 lg:grid-cols-3">
           {NEVERLAND_CARDS.map(card => (
-            <article key={card.kind} className={styles.card}>
+            <article key={card.kind} className="flex flex-col gap-3.5">
               <NeverlandArt kind={card.kind} />
               <Text as="h3" variant="heading" color="cream">
                 {card.title}
@@ -332,11 +339,11 @@ const NeverlandSection = () => {
           ))}
         </div>
       </div>
-      <div className={`${styles.deco} ${styles.horizon}`}>
+      <div className="pointer-events-none absolute right-0 bottom-0 z-4 h-[clamp(48px,12vw,72px)] w-[clamp(140px,42vw,240px)] overflow-hidden leading-none opacity-90 select-none lg:h-[clamp(56px,9vw,108px)] lg:w-[clamp(168px,26vw,340px)] lg:opacity-100">
         <Image
           src={neverlandCity}
           alt=""
-          className={styles.horizonImage}
+          className="block size-full max-w-none object-cover object-right-bottom"
           sizes="480px"
         />
       </div>
@@ -348,14 +355,14 @@ const CommunitySection = ({ stories }: { stories: BrunchCard[] }) => {
   // render
   return (
     <section
-      className={`${styles.sheet} ${styles.community} ${styles.anchor}`}
+      className="sheet-community relative z-2 scroll-mt-19 overflow-x-clip overflow-y-visible bg-transparent pt-21 pb-24 md:pt-16 lg:pt-20"
       id="community">
       <SheetBackdrop
         src={communityBackground}
-        backdropClassName={styles.sheetBackdropCommunity}
+        backdropClassName="sheet-backdrop-community"
       />
-      <div className={`${styles.body} ${styles.wrap} ${styles.communityGrid}`}>
-        <div className={styles.stack}>
+      <div className="relative z-2 mx-auto grid w-[min(1120px,calc(100%-32px))] items-center gap-9 md:w-[min(1120px,calc(100%-40px))] lg:grid-cols-[minmax(260px,420px)_minmax(0,1fr)]">
+        <div className="flex flex-col gap-4.5">
           <Text as="p" variant="label" color="gold">
             Our Community
           </Text>
@@ -385,28 +392,28 @@ const CommunitySection = ({ stories }: { stories: BrunchCard[] }) => {
             수 있습니다.
           </Text>
         ) : (
-          <div className={styles.polaroidsStage}>
+          <div className="relative max-w-full min-w-0 overflow-x-clip px-1 pt-4 pb-1">
             <Image
               src={communityFlower}
               alt=""
-              className={styles.communityFlowerLeft}
+              className="pointer-events-none absolute top-[44%] left-0 z-3 h-auto w-9 -rotate-[14deg] select-none lg:top-[47%] lg:-left-[4%] lg:w-[clamp(44px,6vw,72px)]"
             />
             <Image
               src={communityFlowerTall}
               alt=""
-              className={styles.communityFlowerGap}
+              className="pointer-events-none absolute top-0 left-1/2 z-1 h-auto w-8 -translate-x-[52%] rotate-[8deg] select-none lg:top-[2%] lg:w-[clamp(38px,5.5vw,64px)]"
             />
             <Image
               src={communityFlower}
               alt=""
-              className={styles.communityFlowerRight}
+              className="pointer-events-none absolute top-[42%] right-0 z-3 h-auto w-8.5 rotate-[16deg] select-none lg:top-[45%] lg:-right-[4%] lg:w-[clamp(42px,6vw,70px)]"
             />
             <Image
               src={communityStar}
               alt=""
-              className={styles.communityStarDeco}
+              className="pointer-events-none absolute top-0 left-[34%] z-4 h-auto w-4 select-none lg:left-[36%] lg:w-[clamp(18px,2.6vw,32px)]"
             />
-            <div className={styles.polaroids}>
+            <div className="relative z-2 flex snap-x snap-mandatory gap-4 overflow-x-auto px-0.5 pt-2 pb-4 lg:grid lg:grid-cols-2 lg:gap-x-3 lg:gap-y-4.5 lg:overflow-visible lg:p-0">
               {stories.map(story => (
                 <StoryPolaroid key={story.id} story={story} />
               ))}
@@ -421,10 +428,10 @@ const CommunitySection = ({ stories }: { stories: BrunchCard[] }) => {
 const NewsSection = ({ records }: { records: BrunchCard[] }) => {
   // render
   return (
-    <section className={`${styles.news} ${styles.anchor}`} id="news">
-      <div className={styles.wrap}>
-        <div className={styles.newsHead}>
-          <div className={styles.stack}>
+    <section className="scroll-mt-19 bg-cream pt-7 pb-27" id="news">
+      <div className="mx-auto w-[min(1120px,calc(100%-32px))] md:w-[min(1120px,calc(100%-40px))]">
+        <div className="flex flex-col items-start justify-between gap-5 md:flex-row md:items-end">
+          <div className="flex flex-col gap-4.5">
             <Text as="p" variant="label" color="gold">
               News & Journals
             </Text>
@@ -443,13 +450,13 @@ const NewsSection = ({ records }: { records: BrunchCard[] }) => {
           />
         </div>
         {records.length === 0 ? (
-          <div className={styles.empty}>
+          <div className="mt-7">
             <Text variant="body" color="soft">
               기록을 불러오지 못했습니다. 잠시 후 다시 열어 주세요.
             </Text>
           </div>
         ) : (
-          <div className={styles.records}>
+          <div className="mt-9 grid grid-cols-1 gap-7 lg:grid-cols-3">
             {records.map(record => (
               <RecordCard key={record.id} record={record} />
             ))}
@@ -463,20 +470,22 @@ const NewsSection = ({ records }: { records: BrunchCard[] }) => {
 const SupportSection = () => {
   // render
   return (
-    <section className={`${styles.support} ${styles.anchor}`} id="support">
-      <span className={styles.shooting} aria-hidden="true" />
+    <section
+      className="support-night relative scroll-mt-19 overflow-hidden pt-30 pb-18"
+      id="support">
+      <span className="shooting" aria-hidden="true" />
       <Image
         src={communityStar}
         alt=""
-        className={`${styles.deco} ${styles.supportStar}`}
+        className="pointer-events-none absolute top-[14%] right-[18%] z-3 h-auto w-[clamp(48px,6vw,84px)] select-none"
       />
       <Image
         src={communityFlower}
         alt=""
-        className={`${styles.deco} ${styles.supportFlower}`}
+        className="pointer-events-none absolute right-0 bottom-0 z-3 h-auto w-[clamp(90px,12vw,170px)] select-none"
       />
-      <div className={`${styles.wrap} ${styles.supportGrid}`}>
-        <div className={styles.stack}>
+      <div className="mx-auto grid w-[min(1120px,calc(100%-32px))] items-center gap-8 md:w-[min(1120px,calc(100%-40px))] lg:grid-cols-[minmax(0,1.1fr)_minmax(220px,0.7fr)]">
+        <div className="flex flex-col gap-4.5">
           <Text as="p" variant="label" color="goldLight">
             Together
           </Text>
@@ -493,14 +502,14 @@ const SupportSection = () => {
             <Button variant="gold" text="함께하기" hasChevron />
           </div>
         </div>
-        <div className={styles.supportQuote}>
+        <div className="text-left lg:text-right">
           <Text as="p" variant="quote" color="cream">
             “사람, 사랑, 그리고 꿈을
             <br />
             잃지 않는 사람이 있다면,
             <br />그 별은, 결코 꺼지지 않는다.”
           </Text>
-          <p className={styles.quoteBy}>
+          <p className="mt-2.5">
             <Text as="span" variant="caption" color="creamSoft">
               — 피터팬 재단
             </Text>
@@ -514,44 +523,49 @@ const SupportSection = () => {
 const FooterSection = () => {
   // render
   return (
-    <footer className={styles.footer}>
-      <div className={styles.wrap}>
-        <div className={styles.footerGrid}>
-          <a className={styles.footerBrand} href="#top">
+    <footer className="bg-night-deep pt-9 pb-7 text-cream">
+      <div className="mx-auto w-[min(1120px,calc(100%-32px))] md:w-[min(1120px,calc(100%-40px))]">
+        <div className="flex flex-col items-start justify-between gap-7 lg:flex-row">
+          <a className="flex items-center gap-2.5" href="#top">
             <Icon name="star" size={16} color="#e7cb8d" />
             <Text as="span" variant="heading" color="cream">
               피터팬 재단
             </Text>
           </a>
-          <nav className={styles.footerLinks} aria-label="하단 메뉴">
+          <nav
+            className="flex max-w-[460px] flex-wrap gap-x-5.5 gap-y-2 text-4 opacity-80"
+            aria-label="하단 메뉴">
             {FOOTER_LINKS.map(link => (
               <a key={link.id} href={`#${link.id}`}>
                 {link.label}
               </a>
             ))}
           </nav>
-          <div className={styles.footerActions}>
-            <div className={styles.socials}>
+          <div className="flex flex-col items-start gap-3.5 lg:items-end">
+            <div className="flex gap-2">
               <button
-                className={styles.social}
+                className="grid size-9 cursor-pointer place-items-center rounded-full border border-cream/30 bg-transparent p-0 text-cream"
                 type="button"
                 aria-label="인스타그램">
                 <Icon name="instagram" size={16} />
               </button>
               <button
-                className={styles.social}
+                className="grid size-9 cursor-pointer place-items-center rounded-full border border-cream/30 bg-transparent p-0 text-cream"
                 type="button"
                 aria-label="유튜브">
                 <Icon name="youtube" size={16} />
               </button>
-              <button className={styles.social} type="button" aria-label="메일">
+              <button
+                className="grid size-9 cursor-pointer place-items-center rounded-full border border-cream/30 bg-transparent p-0 text-cream"
+                type="button"
+                aria-label="메일">
                 <Icon name="mail" size={16} />
               </button>
             </div>
             <Button variant="gold" size="small" text="함께하기" />
           </div>
         </div>
-        <p className={styles.copy}>
+        <p className="mt-7 text-3 opacity-55">
           © 2026 Peter Pan Foundation. All rights reserved.
         </p>
       </div>
@@ -575,14 +589,14 @@ const SheetBackdrop = ({
 }: SheetBackdropProps) => {
   // render
   return (
-    <div className={`${styles.sheetBackdrop} ${backdropClassName}`} aria-hidden>
-      <div className={styles.sheetBackdropMedia}>
+    <div className={`sheet-backdrop ${backdropClassName}`} aria-hidden>
+      <div className="sheet-backdrop-media">
         <Image
           src={src}
           alt=""
           fill
           priority={priority}
-          className={styles.sheetBackdropImage}
+          className="object-cover object-top"
           sizes="100vw"
         />
       </div>
@@ -593,17 +607,28 @@ const SheetBackdrop = ({
 const NeverlandArt = ({ kind }: { kind: NeverlandKind }) => {
   // variables
   const artClassName = {
-    lamp: styles.artLamp,
-    hands: styles.artHands,
-    path: styles.artPath,
+    lamp: "art-lamp",
+    hands: "art-hands",
+    path: "art-path",
+  }[kind];
+  const starClassName = {
+    lamp: "absolute right-[14%] bottom-[16%] h-auto w-13.5",
+    hands:
+      "absolute top-[42%] left-1/2 h-auto w-23 -translate-x-1/2 -translate-y-1/2",
+    path: "",
   }[kind];
   // render
   return (
-    <div className={`${styles.art} ${artClassName}`}>
+    <div
+      className={`relative h-60 overflow-hidden rounded-sheet bg-forest-night ${artClassName}`}>
       {kind === "path" ? (
-        <Image src={neverlandCity} alt="" className={styles.artCity} />
+        <Image
+          src={neverlandCity}
+          alt=""
+          className="absolute inset-x-0 bottom-0 h-auto w-full"
+        />
       ) : (
-        <Image src={neverlandStar} alt="" className={styles.artStar} />
+        <Image src={neverlandStar} alt="" className={starClassName} />
       )}
     </div>
   );
@@ -613,31 +638,31 @@ const StoryPolaroid = ({ story }: { story: BrunchCard }) => {
   // render
   return (
     <a
-      className={styles.polaroid}
+      className="flex w-[min(240px,72vw)] shrink-0 snap-start flex-col gap-3 text-inherit lg:w-auto lg:min-w-0 lg:odd:-rotate-4 lg:even:mt-7 lg:even:rotate-[3.5deg]"
       href={story.href}
       target="_blank"
       rel="noreferrer">
-      <div className={styles.frame}>
+      <div className="relative aspect-[1284/1225]">
         {story.imageUrl ? (
-          <div className={styles.photoWrap}>
+          <div className="absolute top-[8%] left-[16%] z-0 h-[61%] w-[64%] overflow-hidden">
             <Image
               src={story.imageUrl}
               alt=""
               fill
-              sizes="(max-width: 980px) 45vw, 240px"
-              className={styles.photo}
+              sizes="(max-width: 1023px) 45vw, 240px"
+              className="object-cover"
               unoptimized
             />
           </div>
         ) : (
-          <div className={styles.photoFallback} />
+          <div className="photo-fallback absolute top-[8%] left-[16%] z-0 h-[61%] w-[64%]" />
         )}
         <Image
           src={communityAlbum}
           alt=""
           fill
           sizes="360px"
-          className={styles.frameImage}
+          className="pointer-events-none absolute inset-0 z-1 size-full"
         />
       </div>
       <Text as="span" variant="caption" color="soft">
@@ -651,23 +676,19 @@ const RecordCard = ({ record }: { record: BrunchCard }) => {
   // render
   return (
     <a
-      className={styles.record}
+      className="flex min-w-0 flex-col gap-3 border-t border-gold-deep/45 pt-4 text-inherit"
       href={record.href}
       target="_blank"
       rel="noreferrer">
       <Text as="span" variant="caption" color="gold">
         {record.publishedOn}
       </Text>
-      <span className={styles.recordTitle}>
-        <Text as="span" variant="heading">
-          {record.title}
-        </Text>
-      </span>
-      <span className={styles.recordSummary}>
-        <Text as="span" variant="caption" color="soft">
-          {record.summary}
-        </Text>
-      </span>
+      <Text as="span" variant="heading" className="line-clamp-3">
+        {record.title}
+      </Text>
+      <Text as="span" variant="caption" color="soft" className="line-clamp-4">
+        {record.summary}
+      </Text>
     </a>
   );
 };

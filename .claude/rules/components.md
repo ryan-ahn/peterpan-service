@@ -10,6 +10,6 @@ paths:
 - 페이지 본문 섹션은 올리지 않는다. 그 `page.tsx`에 둔다.
 - 파일 이름은 camelCase, 컴포넌트는 PascalCase. `V2` 접미사는 붙이지 않는다.
 - 선언과 `export default`는 분리한다. 공개 유니온(`Variant`, `Size`, `Color`, `Name`)만 export한다.
-- 스타일은 같은 폴더의 `*.module.css`다. 클래스 이름은 camelCase.
+- 스타일은 Tailwind 클래스다. 변형은 `tv`, 조합은 `cn`.
 - 글자는 `Text`, 버튼은 `Button`, 아이콘은 `Icon`의 props로 고른다.
 - 상태·이펙트·브라우저 API가 있을 때만 `"use client"`.
