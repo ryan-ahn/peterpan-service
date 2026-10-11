@@ -27,8 +27,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="ko"
-      className={`${notoSans.variable} ${notoSerif.variable} antialiased`}>
-      <body>{children}</body>
+      className={`${notoSans.variable} ${notoSerif.variable} antialiased`}
+      suppressHydrationWarning>
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }

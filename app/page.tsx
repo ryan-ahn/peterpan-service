@@ -1,5 +1,5 @@
 import { cacheLife } from "next/cache";
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 
 import heroBackground from "@assets/images/background/section-1.png";
 import storyBackground from "@assets/images/background/section-2.png";
@@ -229,12 +229,9 @@ const StorySection = () => {
     <section
       className={`${styles.sheet} ${styles.story} ${styles.anchor}`}
       id="story">
-      <Image
+      <SheetBackdrop
         src={storyBackground}
-        alt=""
-        fill
-        sizes="100vw"
-        className={styles.paper}
+        backdropClassName={styles.sheetBackdropStory}
       />
       <div className={`${styles.body} ${styles.wrap} ${styles.storyGrid}`}>
         <div className={styles.stack}>
@@ -273,12 +270,9 @@ const NeverlandSection = () => {
     <section
       className={`${styles.sheet} ${styles.neverland} ${styles.anchor}`}
       id="neverland">
-      <Image
+      <SheetBackdrop
         src={neverlandBackground}
-        alt=""
-        fill
-        sizes="100vw"
-        className={styles.paper}
+        backdropClassName={styles.sheetBackdropNeverland}
       />
       <Image
         src={neverlandLeaf}
@@ -337,7 +331,12 @@ const NeverlandSection = () => {
         </div>
       </div>
       <div className={`${styles.deco} ${styles.horizon}`}>
-        <Image src={neverlandCity} alt="" fill sizes="100vw" />
+        <Image
+          src={neverlandCity}
+          alt=""
+          className={styles.horizonImage}
+          sizes="480px"
+        />
       </div>
     </section>
   );
@@ -349,27 +348,9 @@ const CommunitySection = ({ stories }: { stories: BrunchCard[] }) => {
     <section
       className={`${styles.sheet} ${styles.community} ${styles.anchor}`}
       id="community">
-      <Image
+      <SheetBackdrop
         src={communityBackground}
-        alt=""
-        fill
-        sizes="100vw"
-        className={styles.paper}
-      />
-      <Image
-        src={communityFlower}
-        alt=""
-        className={`${styles.deco} ${styles.flower}`}
-      />
-      <Image
-        src={communityFlowerTall}
-        alt=""
-        className={`${styles.deco} ${styles.flowerTall}`}
-      />
-      <Image
-        src={communityStar}
-        alt=""
-        className={`${styles.deco} ${styles.communityStar}`}
+        backdropClassName={styles.sheetBackdropCommunity}
       />
       <div className={`${styles.body} ${styles.wrap} ${styles.communityGrid}`}>
         <div className={styles.stack}>
@@ -402,10 +383,32 @@ const CommunitySection = ({ stories }: { stories: BrunchCard[] }) => {
             수 있습니다.
           </Text>
         ) : (
-          <div className={styles.polaroids}>
-            {stories.map(story => (
-              <StoryPolaroid key={story.id} story={story} />
-            ))}
+          <div className={styles.polaroidsStage}>
+            <Image
+              src={communityFlower}
+              alt=""
+              className={styles.communityFlowerLeft}
+            />
+            <Image
+              src={communityFlowerTall}
+              alt=""
+              className={styles.communityFlowerGap}
+            />
+            <Image
+              src={communityFlower}
+              alt=""
+              className={styles.communityFlowerRight}
+            />
+            <Image
+              src={communityStar}
+              alt=""
+              className={styles.communityStarDeco}
+            />
+            <div className={styles.polaroids}>
+              {stories.map(story => (
+                <StoryPolaroid key={story.id} story={story} />
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -557,6 +560,28 @@ const FooterSection = () => {
 /**
  * inner components
  */
+type SheetBackdropProps = {
+  src: StaticImageData;
+  backdropClassName: string;
+};
+
+const SheetBackdrop = ({ src, backdropClassName }: SheetBackdropProps) => {
+  // render
+  return (
+    <div
+      className={`${styles.sheetBackdrop} ${backdropClassName}`}
+      aria-hidden>
+      <Image
+        src={src}
+        alt=""
+        fill
+        className={styles.sheetBackdropImage}
+        sizes="150vw"
+      />
+    </div>
+  );
+};
+
 const NeverlandArt = ({ kind }: { kind: NeverlandKind }) => {
   // variables
   const artClassName = {
@@ -586,9 +611,16 @@ const StoryPolaroid = ({ story }: { story: BrunchCard }) => {
       rel="noreferrer">
       <div className={styles.frame}>
         {story.imageUrl ? (
-          // 브런치 이미지는 원격 주소라 next/image 도메인 설정 없이 그대로 둔다.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img className={styles.photo} src={story.imageUrl} alt="" />
+          <div className={styles.photoWrap}>
+            <Image
+              src={story.imageUrl}
+              alt=""
+              fill
+              sizes="(max-width: 980px) 45vw, 240px"
+              className={styles.photo}
+              unoptimized
+            />
+          </div>
         ) : (
           <div className={styles.photoFallback} />
         )}

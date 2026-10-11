@@ -179,7 +179,7 @@ export default HomeScreen;
 - 배치는 `flex`, `grid`, `gap`으로 잡는다. 박스 안쪽 여백은 `padding`, 가운데 정렬 너비는 `margin-inline: auto`다.
 - 글자 모양은 `Text`의 `variant`·`color`, 버튼 모양은 `Button`의 `variant`·`size`로 고른다.
 - 로컬 이미지는 `@assets`에서 가져와 `next/image`에 넘긴다.
-- 호스트가 설정되지 않은 원격 이미지는 `<img>`를 쓰고, 이유를 주석으로 남긴다.
+- 원격 이미지는 `next.config.ts`의 `images.remotePatterns`에 호스트를 추가한 뒤 `next/image`로 쓴다.
 
 ```tsx
 <Text as="h1" variant="display" color="white">

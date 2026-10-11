@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 
 import Button from "@components/button";
 import Icon from "@components/icon";
@@ -49,9 +49,31 @@ const SiteHeader = () => {
       return next;
     });
   };
-  const handleNavClick = () => {
+  const handleAnchorClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    const href = event.currentTarget.getAttribute("href");
     isMenuOpenRef.current = false;
     setIsMenuOpen(false);
+    if (!href?.startsWith("#")) {
+      return;
+    }
+    event.preventDefault();
+    const id = href.slice(1) || "top";
+    const target = document.getElementById(id);
+    if (!target) {
+      return;
+    }
+    if (id === "top") {
+      setIsHidden(false);
+      scrollDeltaRef.current = 0;
+      lastScrollYRef.current = 0;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    setIsHidden(true);
+    scrollDeltaRef.current = SCROLL_DELTA + 1;
+    const top = target.offsetTop;
+    lastScrollYRef.current = top;
+    window.scrollTo({ top, behavior: "smooth" });
   };
   // effects
   useEffect(() => {
@@ -105,7 +127,7 @@ const SiteHeader = () => {
         isHidden && styles.hidden,
       ])}>
       <div className={styles.bar}>
-        <a className={styles.brand} href="#top" onClick={handleNavClick}>
+        <a className={styles.brand} href="#top" onClick={handleAnchorClick}>
           <span className={styles.mark}>
             <Icon name="star" size={16} />
           </span>
@@ -124,17 +146,13 @@ const SiteHeader = () => {
               ])}
               href={`#${item.id}`}
               aria-current={activeId === item.id ? "true" : undefined}
-              onClick={handleNavClick}>
+              onClick={handleAnchorClick}>
               {item.label}
             </a>
           ))}
         </nav>
         <div className={styles.join}>
-          <Button
-            variant={isSolid ? "gold" : "gold"}
-            size="small"
-            text="함께하기"
-          />
+          <Button variant="gold" size="small" text="함께하기" />
         </div>
         <button
           className={styles.menuButton}
@@ -154,7 +172,7 @@ const SiteHeader = () => {
             key={item.id}
             className={styles.menuLink}
             href={`#${item.id}`}
-            onClick={handleNavClick}>
+            onClick={handleAnchorClick}>
             {item.label}
           </a>
         ))}

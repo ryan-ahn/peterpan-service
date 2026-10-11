@@ -12,6 +12,9 @@
   --night: #071525;
   --white: #fffdf8;
   --header-height: 76px;
+  --sheet-overlap: 0px;
+  --sheet-scale: 1.42;
+  --sheet-lift-extra: clamp(40px, 7vw, 88px);
 }
 
 * {
@@ -19,10 +22,12 @@
 }
 
 html {
+  overflow-x: clip;
   scroll-behavior: smooth;
 }
 
 body {
+  overflow-x: clip;
   margin: 0;
   background: var(--sky);
   color: var(--ink);
