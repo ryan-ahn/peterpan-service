@@ -1,7 +1,7 @@
 import { cacheLife } from "next/cache";
 import Image, { type StaticImageData } from "next/image";
 
-import heroBackground from "@assets/images/background/section-1.png";
+import heroBackground from "@assets/images/background/section-1.jpg";
 import storyBackground from "@assets/images/background/section-2.png";
 import neverlandBackground from "@assets/images/background/section-3.png";
 import communityBackground from "@assets/images/background/section-4.png";
@@ -135,6 +135,7 @@ const HomeScreen = async () => {
           alt=""
           fill
           priority
+          quality={90}
           sizes="100vw"
           className={styles.skyImage}
         />
@@ -232,6 +233,7 @@ const StorySection = () => {
       <SheetBackdrop
         src={storyBackground}
         backdropClassName={styles.sheetBackdropStory}
+        priority
       />
       <div className={`${styles.body} ${styles.wrap} ${styles.storyGrid}`}>
         <div className={styles.stack}>
@@ -563,21 +565,27 @@ const FooterSection = () => {
 type SheetBackdropProps = {
   src: StaticImageData;
   backdropClassName: string;
+  priority?: boolean;
 };
 
-const SheetBackdrop = ({ src, backdropClassName }: SheetBackdropProps) => {
+const SheetBackdrop = ({
+  src,
+  backdropClassName,
+  priority,
+}: SheetBackdropProps) => {
   // render
   return (
-    <div
-      className={`${styles.sheetBackdrop} ${backdropClassName}`}
-      aria-hidden>
-      <Image
-        src={src}
-        alt=""
-        fill
-        className={styles.sheetBackdropImage}
-        sizes="150vw"
-      />
+    <div className={`${styles.sheetBackdrop} ${backdropClassName}`} aria-hidden>
+      <div className={styles.sheetBackdropMedia}>
+        <Image
+          src={src}
+          alt=""
+          fill
+          priority={priority}
+          className={styles.sheetBackdropImage}
+          sizes="100vw"
+        />
+      </div>
     </div>
   );
 };

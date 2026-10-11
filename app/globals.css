@@ -13,8 +13,21 @@
   --white: #fffdf8;
   --header-height: 76px;
   --sheet-overlap: 0px;
-  --sheet-scale: 1.42;
-  --sheet-lift-extra: clamp(40px, 7vw, 88px);
+  --sheet-art-width: 1080;
+  --sheet-side-bleed: 12;
+  --sheet-tear-story: 11;
+  --sheet-tear-neverland: 9;
+  --sheet-tear-community: 11;
+  --sheet-tear-bottom-story: 13;
+  --sheet-tear-bottom-neverland: 20;
+  --sheet-tear-bottom-community: 13;
+  --sheet-bleed: calc(100vw * var(--sheet-side-bleed) / var(--sheet-art-width));
+  --sheet-lift-extra: clamp(16px, 2.8vw, 40px);
+  --sheet-lift-extra-community: clamp(6px, 1vw, 14px);
+  --sheet-seam-pull: clamp(6px, 1.2vw, 16px);
+  --sheet-seam-scale-community: 0.25;
+  --sheet-seam-hairline: 3px;
+  --sheet-focus-scale: 1.22;
 }
 
 * {
@@ -22,12 +35,12 @@
 }
 
 html {
-  overflow-x: clip;
+  overflow-x: hidden;
   scroll-behavior: smooth;
 }
 
 body {
-  overflow-x: clip;
+  overflow-x: hidden;
   margin: 0;
   background: var(--sky);
   color: var(--ink);

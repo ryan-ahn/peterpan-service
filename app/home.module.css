@@ -12,7 +12,14 @@
 .page {
   position: relative;
   z-index: 1;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.page main {
+  max-width: 100%;
   overflow-x: clip;
+  overflow-y: visible;
 }
 
 .anchor {
@@ -142,7 +149,8 @@
   position: relative;
   z-index: 1;
   margin-top: calc(-1 * var(--sheet-overlap));
-  overflow: visible;
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 .sheetBackdrop {
@@ -151,43 +159,57 @@
   left: 0;
   z-index: 0;
   width: 100%;
-  min-height: 100%;
   overflow: hidden;
   pointer-events: none;
 }
 
 .sheetBackdropStory {
   top: calc(
-    -100vw * 64 / 1954 * var(--sheet-scale) - var(--sheet-lift-extra)
+    -100vw * var(--sheet-tear-story) / var(--sheet-art-width) -
+      var(--sheet-lift-extra)
   );
   height: calc(
-    100% + 100vw * 64 / 1954 * var(--sheet-scale) + var(--sheet-lift-extra)
+    100% + 100vw * var(--sheet-tear-story) / var(--sheet-art-width) +
+      var(--sheet-lift-extra)
   );
 }
 
 .sheetBackdropNeverland {
   top: calc(
-    -100vw * 84 / 1655 * var(--sheet-scale) - var(--sheet-lift-extra)
+    -100vw * var(--sheet-tear-neverland) / var(--sheet-art-width) -
+      var(--sheet-lift-extra)
   );
   height: calc(
-    100% + 100vw * 84 / 1655 * var(--sheet-scale) + var(--sheet-lift-extra)
+    100% + 100vw * var(--sheet-tear-neverland) / var(--sheet-art-width) +
+      var(--sheet-lift-extra)
   );
 }
 
 .sheetBackdropCommunity {
   top: calc(
-    -100vw * 64 / 1954 * var(--sheet-scale) - var(--sheet-lift-extra)
+    -100vw * var(--sheet-tear-community) / var(--sheet-art-width) -
+      var(--sheet-lift-extra-community) - var(--sheet-seam-hairline)
   );
   height: calc(
-    100% + 100vw * 64 / 1954 * var(--sheet-scale) + var(--sheet-lift-extra)
+    100% + 100vw * var(--sheet-tear-community) / var(--sheet-art-width) +
+      var(--sheet-lift-extra-community) + var(--sheet-seam-hairline)
   );
+}
+
+.sheetBackdropMedia {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: calc(100% * var(--sheet-focus-scale));
+  min-width: 100%;
+  transform: translateX(-50%);
+  overflow: hidden;
 }
 
 .sheetBackdropImage {
   object-fit: cover;
   object-position: top center;
-  transform: scale(var(--sheet-scale));
-  transform-origin: top center;
 }
 
 .body {
@@ -197,8 +219,13 @@
 
 .story {
   background-color: var(--paper);
-  min-height: 100vh;
-  padding: 108px 0 96px;
+  padding: 108px 0 clamp(48px, 8vw, 96px);
+}
+
+@media (min-width: 981px) {
+  .story {
+    min-height: 100vh;
+  }
 }
 
 .storyGrid {
@@ -214,8 +241,21 @@
 }
 
 .neverland {
+  z-index: 1;
   background-color: var(--forest);
-  padding: 108px 0 clamp(72px, 10vw, 96px);
+  margin-top: calc(
+    -1 *
+      (
+        100vw * var(--sheet-tear-bottom-story) / var(--sheet-art-width) +
+          100vw * var(--sheet-tear-neverland) / var(--sheet-art-width) +
+          var(--sheet-seam-pull)
+      )
+  );
+  padding: 108px 0 0;
+}
+
+.neverland .body {
+  padding-bottom: clamp(40px, 5vw, 64px);
 }
 
 .neverlandHead {
@@ -316,43 +356,61 @@
   user-select: none;
 }
 
-.leaf {
-  top: -28px;
-  left: -18px;
-  width: clamp(107px, 15vw, 227px);
+.neverland .leaf {
+  top: 0;
+  left: 0;
+  width: clamp(72px, 10vw, 152px);
+  height: auto;
 }
 
-.bloom {
+.neverland .bloom {
   bottom: 0;
-  left: -12px;
-  width: clamp(80px, 11vw, 160px);
+  left: 0;
+  width: clamp(54px, 7.5vw, 107px);
+  height: auto;
 }
 
-.horizon {
+.neverland .horizon {
   right: 0;
   bottom: 0;
   left: auto;
-  z-index: 1;
-  width: clamp(224px, 40vw, 480px);
+  z-index: 4;
+  width: clamp(168px, 26vw, 340px);
+  height: clamp(56px, 9vw, 108px);
+  overflow: hidden;
   line-height: 0;
 }
 
-.horizonImage {
+.neverland .horizonImage {
   display: block;
   width: 100%;
-  height: auto;
-  vertical-align: bottom;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: right bottom;
 }
 
-.floatingStar {
-  top: 18%;
-  right: 8%;
-  width: clamp(36px, 4vw, 64px);
+.neverland .floatingStar {
+  top: 14%;
+  right: 6%;
+  width: clamp(28px, 3.2vw, 48px);
 }
 
 .community {
-  background-color: var(--paper);
-  padding: 108px 0 96px;
+  z-index: 2;
+  background-color: transparent;
+  margin-top: calc(
+    -1 *
+      (
+        var(--sheet-seam-scale-community) *
+          (
+            100vw * var(--sheet-tear-bottom-neverland) /
+              var(--sheet-art-width) +
+              100vw * var(--sheet-tear-community) / var(--sheet-art-width)
+          ) + var(--sheet-seam-hairline)
+      )
+  );
+  padding: clamp(56px, 6.5vw, 80px) 0 96px;
 }
 
 .communityGrid {
@@ -365,7 +423,9 @@
 .polaroidsStage {
   position: relative;
   min-width: 0;
+  max-width: 100%;
   padding: 16px 4px 4px;
+  overflow-x: clip;
 }
 
 .polaroidsStage .polaroids {
@@ -702,15 +762,19 @@
     transform: none;
   }
 
-  .leaf {
-    top: -20px;
-    width: 100px;
+  .neverland .leaf {
+    width: 68px;
     opacity: 0.85;
   }
 
-  .bloom {
-    bottom: 0;
-    width: 62px;
+  .neverland .bloom {
+    width: 48px;
+  }
+
+  .neverland .horizon {
+    width: clamp(140px, 42vw, 240px);
+    height: clamp(48px, 12vw, 72px);
+    opacity: 0.92;
   }
 
   .communityFlowerLeft {
@@ -737,10 +801,6 @@
     width: 16px;
   }
 
-  .horizon {
-    opacity: 0.85;
-  }
-
   .footerGrid {
     flex-direction: column;
   }
@@ -764,6 +824,10 @@
   .neverland,
   .community {
     padding-top: 84px;
+  }
+
+  .story {
+    padding-bottom: 64px;
   }
 
   .film {
