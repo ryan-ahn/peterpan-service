@@ -9,7 +9,7 @@ const button = tv({
   base: "inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border border-transparent font-medium leading-none tracking-[-0.01em] transition duration-200 hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-gold",
   variants: {
     variant: {
-      solid: "border-bronze bg-bronze text-cream hover:bg-bronze-deep",
+      solid: "border-bronze bg-bronze text-snow hover:bg-bronze-deep",
       gold: "border-gold bg-gold text-ink hover:bg-gold-soft",
       ghostLight: "border-ivory/70 bg-transparent text-ivory hover:bg-ivory/10",
       ghostDark: "border-ink/30 bg-transparent text-ink hover:bg-ink/5",

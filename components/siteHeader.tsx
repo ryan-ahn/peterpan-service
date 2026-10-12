@@ -139,7 +139,11 @@ const SiteHeader = () => {
             <span className="font-serif text-5 leading-none font-semibold tracking-[-0.03em]">
               피터팬 재단
             </span>
-            <span className="text-2 leading-none font-medium tracking-[0.16em] opacity-70">
+            <span
+              className={cn(
+                "text-2 leading-none font-medium tracking-[0.16em]",
+                isSolid ? "text-ink-soft" : "text-ivory/85",
+              )}>
               PETER PAN FOUNDATION
             </span>
           </span>
@@ -151,8 +155,14 @@ const SiteHeader = () => {
             <a
               key={item.id}
               className={cn(
-                "text-4 font-normal tracking-[-0.02em] opacity-80 hover:opacity-100",
-                activeId === item.id && "font-semibold opacity-100",
+                "text-4 font-normal tracking-[-0.02em]",
+                isSolid
+                  ? "text-ink/85 hover:text-ink"
+                  : "text-ivory/90 hover:text-ivory",
+                activeId === item.id &&
+                  (isSolid
+                    ? "font-semibold text-ink"
+                    : "font-semibold text-ivory"),
               )}
               href={`#${item.id}`}
               aria-current={activeId === item.id ? "true" : undefined}

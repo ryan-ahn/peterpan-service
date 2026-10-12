@@ -23,7 +23,15 @@
     "**/out": true,
     "**/build": true
   },
-  "cSpell.userWords": ["brunch", "kkokdu", "neverland", "nextjs", "peterpan"],
+  "cSpell.userWords": [
+    "brunch",
+    "kkokdu",
+    "neverland",
+    "nextjs",
+    "peterpan",
+    "xsmall",
+    "xlarge"
+  ],
   "js/ts.updateImportsOnFileMove.enabled": "always",
   "js/ts.tsdk.path": "node_modules/typescript/lib",
   "js/ts.tsdk.promptToUseWorkspaceVersion": true,
@@ -45,6 +53,13 @@
   "[css]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "css.customData": [".vscode/css-custom-data.json"],
+  "files.associations": {
+    "theme/tailwind.css": "tailwindcss",
+    "app/globals.css": "tailwindcss"
+  },
+  "tailwindCSS.experimental.configFile": "app/globals.css",
+  "css.lint.unknownAtRules": "ignore",
   "eslint.probe": [
     "javascript",
     "javascriptreact",

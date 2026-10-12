@@ -2,6 +2,7 @@
  * 디자인 토큰.
  * 간격은 4px 단위, 글자 크기·줄간격은 2px 단위의 번호 스케일이다.
  * 화면 크기는 sm 640 / md 768 / lg 1024 / xl 1280 / 2xl 1536.
+ * 콘텐츠·미디어 최대 너비는 content-xsmall ~ content-xlarge.
  */
 
 @theme {
@@ -110,6 +111,28 @@
   --tracking-19: -0.19px;
   --tracking-20: -0.2px;
 
+  --width-content-xsmall: 240px;
+  --width-content-small: 460px;
+  --width-content-medium: 720px;
+  --width-content-large: 960px;
+  --width-content-xlarge: 1120px;
+
+  --width-aside-narrow: 220px;
+  --width-aside-wide: 260px;
+  --width-media-story: 480px;
+  --width-media-community: 420px;
+
+  --max-width-content-xsmall: var(--width-content-xsmall);
+  --max-width-content-small: var(--width-content-small);
+  --max-width-content-medium: var(--width-content-medium);
+  --max-width-content-large: var(--width-content-large);
+  --max-width-content-xlarge: var(--width-content-xlarge);
+
+  --z-index-1: 1;
+  --z-index-2: 2;
+  --z-index-3: 3;
+  --z-index-4: 4;
+
   --radius-tiny: 2px;
   --radius-small: 4px;
   --radius-medium: 8px;
@@ -139,6 +162,7 @@
   --color-night-deep: #060f1c;
   --color-sea: #041426;
   --color-ivory: #fffdf8;
+  --color-snow: #ffffff;
 }
 
 @theme inline {

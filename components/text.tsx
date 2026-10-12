@@ -24,11 +24,20 @@ const text = tv({
       ink: "text-ink",
       soft: "text-ink-soft",
       cream: "text-cream",
+      creamDeep: "text-cream-deep",
       creamSoft: "text-cream/80",
       gold: "text-gold-deep",
       goldLight: "text-gold-light",
-      white: "text-ivory",
-      whiteSoft: "text-ivory/80",
+      snow: "text-snow",
+      snowSoft: "text-snow/92",
+      ivory: "text-ivory",
+      ivorySoft: "text-ivory/90",
+      night: "text-night",
+      nightDeep: "text-night-deep",
+      nightSoft: "text-night/90",
+      sea: "text-sea",
+      seaDeep: "text-sea-deep",
+      seaSoft: "text-sea/90",
     },
   },
 });
@@ -43,11 +52,14 @@ export type Color =
   | "ink"
   | "soft"
   | "cream"
+  | "creamDeep"
   | "creamSoft"
   | "gold"
   | "goldLight"
-  | "white"
-  | "whiteSoft";
+  | "snow"
+  | "snowSoft"
+  | "ivory"
+  | "ivorySoft";
 
 type Props = {
   as?: ElementType;
