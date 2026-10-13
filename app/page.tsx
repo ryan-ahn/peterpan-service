@@ -165,14 +165,14 @@ const HeroSection = () => {
       className="hero-screen relative flex min-h-dvh flex-col justify-center px-5 pb-22 md:px-8"
       id="top">
       <div className="hero-shade" />
-      <div className="grid-split-hero">
+      <div className="grid-split-hero relative z-1">
         <div className="flex flex-col gap-4.5">
-          <Text as="h1" variant="display" color="snow">
+          <Text as="h1" variant="display" color="beige">
             어른이 되어서도,
             <br />
             꿈을 잃지 않도록.
           </Text>
-          <Text variant="body" color="snow">
+          <Text variant="body" color="beige">
             한 사람의 자리에서 시작된 이야기가,
             <br />
             이제 우리가 함께 이어갑니다.
@@ -183,14 +183,14 @@ const HeroSection = () => {
           </div>
         </div>
         <div className="max-w-none text-left lg:max-w-70 lg:justify-self-end lg:text-right">
-          <Text as="p" variant="quote" color="snow">
+          <Text as="p" variant="quote" color="beige">
             “성장하는 피터팬들이 살아갈
             <br />
             네버랜드를 이땅에…”
           </Text>
           <p className="mt-2.5">
-            <Text as="span" variant="caption" color="snowSoft">
-              — 꼭두
+            <Text as="span" variant="caption" color="beige">
+              — 전경철
             </Text>
           </p>
         </div>

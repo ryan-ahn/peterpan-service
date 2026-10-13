@@ -42,16 +42,16 @@
   }
 }
 
-html {
-  @apply overflow-x-hidden scroll-smooth;
-}
-
-body {
-  @apply overflow-x-hidden bg-sky font-sans text-ink;
-  word-break: keep-all;
-}
-
 @layer base {
+  html {
+    @apply overflow-x-hidden scroll-smooth;
+  }
+
+  body {
+    @apply overflow-x-hidden bg-sky font-sans text-ink;
+    word-break: keep-all;
+  }
+
   a {
     @apply text-inherit no-underline;
   }
@@ -290,7 +290,7 @@ a {
   }
 
   .hero-scroll-cue {
-    @apply absolute bottom-7 left-1/2 flex -translate-x-1/2 flex-col items-center gap-1.5;
+    @apply absolute bottom-7 left-1/2 z-1 flex -translate-x-1/2 flex-col items-center gap-1.5;
     color: var(--color-cream-deep);
     animation: hero-scroll-cue 2.4s ease-in-out infinite;
   }
@@ -311,7 +311,7 @@ a {
   }
 
   .hero-shade {
-    @apply pointer-events-none absolute inset-0;
+    @apply pointer-events-none absolute inset-0 z-0;
     background:
       linear-gradient(
         90deg,

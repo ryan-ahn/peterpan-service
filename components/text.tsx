@@ -26,6 +26,7 @@ const text = tv({
       cream: "text-cream",
       creamDeep: "text-cream-deep",
       creamSoft: "text-cream/80",
+      beige: "text-beige",
       gold: "text-gold-deep",
       goldLight: "text-gold-light",
       snow: "text-snow",
@@ -54,6 +55,7 @@ export type Color =
   | "cream"
   | "creamDeep"
   | "creamSoft"
+  | "beige"
   | "gold"
   | "goldLight"
   | "snow"
