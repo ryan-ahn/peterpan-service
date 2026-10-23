@@ -29,8 +29,8 @@ const ArticlePage = ({
         </div>
       </header>
       <div className="mx-auto flex w-[min(860px,calc(100%-2rem))] flex-col gap-12 py-14">
-        {sections.map(section => (
-          <section key={section.title ?? section.paragraphs?.[0]} className="flex flex-col gap-4">
+        {sections.map((section, index) => (
+          <section key={index} className="flex flex-col gap-4">
             {section.title ? (
               <h2 className="text-2xl font-semibold text-green">{section.title}</h2>
             ) : null}
