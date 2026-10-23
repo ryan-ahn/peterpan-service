@@ -4,10 +4,10 @@
 
 ## 구조
 
-- `apps/web` 공개 사이트, 게시판, 관리자, 카카오·구글 로그인
+- `apps/website` 공개 사이트, 게시판, 관리자, 카카오·구글 로그인
 - `packages/db` Drizzle 스키마와 데이터베이스 연결
 
-환경 변수는 `apps/web/.env`에 둡니다. 예시는 루트 `.env.example`입니다.
+환경 변수는 `apps/website/.env`에 둡니다. 예시는 루트 `.env.example`입니다.
 
 ## 실행
 
@@ -22,7 +22,7 @@ npm run dev
 
 ## 로그인에 더 필요한 값
 
-`apps/web/.env`에 아래를 넣습니다.
+`apps/website/.env`에 아래를 넣습니다.
 
 - `GOOGLE_CLIENT_SECRET` 구글 클라우드 콘솔의 클라이언트 보안 비밀번호
 - `KAKAO_CLIENT_SECRET` 카카오 콘솔에서 시크릿을 켠 경우에만
@@ -37,6 +37,6 @@ npm run dev
 
 ## 데이터
 
-소식, 경영공시, 기부금 공시, 후원 문의, 하단 연락처는 Supabase Postgres에 있습니다. 첨부파일은 `documents`, `media` 공개 버킷입니다. 정관 PDF는 `apps/web/public/docs/bylaws.pdf`와 버킷에 함께 있습니다.
+소식, 경영공시, 기부금 공시, 후원 문의, 하단 연락처는 Supabase Postgres에 있습니다. 첨부파일은 `documents`, `media` 공개 버킷입니다. 정관 PDF는 `apps/website/public/docs/bylaws.pdf`와 버킷에 함께 있습니다.
 
 홈과 마을 사진 일부는 실제 마을 촬영본이 생기기 전의 예시입니다.
