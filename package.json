@@ -11,7 +11,9 @@
     "check": "npm run check-types && npm run lint",
     "format": "prettier --write \"**/*.{ts,tsx,css,md,json}\"",
     "db:migrate": "npm run db:migrate --workspace=@repo/db",
-    "db:bootstrap": "npm run db:bootstrap --workspace=@repo/db"
+    "db:bootstrap": "npm run db:bootstrap --workspace=@repo/db",
+    "deploy:peterpan-website": "npx vercel deploy --prod --yes --local-config apps/peterpan-website/vercel.json --project prj_9FeY1O61DdfEEuH7Pt2YLRfFYUpE",
+    "deploy:peterpan-admin": "npx vercel deploy --prod --yes --local-config apps/peterpan-admin/vercel.json --project prj_CGEv5ywxsmzpW7NY4FUoJw4v6Etl"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",

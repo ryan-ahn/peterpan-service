@@ -74,18 +74,22 @@ npm run dev
 
 루트에서 실행한다.
 
-| 명령                   | 하는 일                         |
-| ---------------------- | ------------------------------- |
-| `npm run dev`          | 두 앱 개발 서버                 |
-| `npm run dev:website`  | 웹사이트만                      |
-| `npm run dev:admin`    | 어드민만                        |
-| `npm run build`        | 전체 프로덕션 빌드              |
-| `npm run check-types`  | 타입 검사 (`next typegen` 포함) |
-| `npm run lint`         | ESLint                          |
-| `npm run check`        | 타입 검사 + 린트                |
-| `npm run format`       | Prettier                        |
-| `npm run db:migrate`   | 스키마 반영                     |
-| `npm run db:bootstrap` | 버킷·초기 데이터                |
+| 명령                              | 하는 일                         |
+| --------------------------------- | ------------------------------- |
+| `npm run dev`                     | 두 앱 개발 서버                 |
+| `npm run dev:website`             | 웹사이트만                      |
+| `npm run dev:admin`               | 어드민만                        |
+| `npm run build`                   | 전체 프로덕션 빌드              |
+| `npm run check-types`             | 타입 검사 (`next typegen` 포함) |
+| `npm run lint`                    | ESLint                          |
+| `npm run check`                   | 타입 검사 + 린트                |
+| `npm run format`                  | Prettier                        |
+| `npm run db:migrate`              | 스키마 반영                     |
+| `npm run db:bootstrap`            | 버킷·초기 데이터                |
+| `npm run deploy:peterpan-website` | 웹사이트 Vercel 프로덕션 배포   |
+| `npm run deploy:peterpan-admin`   | 어드민 Vercel 프로덕션 배포     |
+
+배포는 루트 전체를 올리고 각 앱 `vercel.json`의 설치·빌드 명령(`npm ci`, `turbo run build --filter=…`)으로 빌드한다. Git 푸시 자동 배포는 꺼 두었다. 환경 변수는 로컬 `.env`가 아니라 Vercel 프로젝트 설정에서 읽는다. 처음 한 번 `npx vercel login`이 필요하다.
 
 ---
 
