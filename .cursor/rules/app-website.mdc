@@ -1,0 +1,15 @@
+---
+description: peterpan-website app/ 라우트·페이지. 원문 apps/peterpan-website/app/CONVENTIONS.md.
+globs: apps/peterpan-website/**
+alwaysApply: false
+---
+
+# peterpan-website
+
+`apps/peterpan-website/` 작업 시 `apps/peterpan-website/app/CONVENTIONS.md`와 루트 `CONVENTIONS.md`를 따른다.
+
+- 서버 컴포넌트 기본. 게시물은 `@lib/posts`, 고정 문구는 `@lib/foundation`, 메뉴는 `@lib/nav`.
+- 화면 첫머리 `PageIntro`, 글자 `BrandText`, 버튼 `@repo/ui` `Button`(`pine`·`gold`·`paper`·`white`·`kakao`). 라우트 링크 버튼은 `next/link` + `buttonStyle`.
+- 화면 폭은 `page-*` 유틸리티(`globals.css`). 브랜드 색은 `pine`·`gold`·`paper`·`ink` 등 토큰만.
+- 세션·OAuth는 `@repo/auth`, 게시판 상수는 `@repo/db/boards`. 관리 기능은 이 앱에 두지 않는다.
+- 로컬 이미지는 `@assets` + `next/image`. 원격 이미지는 `images.remotePatterns` 등록 후.

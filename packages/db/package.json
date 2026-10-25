@@ -4,14 +4,25 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./boards": "./src/boards.ts",
+    "./siteContact": "./src/siteContact.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:bootstrap": "tsx scripts/bootstrap.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",
     "postgres": "^3.4.7"
   },
   "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@supabase/supabase-js": "^2.118.0",
     "@types/node": "^20",
+    "dotenv": "^17.2.3",
+    "tsx": "^4.20.6",
     "typescript": "~5.9.2"
   }
 }

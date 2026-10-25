@@ -1,0 +1,15 @@
+---
+description: peterpan-admin 라우트·페이지·컴포넌트. 원문 apps/peterpan-admin/app/CONVENTIONS.md.
+globs: apps/peterpan-admin/**
+alwaysApply: false
+---
+
+# peterpan-admin
+
+`apps/peterpan-admin/` 작업 시 `apps/peterpan-admin/app/CONVENTIONS.md`와 루트 `CONVENTIONS.md`를 따른다.
+
+- `/` 운영자 로그인(카카오·구글). 관리 화면은 `app/(manage)/` (`/posts`, `/notices`, `/inquiries`, `/members`, `/settings`). 메뉴는 `adminShell.tsx`의 `NAV_LINKS` 한 곳.
+- 그룹 레이아웃이 `requireAdmin()`으로 확인한다. 데이터는 `@lib/adminData` 서버 액션만 부르고, 액션은 첫 줄에서 `assertAdmin()`.
+- 공지는 `posts` 테이블의 `board: "news"`, `category: "notice"`. 첨부 저장은 `FormData`로 `savePost`.
+- 화면 구성: `AdminPageHeader` → 필터 → `AdminTable` → `AdminPager`. 상세는 `AdminDrawer` 안 `*EditorSection`.
+- 삭제는 `Modal`로 확인, 결과는 `useToast`. 패널·제목·라벨 클래스는 `@constants/adminUi`.

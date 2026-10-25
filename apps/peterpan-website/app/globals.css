@@ -1,0 +1,53 @@
+@import "tailwindcss";
+@import "@repo/tailwind-config/tailwind.css";
+
+@source "../../../packages/ui/src";
+
+/*
+ * 화면 폭. 화면 양옆 16px 여백을 남기고 최대 폭까지 늘어난다.
+ * page-wide 1180 / page-form 1100 / page-list 980 / page-article 860 / page-reading 820 / page-narrow 640 / page-auth 480
+ */
+@theme {
+  --page-width-wide: 1180px;
+  --page-width-form: 1100px;
+  --page-width-list: 980px;
+  --page-width-article: 860px;
+  --page-width-reading: 820px;
+  --page-width-narrow: 640px;
+  --page-width-auth: 480px;
+}
+
+@utility page-* {
+  width: min(--value(--page-width-*), calc(100% - 32px));
+  margin-inline: auto;
+}
+
+@utility hero-mask {
+  mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 100%);
+
+  @variant lg {
+    mask-image: linear-gradient(90deg, transparent 0%, #000 16%, #000 100%);
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-paper font-sans text-ink;
+  }
+
+  ::selection {
+    @apply bg-gold text-pine-deep;
+  }
+
+  button:not(:disabled),
+  a[href],
+  summary,
+  select:not(:disabled),
+  [role="button"] {
+    @apply cursor-pointer;
+  }
+}

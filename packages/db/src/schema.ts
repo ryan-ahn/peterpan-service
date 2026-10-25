@@ -25,7 +25,9 @@ export const profiles = pgTable(
       .notNull()
       .defaultNow(),
   },
-  table => [unique("profiles_provider_user").on(table.provider, table.providerUserId)],
+  table => [
+    unique("profiles_provider_user").on(table.provider, table.providerUserId),
+  ],
 );
 
 /**

@@ -1,0 +1,28 @@
+{
+  "name": "@repo/auth",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./oauth": "./src/oauth.ts",
+    "./session": "./src/session.ts",
+    "./supabase": "./src/supabase.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@repo/db": "*",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.118.0",
+    "drizzle-orm": "^0.45.2"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@types/node": "^20",
+    "typescript": "~5.9.2"
+  },
+  "peerDependencies": {
+    "next": "^16"
+  }
+}

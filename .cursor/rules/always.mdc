@@ -1,43 +1,45 @@
 ---
-description: 모든 파일에 항상 적용하는 작성 규칙. 상세는 루트 CONVENTIONS.md.
+description: 피터팬 모노레포 전역 작성 규칙. 원문 CONVENTIONS.md.
 alwaysApply: true
 ---
 
 # 작성 규칙
 
-피터팬 재단 웹. Next.js App Router, React, Tailwind CSS.
+피터팬 재단 Turborepo 모노레포. 상세는 루트 `CONVENTIONS.md`, 실행·빌드는 `README.md`.
 
-상세는 루트 `CONVENTIONS.md`, 실행·빌드는 `README.md`.
+영역별 상세는 해당 경로를 열 때 `.cursor/rules/` glob 규칙이 붙는다. 원문은 각 디렉터리의 `CONVENTIONS.md`가 기준이다.
 
-영역별 규칙은 해당 경로를 열 때 `.cursor/rules/`가 붙는다.
-
-| 경로 | 규칙 |
+| 경로 | 문서 |
 | --- | --- |
-| `app/` | `.cursor/rules/app.mdc` |
-| `components/` | `.cursor/rules/components.mdc` |
-| `hooks/` | `.cursor/rules/hooks.mdc` |
-| `utils/` | `.cursor/rules/utils.mdc` |
-| `types/` | `.cursor/rules/types.mdc` |
+| `apps/peterpan-website/app/` | `apps/peterpan-website/app/CONVENTIONS.md` |
+| `apps/peterpan-admin/app/` | `apps/peterpan-admin/app/CONVENTIONS.md` |
+| `packages/ui/` | `packages/ui/CONVENTIONS.md` |
 
 ## 원칙
 
-- 의존성 최소화. 쓰는 파일에 두고, 두 파일 이상일 때만 분리한다.
-- 단일 책임. 이름만 봐도 역할이 드러나게 짓는다.
-- 가독성 우선. 리렌더를 따라가기 어려울 때만 메모이제이션한다.
-- 페이지 본문 섹션은 그 `page.tsx` 안에 둔다.
+- 의존성 최소화: 사용처에 두고, 두 곳 이상 쓸 때만 분리. 불필요한 컴포넌트화 지양.
+- 단일 책임: 한 파일·한 함수는 한 역할. 이름만 봐도 역할이 드러나게.
+- 가독성 우선: 리렌더를 따라가기 어려울 때만 메모이제이션.
+- 작업 후 정리: 미사용 코드 제거 후 루트에서 `npm run check` 통과.
 
-## 경로
+## 컴포넌트 위치
 
-- 다른 폴더의 코드는 `tsconfig.json` 별칭으로 가져온다. `@app/*`, `@assets/*`, `@components/*`, `@constants/*`, `@hooks/*`, `@theme/*`, `@utils/*`.
-- `paths` 대상은 `./`로 시작한다. `baseUrl`은 쓰지 않는다.
-- 상대 경로는 같은 폴더의 CSS 모듈만.
-- `types/`는 `import type`만.
+- 두 앱 공통 원자(버튼·칩·인풋·모달·바텀시트·캐러셀 등): `packages/ui`.
+- 어드민 여러 화면: `apps/peterpan-admin/components`. 웹사이트 여러 화면: `apps/peterpan-website/components`.
+- 한 화면만: 그 `page.tsx` 안.
+
+## 경로·타입
+
+- 앱 별칭: `@/*`, `@app/*`, `@components/*`, `@lib/*`. 웹사이트 `@assets/*`, 어드민 `@constants/*`.
+- 공유: `@repo/ui/...`(exports 경로, barrel 없음), `@repo/tailwind-config`, `@repo/db/...`(DB·게시판 상수), `@repo/auth/...`(Supabase·세션·OAuth). `tsconfig`는 `@repo/typescript-config`를 `extends`.
+- 환경 변수는 루트 `.env` 하나. 각 앱 `next.config.ts`가 `loadEnvConfig`로 읽는다.
+- 타입만 가져올 때 `import type`.
 
 ## import
 
-`"use client"`가 필요하면 파일 첫 줄. 이어서 `react`·`next`, 별칭, CSS 모듈. 그룹 사이 빈 줄.
+`"use client"` → `react` → `next` → 서드파티 → `@repo/*` → `@app|@assets|@components|@constants|@lib` → `@/` → 상대 경로. 그룹 사이 빈 줄.
 
-## 파일 블록
+## 컴포넌트 파일 블록 순서
 
 없는 블록은 주석도 선언도 두지 않는다.
 
@@ -45,54 +47,27 @@ alwaysApply: true
 imports → /** constants */ → /** types */ → /** actions */ → /** pre-root runtime */ → /** pre-root utils */ → /** hooks */ → /** screen */ → /** section */ → /** inner components */ → /** utils */ → export default
 ```
 
-- 파일 레벨 주석은 JSDoc 여러 줄. 첫 줄은 구역 이름(`screen — 역할`). 컴포넌트 내부만 `// hooks`, `// render`.
-- `pre-root runtime`은 screen이 기다리는 `read*`. `utils`는 screen이 직접 부르지 않는 헬퍼이며 inner 다음, `export default` 직전.
-- 라우트 파일은 `page.tsx`, `layout.tsx`. 페이지 컴포넌트 이름만 `*Screen`.
-- `export default`는 파일 맨 아래. `layout.tsx`만 `metadata`와 `export default function RootLayout`.
+- `pre-root runtime`은 비순수 로딩 `read*`. `pre-root utils`·`utils`는 순수 함수.
+- 파일 레벨 주석은 JSDoc 여러 줄. 첫 줄은 구역 이름(`screen — 역할`).
+- `export default`는 선언과 분리해 파일 맨 아래. `layout.tsx`만 `metadata`와 `export default function RootLayout`.
 
-## 컴포넌트 내부
+## 컴포넌트 내부 섹션 순서
 
-필요한 블록만 이 순서로. 블록 사이 빈 줄 없음. 함수 본문 안 빈 줄 없음.
+`// hooks` → `// refs` → `// states` → `// variables` → `// functions` → `// handlers` → `// initialize` → `// effects` → `// render`
 
-1. `// hooks`
-2. `// refs` — 렌더 중 `ref.current` 접근 금지
-3. `// states`
-4. `// variables`
-5. `// functions`
-6. `// handlers`
-7. `// effects`
-8. `// render`
-
-스타일은 Tailwind 클래스다. 컴포넌트 안에 스타일 객체를 두지 않는다.
-
-## 서버와 클라이언트
-
-- 페이지는 서버 컴포넌트가 기본. 필요하면 `async`.
-- 상태·이펙트·브라우저 API가 있는 파일만 `"use client"`.
-- 캐시할 데이터 로딩은 `read*` 안에서 `"use cache"`와 `cacheLife`.
+- 블록 사이·함수 본문 안 빈 줄 없음. 렌더 중 `ref.current` 접근 금지.
+- 인자 없는 이벤트는 JSX 인라인 화살표 대신 `handle*` 핸들러로 둔다.
 
 ## 스타일
 
-- 토큰은 `theme/tailwind.css`. 간격 4px, 글자·줄간격 2px 번호. 화면은 `sm` `md` `lg` `xl`.
-- 글꼴은 `app/layout.tsx`의 `next/font`. 변형은 `tv`, 조합은 `cn`.
-- 배치는 `flex`, `grid`, `gap`. 모바일 기본, 커질 때 `md:` `lg:` `xl:`.
-- 글자는 `Text`의 `variant`·`color`, 버튼은 `Button`의 `variant`·`size`.
-- 로컬 이미지는 `@assets`와 `next/image`.
+- 토큰은 `packages/tailwind-config/tokens.css`. Tailwind 기본 색·글자·모서리·그림자는 지웠다. 등록한 이름만 쓴다.
+- 간격 4px(`p-4` = 16px), 글자·줄간격 2px 번호(`text-5` = 16px). 모바일 기본, 커질 때 `md:` `lg:` `xl:`.
+- 조합은 `@repo/ui/lib/cn`, 변형은 `@repo/ui/lib/tv`. 글자 `Text`, 버튼 `Button`.
+- 임의 hex·px 금지(예외: 웹사이트 장식 그라디언트·safe area·외부 브랜드). 배치는 `flex`·`grid`·`gap`.
 
-## 링크
+## 네이밍·조건식·함수
 
-- 페이지 안 이동은 `<a href="#id">`.
-- 다른 라우트는 `next/link`.
-- 바깥 주소는 `<a target="_blank" rel="noreferrer">`.
-
-## 네이밍
-
-- 파일·폴더 camelCase. 컴포넌트 PascalCase. `*Screen`, `*Section`.
-- 이미지 kebab-case.
-- 핸들러는 `handle` + 대상 + 동작.
-
-## 조건식과 함수
-
-- `else` 없이 early return. JSX의 짧은 분기는 삼항.
-- 컴포넌트는 `Props`를 파라미터에서 분해한다.
-- 유틸·훅은 파라미터 객체에 타입 이름을 붙이고, 분해는 함수 안에서 한다.
+- 파일·폴더 camelCase, 컴포넌트 PascalCase. 페이지 `*Screen`, 섹션 `*Section`. 이미지 kebab-case.
+- boolean `is*`/`has*`. 핸들러 `handle[대상][동작]`, 콜백 prop `on*`.
+- `else` 없이 early return. JSX 짧은 분기는 삼항.
+- 컴포넌트는 `Props`를 파라미터에서 분해. 유틸·훅은 파라미터 객체 타입 이름을 붙이고 함수 안에서 분해.

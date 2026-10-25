@@ -1,0 +1,54 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+
+import BrandText from "@components/brandText";
+import PageIntro from "@components/pageIntro";
+
+export const metadata: Metadata = { title: "정보공개" };
+
+/**
+ * constants
+ */
+const BOARDS = [
+  {
+    href: "/disclosure/management",
+    title: "경영공시",
+    body: "사업계획과 예산, 결산과 재무제표, 감사보고서.",
+  },
+  {
+    href: "/disclosure/donations",
+    title: "기부금 공시",
+    body: "모금과 활용 실적, 국세청 공시 자료 링크.",
+  },
+];
+
+/**
+ * screen — 정보공개 안내와 두 게시판 입구
+ */
+const DisclosureScreen = () => (
+  <section className="page-list py-16">
+    <PageIntro
+      eyebrow="정보공개"
+      title="경영과 기부를 공개합니다"
+      lead="정관은 기부금 모금액과 활용실적, 사업실적을 홈페이지에 공개하도록 정하고 있습니다. 설립 등기 이후의 회계연도 자료를 파일로 올립니다."
+      className="max-w-2xl"
+    />
+    <div className="mt-10 grid gap-4 md:grid-cols-2">
+      {BOARDS.map(board => (
+        <Link
+          key={board.href}
+          href={board.href}
+          className="rounded-3xlarge bg-white p-8">
+          <BrandText as="h2" variant="heading" color="pine">
+            {board.title}
+          </BrandText>
+          <BrandText variant="bodyCompact" color="muted" className="mt-3">
+            {board.body}
+          </BrandText>
+        </Link>
+      ))}
+    </div>
+  </section>
+);
+
+export default DisclosureScreen;

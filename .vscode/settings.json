@@ -53,12 +53,17 @@
   "[css]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "css.customData": [".vscode/css-custom-data.json"],
   "files.associations": {
-    "theme/tailwind.css": "tailwindcss",
-    "app/globals.css": "tailwindcss"
+    "*.css": "tailwindcss"
   },
-  "tailwindCSS.experimental.configFile": "app/globals.css",
+  "tailwindCSS.experimental.configFile": {
+    "apps/peterpan-website/app/globals.css": "apps/peterpan-website/**",
+    "apps/peterpan-admin/app/globals.css": [
+      "apps/peterpan-admin/**",
+      "packages/ui/**"
+    ]
+  },
+  "tailwindCSS.classFunctions": ["tv", "cn"],
   "css.lint.unknownAtRules": "ignore",
   "eslint.probe": [
     "javascript",

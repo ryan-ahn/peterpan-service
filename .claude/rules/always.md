@@ -1,93 +1,44 @@
 # 작성 규칙
 
-피터팬 재단 웹. Next.js App Router, React, CSS Modules.
+피터팬 재단 Turborepo 모노레포. 상세는 루트 `CONVENTIONS.md`, 실행·빌드는 `README.md`.
 
-상세는 루트 `CONVENTIONS.md`, 실행·빌드는 `README.md`.
+영역별 상세는 해당 경로를 열 때 `.claude/rules/` glob 규칙이 붙는다. 원문은 각 디렉터리의 `CONVENTIONS.md`가 기준이다.
 
-영역별 규칙은 해당 경로를 열 때 `.claude/rules/`가 붙는다.
-
-| 경로          | 규칙                          |
-| ------------- | ----------------------------- |
-| `app/`        | `.claude/rules/app.md`        |
-| `components/` | `.claude/rules/components.md` |
-| `hooks/`      | `.claude/rules/hooks.md`      |
-| `utils/`      | `.claude/rules/utils.md`      |
-| `types/`      | `.claude/rules/types.md`      |
+| 경로                         | 문서                                       |
+| ---------------------------- | ------------------------------------------ |
+| `apps/peterpan-website/app/` | `apps/peterpan-website/app/CONVENTIONS.md` |
+| `apps/peterpan-admin/app/`   | `apps/peterpan-admin/app/CONVENTIONS.md`   |
+| `packages/ui/`               | `packages/ui/CONVENTIONS.md`               |
 
 ## 원칙
 
-- 의존성 최소화. 쓰는 파일에 두고, 두 파일 이상일 때만 분리한다.
-- 단일 책임. 이름만 봐도 역할이 드러나게 짓는다.
-- 가독성 우선. 리렌더를 따라가기 어려울 때만 메모이제이션한다.
-- 페이지 본문 섹션은 그 `page.tsx` 안에 둔다.
+- 의존성 최소화: 사용처에 두고, 두 곳 이상 쓸 때만 분리.
+- 단일 책임·가독성 우선. 작업 후 루트에서 `npm run check`.
+
+## 컴포넌트 위치
+
+- 두 앱 공통 원자: `packages/ui`. 어드민 여러 화면: `apps/peterpan-admin/components`. 웹사이트 여러 화면: `apps/peterpan-website/components`. 한 화면만: 그 `page.tsx`.
 
 ## 경로
 
-- 다른 폴더의 코드는 `tsconfig.json` 별칭으로 가져온다. `@app/*`, `@assets/*`, `@components/*`, `@constants/*`, `@hooks/*`, `@theme/*`, `@utils/*`.
-- `paths` 대상은 `./`로 시작한다. `baseUrl`은 쓰지 않는다.
-- 상대 경로는 같은 폴더의 CSS 모듈만.
-- `types/`는 `import type`만.
-
-## import
-
-`"use client"`가 필요하면 파일 첫 줄. 이어서 `react`·`next`, 별칭, CSS 모듈. 그룹 사이 빈 줄.
+- 앱: `@/*`, `@app/*`, `@components/*`, `@lib/*`. 웹사이트 `@assets/*`, 어드민 `@constants/*`.
+- 공유: `@repo/ui/...`, `@repo/tailwind-config`, `@repo/db/...`(DB·게시판 상수), `@repo/auth/...`(Supabase·세션·OAuth). 타입 프리셋 `@repo/typescript-config`.
+- 환경 변수는 루트 `.env` 하나.
+- 타입만 가져올 때 `import type`.
 
 ## 파일 블록
 
-없는 블록은 주석도 선언도 두지 않는다.
-
 ```
-imports → /** constants */ → /** types */ → /** actions */ → /** pre-root runtime */ → /** pre-root utils */ → /** hooks */ → /** screen */ → /** section */ → /** inner components */ → /** utils */ → export default
+imports → constants → types → actions → pre-root runtime → pre-root utils → hooks → screen → section → inner → utils → export default
 ```
 
-- 파일 레벨 주석은 JSDoc 여러 줄. 첫 줄은 구역 이름(`screen — 역할`). 컴포넌트 내부만 `// hooks`, `// render`.
-- `pre-root runtime`은 screen이 기다리는 `read*`. `utils`는 screen이 직접 부르지 않는 헬퍼이며 inner 다음, `export default` 직전.
-- 라우트 파일은 `page.tsx`, `layout.tsx`. 페이지 컴포넌트 이름만 `*Screen`.
-- `export default`는 파일 맨 아래. `layout.tsx`만 `metadata`와 `export default function RootLayout`.
-
-## 컴포넌트 내부
-
-필요한 블록만 이 순서로. 블록 사이 빈 줄 없음. 함수 본문 안 빈 줄 없음.
-
-1. `// hooks`
-2. `// refs` — 렌더 중 `ref.current` 접근 금지
-3. `// states`
-4. `// variables`
-5. `// functions`
-6. `// handlers`
-7. `// effects`
-8. `// render`
-
-스타일은 Tailwind 클래스다. 컴포넌트 안에 스타일 객체를 두지 않는다.
-
-## 서버와 클라이언트
-
-- 페이지는 서버 컴포넌트가 기본. 필요하면 `async`.
-- 상태·이펙트·브라우저 API가 있는 파일만 `"use client"`.
-- 캐시할 데이터 로딩은 `read*` 안에서 `"use cache"`와 `cacheLife`.
+- 페이지 컴포넌트 `*Screen`. JSDoc 파일 블록, 내부 `// hooks` … `// render`. 블록 사이·함수 본문 안 빈 줄 없음.
 
 ## 스타일
 
-- 토큰은 `theme/tailwind.css`. 간격 4px, 글자·줄간격 2px 번호. 화면은 `sm` `md` `lg` `xl`.
-- 글꼴은 `app/layout.tsx`의 `next/font`. 변형은 `tv`, 조합은 `cn`.
-- 배치는 `flex`, `grid`, `gap`. 모바일 기본, 커질 때 `md:` `lg:` `xl:`.
-- 글자는 `Text`의 `variant`·`color`, 버튼은 `Button`의 `variant`·`size`.
-- 로컬 이미지는 `@assets`와 `next/image`.
+- 토큰은 `packages/tailwind-config/tokens.css`의 등록 이름만. 간격 4px, 글자 2px 번호. 모바일 기본.
+- `cn`·`tv`는 `@repo/ui/lib`. 임의 hex·px 금지.
 
-## 링크
+## 네이밍·조건식
 
-- 페이지 안 이동은 `<a href="#id">`.
-- 다른 라우트는 `next/link`.
-- 바깥 주소는 `<a target="_blank" rel="noreferrer">`.
-
-## 네이밍
-
-- 파일·폴더 camelCase. 컴포넌트 PascalCase. `*Screen`, `*Section`.
-- 이미지 kebab-case.
-- 핸들러는 `handle` + 대상 + 동작.
-
-## 조건식과 함수
-
-- `else` 없이 early return. JSX의 짧은 분기는 삼항.
-- 컴포넌트는 `Props`를 파라미터에서 분해한다.
-- 유틸·훅은 파라미터 객체에 타입 이름을 붙이고, 분해는 함수 안에서 한다.
+- 핸들러 `handle[대상][동작]`, boolean `is*`/`has*`. `else` 없이 early return.

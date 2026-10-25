@@ -1,0 +1,15 @@
+---
+description: packages/ui 공용 DS와 tailwind-config 토큰. 원문 packages/ui/CONVENTIONS.md.
+globs: packages/ui/**, packages/tailwind-config/**
+alwaysApply: false
+---
+
+# packages/ui
+
+`packages/ui/` 작업 시 `packages/ui/CONVENTIONS.md`를 따른다.
+
+- 두 앱 공통 원자만. 도메인 상태·데이터 로딩·라우팅·`next` 의존 금지.
+- 토큰은 `@repo/tailwind-config`의 등록 이름만. 임의 값 금지. `tv` + `cn`.
+- barrel re-export 금지. 패키지 안은 상대 경로, 밖은 `@repo/ui/...` exports 경로.
+- 값 변경은 `value` + `onChange(nextValue)`. 크기 `xsmall`·`small`·`medium`·`large`. boolean `is*`/`has*`.
+- 외부 유니온 타입(`Variant`, `Color`, `Size`)만 export, `Props`는 파일 안.

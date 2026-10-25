@@ -1,0 +1,231 @@
+/*
+ * 피터팬 디자인 토큰.
+ * 모든 앱과 @repo/ui가 이 값만 쓴다. Tailwind 기본 색·글자·모서리·그림자는 지우고 여기 등록한 이름만 남긴다.
+ *
+ * 간격      4px 배수. p-4 = 16px, h-12 = 48px
+ * 글자      2px 번호. text-5 = 16px, text-15 = 36px (text-3.5 = 13px)
+ * 줄간격    2px 번호. leading-5 = 20px, leading-19 = 48px
+ * 자간      0.01px 번호. tracking-2 = -0.02px. 영문 대문자 라벨은 tracking-caps(-wide)
+ * 모서리    tiny 2 / small 4 / medium 8 / large 12 / xlarge 16 / sheet 18 / 2xlarge 24 / 3xlarge 32
+ * 브랜드    pine(주색)·gold(강조)·sage·beige·paper(바탕)·ink(본문)·muted(보조 글자)
+ * 화면      sm 640 / md 768 / lg 1024 / xl 1280 / 2xl 1536 (Tailwind 기본)
+ */
+
+@theme {
+  --color-*: initial;
+  --text-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+
+  --spacing: 4px;
+
+  --font-sans:
+    "Pretendard Variable", Pretendard, "Apple SD Gothic Neo", "Noto Sans KR",
+    sans-serif;
+  --font-serif: "Noto Serif KR", serif;
+  --font-pen: var(--font-nanum-pen), "Nanum Pen Script", cursive;
+
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --text-1: 8px;
+  --text-2: 10px;
+  --text-3: 12px;
+  --text-3\.5: 13px;
+  --text-4: 14px;
+  --text-4\.5: 15px;
+  --text-5: 16px;
+  --text-6: 18px;
+  --text-7: 20px;
+  --text-8: 22px;
+  --text-9: 24px;
+  --text-10: 26px;
+  --text-11: 28px;
+  --text-12: 30px;
+  --text-13: 32px;
+  --text-14: 34px;
+  --text-15: 36px;
+  --text-16: 38px;
+  --text-17: 40px;
+  --text-18: 42px;
+  --text-19: 44px;
+  --text-20: 46px;
+  --text-21: 48px;
+  --text-22: 50px;
+  --text-23: 52px;
+  --text-24: 54px;
+  --text-25: 56px;
+  --text-26: 58px;
+  --text-27: 60px;
+  --text-28: 62px;
+  --text-29: 64px;
+  --text-30: 66px;
+  --text-31: 68px;
+  --text-32: 70px;
+  --text-33: 72px;
+
+  --leading-1: 12px;
+  --leading-2: 14px;
+  --leading-3: 16px;
+  --leading-4: 18px;
+  --leading-5: 20px;
+  --leading-6: 22px;
+  --leading-7: 24px;
+  --leading-8: 26px;
+  --leading-9: 28px;
+  --leading-10: 30px;
+  --leading-11: 32px;
+  --leading-12: 34px;
+  --leading-13: 36px;
+  --leading-14: 38px;
+  --leading-15: 40px;
+  --leading-16: 42px;
+  --leading-17: 44px;
+  --leading-18: 46px;
+  --leading-19: 48px;
+  --leading-20: 50px;
+  --leading-21: 52px;
+  --leading-22: 54px;
+  --leading-23: 56px;
+  --leading-24: 58px;
+  --leading-25: 60px;
+  --leading-26: 62px;
+  --leading-27: 64px;
+  --leading-28: 66px;
+  --leading-29: 68px;
+  --leading-30: 70px;
+  --leading-31: 72px;
+  --leading-32: 74px;
+  --leading-33: 76px;
+  --leading-34: 78px;
+  --leading-35: 80px;
+  --leading-36: 82px;
+  --leading-37: 84px;
+  --leading-38: 86px;
+  --leading-39: 88px;
+  --leading-40: 90px;
+
+  --tracking-1: -0.01px;
+  --tracking-2: -0.02px;
+  --tracking-3: -0.03px;
+  --tracking-4: -0.04px;
+  --tracking-5: -0.05px;
+  --tracking-6: -0.06px;
+  --tracking-7: -0.07px;
+  --tracking-8: -0.08px;
+  --tracking-9: -0.09px;
+  --tracking-10: -0.1px;
+  --tracking-11: -0.11px;
+  --tracking-12: -0.12px;
+  --tracking-13: -0.13px;
+  --tracking-14: -0.14px;
+  --tracking-15: -0.15px;
+  --tracking-16: -0.16px;
+  --tracking-17: -0.17px;
+  --tracking-18: -0.18px;
+  --tracking-19: -0.19px;
+  --tracking-20: -0.2px;
+  --tracking-caps: 0.16em;
+  --tracking-caps-wide: 0.22em;
+
+  --radius-tiny: 2px;
+  --radius-small: 4px;
+  --radius-medium: 8px;
+  --radius-large: 12px;
+  --radius-xlarge: 16px;
+  --radius-sheet: 18px;
+  --radius-2xlarge: 24px;
+  --radius-3xlarge: 32px;
+  --radius-full: 9999px;
+
+  --shadow-small: 0 1px 2px rgba(24, 24, 24, 0.06);
+  --shadow-medium: 0 4px 16px rgba(24, 24, 24, 0.08);
+  --shadow-large: 0 12px 40px rgba(24, 24, 24, 0.16);
+
+  /* 시스템 */
+  --color-transparent: transparent;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-background: #ffffff;
+  --color-foreground: #181818;
+
+  --color-gray: #717171;
+  --color-gray-50: #fafafa;
+  --color-gray-100: #f5f5f5;
+  --color-gray-200: #e4e4e4;
+  --color-gray-300: #d4d4d4;
+  --color-gray-400: #a1a1a1;
+  --color-gray-500: #717171;
+  --color-gray-600: #525252;
+  --color-gray-700: #3f3f3f;
+  --color-gray-800: #272727;
+  --color-gray-900: #181818;
+
+  --color-primary: #006fee;
+  --color-primary-50: #e6f1fe;
+  --color-primary-100: #cce3fd;
+  --color-primary-200: #99c7fb;
+  --color-primary-300: #66aaf9;
+  --color-primary-400: #338ef7;
+  --color-primary-500: #006fee;
+  --color-primary-600: #005bc4;
+  --color-primary-700: #004493;
+  --color-primary-800: #002e62;
+  --color-primary-900: #001731;
+
+  --color-green: #17c964;
+  --color-green-50: #e8faf0;
+  --color-green-100: #d1f4e0;
+  --color-green-200: #a2e9c1;
+  --color-green-300: #74dfa2;
+  --color-green-400: #45d483;
+  --color-green-500: #17c964;
+  --color-green-600: #12a150;
+  --color-green-700: #0e793c;
+  --color-green-800: #095028;
+  --color-green-900: #063a1d;
+
+  --color-orange: #fd9332;
+  --color-orange-50: #ffead7;
+  --color-orange-100: #ffdec3;
+  --color-orange-200: #ffcfa3;
+  --color-orange-300: #ffb067;
+  --color-orange-400: #ffa052;
+  --color-orange-500: #fd9332;
+  --color-orange-600: #e27f2d;
+  --color-orange-700: #c36b27;
+  --color-orange-800: #a15621;
+  --color-orange-900: #7f421a;
+
+  --color-red: #ff4747;
+  --color-red-50: #ffebeb;
+  --color-red-100: #ffb8b8;
+  --color-red-200: #ff8f8f;
+  --color-red-300: #ff6a6a;
+  --color-red-400: #ff4646;
+  --color-red-500: #ff4747;
+  --color-red-600: #ff2b00;
+  --color-red-700: #cc0000;
+  --color-red-800: #9a0000;
+  --color-red-900: #7a0000;
+
+  /* 브랜드 */
+  --color-pine: #2e5b4b;
+  --color-pine-deep: #1e4336;
+  --color-sage: #8daa8e;
+  --color-gold: #f2c15e;
+  --color-gold-deep: #b8892d;
+  --color-bark: #8b5e3c;
+  --color-beige: #eadcc6;
+  --color-paper: #f7f3ea;
+  --color-paper-light: #fffaf3;
+  --color-ink: #24312c;
+  --color-muted: #5d6b64;
+
+  /* 외부 브랜드 */
+  --color-kakao: #fee500;
+  --color-kakao-ink: #191919;
+}

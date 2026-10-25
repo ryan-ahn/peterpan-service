@@ -1,19 +1,20 @@
 {
-  "name": "service-peterpan-web",
+  "name": "service-peterpan",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
-    "dev": "turbo run dev",
     "build": "turbo run build",
+    "dev": "turbo run dev",
+    "dev:website": "turbo run dev --filter=peterpan-website",
+    "dev:admin": "turbo run dev --filter=peterpan-admin",
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
-    "db:migrate": "npm run db:migrate --workspace=web",
-    "db:bootstrap": "npm run db:bootstrap --workspace=web"
+    "check": "npm run check-types && npm run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,css,md,json}\"",
+    "db:migrate": "npm run db:migrate --workspace=@repo/db",
+    "db:bootstrap": "npm run db:bootstrap --workspace=@repo/db"
   },
   "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "turbo": "^2.10.12",
@@ -22,5 +23,9 @@
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "npm@11.8.0"
+  "packageManager": "npm@11.8.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
 }

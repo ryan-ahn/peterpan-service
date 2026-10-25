@@ -1,15 +1,17 @@
 ---
 paths:
-  - "app/**"
+  - "apps/peterpan-website/**"
+  - "apps/peterpan-admin/**"
 ---
 
 # app
 
-`app/`은 Next.js App Router다. 상세는 루트 [`CONVENTIONS.md`](../../CONVENTIONS.md).
+앱 작업 시 해당 `CONVENTIONS.md`와 루트 `CONVENTIONS.md`를 따른다.
 
-- 라우트 파일 이름은 `page.tsx`, `layout.tsx`다. 페이지 컴포넌트만 `*Screen`.
-- `layout.tsx`는 `metadata`와 `export default function RootLayout`을 둔다. 글꼴은 `next/font`로 불러 CSS 변수에 연결한다.
-- 페이지는 서버 컴포넌트가 기본이다. 목록 데이터는 `/** pre-root runtime */`의 `read*`에서 읽고, 캐시할 때 `"use cache"`와 `cacheLife`를 쓴다.
-- 본문 섹션과 그 섹션 전용 카드는 같은 `page.tsx`의 `/** section */`, `/** inner components */`에 둔다.
-- 페이지 스타일은 Tailwind 클래스다. 토큰은 `theme/tailwind.css`, 화면 크기는 `sm` `md` `lg` `xl`.
-- 페이지 안 이동은 섹션 `id` 앵커다.
+- `apps/peterpan-website/app/CONVENTIONS.md` — 재단 소개·소식·공시·기부하기·로그인. `@lib/posts`, `PageIntro`·`BrandText`, `page-*` 폭.
+- `apps/peterpan-admin/app/CONVENTIONS.md` — 운영자 로그인, 게시물·공지·후원 문의·회원·기본정보. `requireAdmin`, `@lib/adminData` 서버 액션, `AdminTable`·`AdminDrawer`.
+- 세션·OAuth는 `@repo/auth`, DB·게시판 상수는 `@repo/db`.
+
+- 라우트 파일은 `page.tsx`, `layout.tsx`. 페이지 컴포넌트만 `*Screen`.
+- 본문 `*Section`. 한 화면만 쓰는 UI는 그 `page.tsx` 안에 둔다.
+- 상태·브라우저 API가 있으면 `"use client"`.
