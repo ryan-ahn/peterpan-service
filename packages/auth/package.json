@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./oauth": "./src/oauth.ts",
+    "./proxy": "./src/proxy.ts",
     "./session": "./src/session.ts",
     "./supabase": "./src/supabase.ts"
   },
