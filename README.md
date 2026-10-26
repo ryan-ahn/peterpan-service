@@ -40,7 +40,7 @@ npm run dev
 | `peterpan-website` | [http://localhost:3000](http://localhost:3000) |
 | `peterpan-admin`   | [http://localhost:3001](http://localhost:3001) |
 
-`db:migrate`는 테이블을, `db:bootstrap`은 스토리지 버킷과 처음 게시물·정관 PDF를 만든다.
+`db:migrate`는 테이블을, `db:bootstrap`은 스토리지 버킷과 처음 게시물·정관 PDF(`packages/db/seed/bylaws.pdf`)를 만든다.
 
 ---
 

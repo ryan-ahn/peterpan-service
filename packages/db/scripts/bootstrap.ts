@@ -14,10 +14,7 @@ import { getDb, notices, posts, siteSettings } from "../src";
  */
 const ROOT_PATH = resolve(import.meta.dirname, "../../..");
 
-const BYLAWS_PATH = resolve(
-  ROOT_PATH,
-  "apps/peterpan-website/public/docs/bylaws.pdf",
-);
+const BYLAWS_PATH = resolve(ROOT_PATH, "packages/db/seed/bylaws.pdf");
 
 const SETTINGS = [
   ["representative", "변경희 (설립발기인 대표)"],

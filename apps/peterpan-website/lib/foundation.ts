@@ -105,7 +105,7 @@ export const FOUNDING_AIM = [
 export const CREED_STATEMENT =
   "자폐인의 존엄한 삶과 자립을 지원하며, 모두가 함께 살아가는 포용적인 사회를 만듭니다.";
 
-export const CREED_HORIZON = "모두의 존엄한 삶이 이어지는 사회.";
+export const CREED_HORIZON = "자폐인의 오늘, 더 넓은 내일로";
 
 export const CREED_PRINCIPLES = [
   { name: "people", words: "존중 · 포용", title: "함께하는 사람들" },
