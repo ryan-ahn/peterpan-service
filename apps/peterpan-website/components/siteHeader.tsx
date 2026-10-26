@@ -2,13 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import Link from "next/link";
-
 import Avatar from "@repo/ui/components/avatar";
 import { buttonStyle } from "@repo/ui/components/button";
 import Icon from "@repo/ui/icon";
 import cn from "@repo/ui/lib/cn";
 
+import HoverPrefetchLink from "@components/hoverPrefetchLink";
 import Logo from "@components/logo";
 import { NAV } from "@lib/nav";
 
@@ -89,24 +88,24 @@ const SiteHeader = ({ user }: Props) => {
               onMouseEnter={handleDropdownReset}
               onMouseLeave={handleDropdownReset}
               onFocus={handleDropdownReset}>
-              <Link
+              <HoverPrefetchLink
                 href={item.href}
                 className="text-4.5 leading-6 font-medium text-ink transition hover:text-pine">
                 {item.label}
-              </Link>
+              </HoverPrefetchLink>
               {item.children &&
               !isScrollHidden &&
               dismissedHref !== item.href ? (
                 <div className="invisible absolute top-full left-1/2 z-20 w-max min-w-32 -translate-x-1/2 pt-3 opacity-0 transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
                   <div className="rounded-xlarge border border-beige bg-white p-1.5 shadow-large">
                     {item.children.map(child => (
-                      <Link
+                      <HoverPrefetchLink
                         key={child.href}
                         href={child.href}
                         className="block rounded-large px-4 py-2 text-center text-4 leading-5 whitespace-nowrap text-ink/80 hover:bg-paper hover:text-pine"
                         onClick={() => handleDropdownDismiss(item.href)}>
                         {child.label}
-                      </Link>
+                      </HoverPrefetchLink>
                     ))}
                   </div>
                 </div>
@@ -116,22 +115,22 @@ const SiteHeader = ({ user }: Props) => {
         </nav>
         <div className="flex items-center gap-2">
           {user ? (
-            <Link
+            <HoverPrefetchLink
               href="/mypage"
               className="mr-2 hidden items-center gap-2 text-4 leading-5 font-medium text-ink transition hover:text-pine md:inline-flex">
               <UserBadge user={user} />
-            </Link>
+            </HoverPrefetchLink>
           ) : (
-            <Link
+            <HoverPrefetchLink
               href="/login"
               className={cn(
                 buttonStyle({ variant: "line", color: "pine", size: "small" }),
                 "hidden md:inline-flex",
               )}>
               로그인
-            </Link>
+            </HoverPrefetchLink>
           )}
-          <Link
+          <HoverPrefetchLink
             href="/donate"
             className={buttonStyle({
               variant: "solid",
@@ -139,7 +138,7 @@ const SiteHeader = ({ user }: Props) => {
               size: "small",
             })}>
             후원하기
-          </Link>
+          </HoverPrefetchLink>
           <button
             type="button"
             className="grid size-10 place-items-center rounded-full border border-beige text-pine lg:hidden"
@@ -156,33 +155,33 @@ const SiteHeader = ({ user }: Props) => {
           aria-label="모바일 메뉴">
           {NAV.map(item => (
             <div key={item.href} className="border-b border-beige/70 py-3">
-              <Link
+              <HoverPrefetchLink
                 href={item.href}
                 className="font-medium"
                 onClick={handleMenuClose}>
                 {item.label}
-              </Link>
+              </HoverPrefetchLink>
               {item.children ? (
                 <div className="mt-2 flex flex-col gap-2 pl-3">
                   {item.children.map(child => (
-                    <Link
+                    <HoverPrefetchLink
                       key={child.href}
                       href={child.href}
                       className="text-4 leading-5 text-muted"
                       onClick={handleMenuClose}>
                       {child.label}
-                    </Link>
+                    </HoverPrefetchLink>
                   ))}
                 </div>
               ) : null}
             </div>
           ))}
-          <Link
+          <HoverPrefetchLink
             href={user ? "/mypage" : "/login"}
             className="mt-3 flex items-center gap-2 text-4 leading-5"
             onClick={handleMenuClose}>
             {user ? <UserBadge user={user} /> : "로그인"}
-          </Link>
+          </HoverPrefetchLink>
         </nav>
       ) : null}
     </header>

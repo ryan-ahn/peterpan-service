@@ -1,8 +1,7 @@
-import Link from "next/link";
-
 import type { SiteContact } from "@repo/db/siteContact";
 import Icon from "@repo/ui/icon";
 
+import HoverPrefetchLink from "@components/hoverPrefetchLink";
 import Logo from "@components/logo";
 import { displayOrPreparing } from "@lib/format";
 
@@ -63,11 +62,11 @@ const SiteFooter = ({ contact }: Props) => {
       <div className="border-t border-white/10">
         <div className="page-wide flex flex-col gap-2 py-5 text-4 leading-5 text-beige md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <Link
+            <HoverPrefetchLink
               href="/privacy"
               className="font-semibold text-gold hover:text-paper">
               개인정보처리방침
-            </Link>
+            </HoverPrefetchLink>
             <a
               href={PUBLIC_INTEREST_REPORT_URL}
               target="_blank"

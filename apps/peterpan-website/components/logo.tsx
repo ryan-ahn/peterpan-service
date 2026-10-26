@@ -1,5 +1,6 @@
 import Image from "next/image";
-import Link from "next/link";
+
+import HoverPrefetchLink from "@components/hoverPrefetchLink";
 
 /**
  * types
@@ -17,7 +18,7 @@ type Props = {
 const Logo = ({ variant = "horizontal" }: Props) => {
   // render
   return (
-    <Link
+    <HoverPrefetchLink
       href="/"
       className="inline-flex shrink-0 items-center gap-2.5"
       aria-label="피터팬 재단 홈">
@@ -39,7 +40,7 @@ const Logo = ({ variant = "horizontal" }: Props) => {
           </span>
         </span>
       ) : null}
-    </Link>
+    </HoverPrefetchLink>
   );
 };
 

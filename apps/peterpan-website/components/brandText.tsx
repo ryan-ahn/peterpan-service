@@ -28,7 +28,8 @@ const brandText = tv({
     variant: {
       display:
         "text-18 leading-20 font-semibold tracking-tight md:text-27 md:leading-31",
-      title: "text-15 leading-15 font-semibold tracking-normal",
+      title:
+        "text-12 leading-12 font-semibold tracking-normal xs:text-15 xs:leading-15",
       section:
         "text-12 leading-13 font-semibold tracking-normal md:text-15 md:leading-15",
       heading: "text-9 leading-11 font-semibold tracking-normal",

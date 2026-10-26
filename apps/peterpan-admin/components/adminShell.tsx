@@ -398,12 +398,19 @@ const AdminShell = ({ self, headerSearch, children }: Props) => {
  * inner components
  */
 /**
- * 왼쪽 메뉴 한 줄. 권한이 없으면 흐리게 두고 누를 수 없다
+ * 왼쪽 메뉴 한 줄. 권한이 없으면 흐리게 두고 누를 수 없다.
+ * 프리페치마다 관리 레이아웃의 requireAdmin()이 돌므로, 마우스를 올리거나·터치·포커스할 때만 프리페치한다
  * @param item 메뉴
  * @param isActive 지금 화면인지
  * @param onClick 눌렀을 때(모바일 메뉴 닫기)
  */
 const NavLink = ({ item, isActive, onClick }: NavLinkProps) => {
+  // states
+  const [isPrefetchable, setIsPrefetchable] = useState(false);
+  // handlers
+  const handlePrefetchIntent = () => {
+    setIsPrefetchable(true);
+  };
   // render
   if (!item.isAllowed) {
     return (
@@ -424,7 +431,11 @@ const NavLink = ({ item, isActive, onClick }: NavLinkProps) => {
           : "text-gray-500 hover:bg-gray-100 hover:text-gray-800",
       )}
       href={item.href}
+      prefetch={isPrefetchable ? null : false}
       aria-current={isActive ? "page" : undefined}
+      onMouseEnter={handlePrefetchIntent}
+      onTouchStart={handlePrefetchIntent}
+      onFocus={handlePrefetchIntent}
       onClick={onClick}>
       <Icon name={item.icon} size={18} />
       {item.label}

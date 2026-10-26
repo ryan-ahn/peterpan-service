@@ -57,7 +57,7 @@ const HeroSection = () => (
           as="h1"
           variant="title"
           color="pine"
-          className="mt-5 leading-20">
+          className="mt-5 leading-16 xs:leading-20">
           홀로 남겨지지 않는 삶,
           <br />
           존엄이 지켜지는 안전한 삶,

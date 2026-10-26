@@ -5,8 +5,10 @@
 /*
  * 화면 폭. 화면 양옆 16px 여백을 남기고 최대 폭까지 늘어난다.
  * page-wide 1180 / page-form 1100 / page-list 980 / page-article 860 / page-reading 820 / page-narrow 640 / page-auth 480
+ * xs 500px: 큰 제목이 360px 폰에서 넘치지 않도록 그 아래는 한 단계 작게 쓴다
  */
 @theme {
+  --breakpoint-xs: 500px;
   --page-width-wide: 1180px;
   --page-width-form: 1100px;
   --page-width-list: 980px;
