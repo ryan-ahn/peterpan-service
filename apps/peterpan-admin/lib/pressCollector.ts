@@ -3,7 +3,7 @@ import { getDb, pressCandidates } from "@repo/db";
 /**
  * 언론보도 수집. NAVER API HUB(네이버 클라우드 플랫폼) 뉴스 검색으로 키워드마다 최근 기사를 읽어 press_candidates에 쌓는다.
  * 같은 원문 주소는 한 번만 들어간다. 서버(크론 라우트·서버 액션)에서만 부른다.
- * 환경 변수: NAVER_CLIENT_ID, NAVER_CLIENT_SECRET
+ * 환경 변수: NAVER_SEARCH_CLIENT_ID, NAVER_SEARCH_CLIENT_SECRET
  */
 
 /**
@@ -90,11 +90,11 @@ export type CollectPressResult = {
  * actions
  */
 export const collectPress = async (): Promise<CollectPressResult> => {
-  const clientId = process.env.NAVER_CLIENT_ID;
-  const clientSecret = process.env.NAVER_CLIENT_SECRET;
+  const clientId = process.env.NAVER_SEARCH_CLIENT_ID;
+  const clientSecret = process.env.NAVER_SEARCH_CLIENT_SECRET;
   if (!clientId || !clientSecret) {
     throw new Error(
-      "NAVER API HUB 키가 없어요. NAVER_CLIENT_ID, NAVER_CLIENT_SECRET를 설정해 주세요.",
+      "NAVER API HUB 키가 없어요. NAVER_SEARCH_CLIENT_ID, NAVER_SEARCH_CLIENT_SECRET를 설정해 주세요.",
     );
   }
   let fetched = 0;

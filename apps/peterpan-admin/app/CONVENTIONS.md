@@ -46,7 +46,7 @@
 - 서버 컴포넌트·레이아웃의 권한 확인은 `@lib/adminSession`의 `requireAdmin()`(운영진이 아니면 `/`로 보냄). 오너 전용 화면은 `requireOwner()`, 오너 전용 액션은 첫 줄에서 `assertOwner()`.
 - 회원 게시물은 `board_posts`(댓글 `board_comments`, 좋아요 `board_likes`). 어드민은 숨김(`published`)·삭제만 하고 글을 고치지 않는다.
 - 소식의 공지는 `notices`, 활동과 공시는 `posts` 테이블이다. 웹사이트 재단소식은 공지와 활동을 합쳐 보여 준다. `posts` 작성·수정 드로어는 `components/postEditor.tsx` 하나를 소식·공시 화면이 같이 쓴다.
-- 언론보도는 직접 쓰지 않는다. `@lib/pressCollector`가 NAVER API HUB 뉴스 검색(네이버 클라우드 플랫폼 Application 키 `NAVER_CLIENT_ID`·`NAVER_CLIENT_SECRET`)로 키워드 기사를 `press_candidates`에 모으고, 운영자가 승인하면 `posts`(news·press, `externalUrl` 원문 링크)를 만든다. 숨기면 글을 지우고 상태만 남겨 다시 올라오지 않게 한다. 기사 본문은 저장하지 않는다.
+- 언론보도는 직접 쓰지 않는다. `@lib/pressCollector`가 NAVER API HUB 뉴스 검색(네이버 클라우드 플랫폼 Application 키 `NAVER_SEARCH_CLIENT_ID`·`NAVER_SEARCH_CLIENT_SECRET`)로 키워드 기사를 `press_candidates`에 모으고, 운영자가 승인하면 `posts`(news·press, `externalUrl` 원문 링크)를 만든다. 숨기면 글을 지우고 상태만 남겨 다시 올라오지 않게 한다. 기사 본문은 저장하지 않는다.
 - 첨부가 있는 저장은 `FormData`로 `savePost`에 넘긴다. 파일당 20MB, 이미지는 `media`, 나머지는 `documents` 버킷. 서버 액션 본문 한도는 `next.config.ts`의 `serverActions.bodySizeLimit`.
 - 목록 화면의 검색·필터·쪽 상태는 `@lib/useAdminList`. 쪽 크기는 `@constants/adminUi`의 `ADMIN_PAGE_SIZE`.
 - 날짜 표기는 `@lib/formatDate`의 `formatAdminDate`. 게시판·분류 이름은 `@repo/db/boards`.
