@@ -55,7 +55,7 @@ const COLUMNS: AdminColumn<AdminLog>[] = [
   },
   {
     key: "action",
-    label: "무엇을",
+    label: "비고",
     render: log => (
       <div className="flex min-w-0 flex-col">
         <Text variant="label-3">{log.action}</Text>

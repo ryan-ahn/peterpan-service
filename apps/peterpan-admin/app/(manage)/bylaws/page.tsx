@@ -79,7 +79,7 @@ const COLUMNS: AdminColumn<Bylaw>[] = [
   },
   {
     key: "isPublished",
-    label: "웹사이트",
+    label: "노출여부",
     className: "whitespace-nowrap",
     render: bylaw => (
       <Chip
