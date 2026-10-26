@@ -9,18 +9,20 @@ import { createServerSupabase } from "./supabase";
 /**
  * types
  */
-export type AdminRole = "owner" | "manager";
+export type AdminRole = "owner" | "super" | "manager";
 
 export type SessionProfile = {
   id: string;
   email: string | null;
   name: string;
   role: AdminRole | null;
+  adminMenus: string[];
   avatarUrl: string | null;
 };
 
 /**
- * 로그인한 사용자와 profiles 행, 어드민 권한. 이름·사진·이메일은 profiles에서만 읽는다. 일반 회원은 role이 null.
+ * 로그인한 사용자와 profiles 행, 어드민 권한. 이름·사진·이메일은 profiles에서만 읽는다.
+ * 일반 회원은 role이 null. adminMenus는 manager가 쓸 수 있는 어드민 메뉴 id.
  * 로그인하지 않았거나 profiles 행이 없거나 읽지 못하면 null.
  * 한 요청 안에서는 한 번만 읽는다. 세션 확인은 `getClaims()`(비대칭 서명 키면 Auth 서버를 부르지 않고 JWT를 검증)
  */
@@ -34,7 +36,11 @@ export const getSessionProfile = cache(
         return null;
       }
       const rows = await getDb()
-        .select({ profile: profiles, role: adminMembers.role })
+        .select({
+          profile: profiles,
+          role: adminMembers.role,
+          menus: adminMembers.menus,
+        })
         .from(profiles)
         .leftJoin(adminMembers, eq(adminMembers.userId, profiles.id))
         .where(eq(profiles.id, claims.sub))
@@ -48,6 +54,7 @@ export const getSessionProfile = cache(
         email: row.profile.email,
         name: row.profile.name || "회원",
         role: readAdminRole(row.role),
+        adminMenus: row.menus ?? [],
         avatarUrl: row.profile.avatarUrl,
       };
     } catch {
@@ -60,7 +67,7 @@ export const getSessionProfile = cache(
  * admin_members.role 값을 권한으로 읽는다. 그 밖의 값은 null
  */
 export const readAdminRole = (value: unknown): AdminRole | null => {
-  if (value === "owner" || value === "manager") {
+  if (value === "owner" || value === "super" || value === "manager") {
     return value;
   }
   return null;

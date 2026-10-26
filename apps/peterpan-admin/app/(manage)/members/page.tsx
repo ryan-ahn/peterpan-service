@@ -23,7 +23,7 @@ import {
 } from "@constants/adminUi";
 import {
   type Member,
-  type MemberRole,
+  type MemberRoleFilter,
   deleteMember,
   listMembers,
 } from "@lib/adminData";
@@ -38,7 +38,7 @@ const PROVIDER_LABEL: Record<string, string> = {
   google: "구글",
 };
 
-const FILTERS: MemberFilter[] = ["all", "manager", "member"];
+const FILTERS: MemberFilter[] = ["all", "super", "manager", "member"];
 
 const COLUMNS: AdminColumn<Member>[] = [
   {
@@ -64,7 +64,7 @@ const COLUMNS: AdminColumn<Member>[] = [
   },
   {
     key: "provider",
-    label: "가입 경로",
+    label: "가입 방법",
     className: "whitespace-nowrap text-gray-600",
     render: member => PROVIDER_LABEL[member.provider] ?? member.provider,
   },
@@ -79,7 +79,7 @@ const COLUMNS: AdminColumn<Member>[] = [
 /**
  * types
  */
-type MemberFilter = Exclude<MemberRole, "owner"> | "all";
+type MemberFilter = MemberRoleFilter | "all";
 
 type ReadMembersParams = {
   search: string;
@@ -243,7 +243,7 @@ const MemberDetailSection = ({
           <dd>
             <MemberRoleChip role={member.role} />
           </dd>
-          <dt className="text-gray-500">가입 경로</dt>
+          <dt className="text-gray-500">가입 방법</dt>
           <dd>{PROVIDER_LABEL[member.provider] ?? member.provider}</dd>
           <dt className="text-gray-500">가입일</dt>
           <dd>{formatAdminDate({ value: member.joinedAt, hasTime: true })}</dd>
@@ -251,7 +251,7 @@ const MemberDetailSection = ({
         <Text variant="caption-2" color={adminTextLabelColor}>
           {isOwner
             ? "이 계정은 삭제할 수 없어요."
-            : "관리자 지정·해제는 권한 관리에서 해요."}
+            : "관리자 계정은 슈퍼 관리자만, 슈퍼 관리자 계정은 오너만 삭제할 수 있어요. 권한 지정·해제는 권한 관리에서 해요."}
         </Text>
         {error ? (
           <Text

@@ -48,7 +48,7 @@ npm run dev
 
 두 앱 모두 Supabase Auth의 카카오·구글 로그인이다. 버튼은 `/auth/{kakao,google}`로 가고, 돌아온 코드는 `/auth/callback`에서 세션으로 바꾼다. 로직은 `packages/auth` 하나다.
 
-어드민은 `admin_members` 테이블의 오너·매니저만 들어간다. 오너는 한 명으로 고정이고 `0002_admin_members.sql`이 지정한다. 매니저는 오너가 어드민 권한 관리(`/permissions`)에서 지정·해제한다. 새 매니저는 먼저 한 번 로그인해 회원으로 잡혀야 지정할 수 있다.
+어드민은 `admin_members` 테이블의 오너·슈퍼 관리자·관리자만 들어간다. 오너는 한 명으로 고정이고 `0002_admin_members.sql`이 지정한다. 슈퍼 관리자는 오너만 지정·해제한다. 슈퍼 관리자는 어드민 권한 관리(`/permissions`)에서 회원을 관리자로 등록하고, 관리자가 쓸 메뉴를 고르고, 회원으로 내린다. 새 관리자는 먼저 한 번 로그인해 회원으로 잡혀야 지정할 수 있다.
 
 어드민은 탭마다 10분이 지나면 자동으로 로그아웃한다. 남은 1분부터 메뉴에서, 30초부터 화면 위 알림에서 10분을 다시 연장할 수 있다. 시간은 `sessionStorage`에 두므로 새로고침해도 이어지고, 새 탭은 새로 센다. 로직은 `apps/peterpan-admin/components/adminShell.tsx`에 있다.
 

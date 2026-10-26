@@ -1,8 +1,8 @@
-import { requireOwner } from "@lib/adminSession";
+import { requireSuper } from "@lib/adminSession";
 
 export default async function PermissionsLayout({
   children,
 }: LayoutProps<"/permissions">) {
-  await requireOwner();
+  await requireSuper();
   return children;
 }

@@ -220,7 +220,7 @@ const NoticeSection = ({ isSent, profile }: NoticeSectionProps) => (
           {profile ? (
             <>
               {" "}
-              <Link href="/mypage#inquiries" className="underline">
+              <Link href="/mypage?tab=inquiries" className="underline">
                 내 문의 내역
               </Link>
               에서 볼 수 있습니다.

@@ -5,6 +5,7 @@ import { type SQL, and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { readAdminRole } from "@repo/auth/session";
 import { createAdminClient } from "@repo/auth/supabase";
 import {
+  adminLogs,
   adminMembers,
   boardComments,
   boardPosts,
@@ -38,12 +39,20 @@ import {
 } from "@repo/db/siteContact";
 
 import { ADMIN_PAGE_SIZE } from "@constants/adminUi";
-import { assertAdmin, assertOwner } from "@lib/adminSession";
+import {
+  ADMIN_LOG_MENUS,
+  ADMIN_MENU_LABEL,
+  type AdminLogMenu,
+  type AdminMenuId,
+  isSuperRole,
+  readAdminMenus,
+} from "@lib/adminMenu";
+import { type AdminSelf, assertMenu, assertSuper } from "@lib/adminSession";
 import { type CollectPressResult, collectPress } from "@lib/pressCollector";
 
 /**
  * 어드민 데이터. 화면(클라이언트)이 서버 액션으로 부른다.
- * 함수마다 첫 줄에서 운영자인지 확인한다.
+ * 함수마다 첫 줄에서 그 메뉴를 쓸 수 있는 운영자인지 확인하고, 무언가 바꾸면 `writeLog`로 활동 기록을 남긴다.
  */
 
 /**
@@ -51,10 +60,12 @@ import { type CollectPressResult, collectPress } from "@lib/pressCollector";
  */
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
 
+const LOG_TARGET_LIMIT = 200;
+
 /**
  * types
  */
-export type MemberRole = "owner" | "manager" | "member";
+export type MemberRole = "owner" | "super" | "manager" | "member";
 
 export type Member = {
   id: string;
@@ -63,6 +74,7 @@ export type Member = {
   avatarUrl: string | null;
   provider: string;
   role: MemberRole;
+  menus: AdminMenuId[];
   joinedAt: string;
 };
 
@@ -177,6 +189,15 @@ export type Bylaw = {
   createdAt: string;
 };
 
+export type AdminLog = {
+  id: string;
+  actorName: string;
+  menu: AdminLogMenu;
+  action: string;
+  target: string;
+  createdAt: string;
+};
+
 export type ListResult<T, F extends string> = {
   items: T[];
   total: number;
@@ -189,10 +210,12 @@ type NoticeRow = typeof notices.$inferSelect;
 
 type PressCandidateRow = typeof pressCandidates.$inferSelect;
 
+export type MemberRoleFilter = Exclude<MemberRole, "owner">;
+
 type ListMembersParams = {
   search: string;
   page: number;
-  role: Exclude<MemberRole, "owner"> | "all";
+  role: MemberRoleFilter | "all";
 };
 
 type ReadRoleFilterParams = {
@@ -200,9 +223,10 @@ type ReadRoleFilterParams = {
   role: ListMembersParams["role"];
 };
 
-type SetManagerParams = {
+type SetMemberRoleParams = {
   id: string;
-  isManager: boolean;
+  role: MemberRoleFilter;
+  menus: AdminMenuId[];
 };
 
 type ListPostsParams = {
@@ -308,20 +332,43 @@ type StoredFile = {
   path: string;
 };
 
+type ListLogsParams = {
+  search: string;
+  page: number;
+  menu: AdminLogMenu | "all";
+};
+
+type WriteLogParams = {
+  self: AdminSelf;
+  menu: AdminLogMenu;
+  action: string;
+  target?: string;
+};
+
+type MemberTargetRow = {
+  name: string;
+  email: string | null;
+};
+
+type ReadRoleActionParams = {
+  current: MemberRole;
+  role: MemberRoleFilter;
+};
+
 /**
  * actions — 회원
  */
 /**
- * 오너는 화면에서 관리자로 보인다. 관리자 필터·개수에 오너를 함께 넣는다
+ * 오너는 화면에서 슈퍼 관리자로 보인다. 슈퍼 관리자 필터·개수에 오너를 함께 넣는다
  */
 export const listMembers = async (
   params: ListMembersParams,
-): Promise<ListResult<Member, Exclude<MemberRole, "owner">>> => {
+): Promise<ListResult<Member, MemberRoleFilter>> => {
   const { search, page, role } = params;
-  await assertAdmin();
+  await assertMenu("members");
   const db = getDb();
   const memberRole = sql<MemberRole>`coalesce(${adminMembers.role}, 'member')`;
-  const shownRole = sql<string>`case when ${memberRole} = 'member' then 'member' else 'manager' end`;
+  const shownRole = sql<string>`case when ${memberRole} = 'owner' then 'super' else ${memberRole} end`;
   const searchFilter = matchKeyword({
     search,
     columns: [profiles.name, profiles.email],
@@ -329,7 +376,11 @@ export const listMembers = async (
   const where = and(searchFilter, readRoleFilter({ memberRole, role }));
   const [rows, totalRows, roleRows] = await Promise.all([
     db
-      .select({ profile: profiles, role: memberRole })
+      .select({
+        profile: profiles,
+        role: memberRole,
+        menus: adminMembers.menus,
+      })
       .from(profiles)
       .leftJoin(adminMembers, eq(adminMembers.userId, profiles.id))
       .where(where)
@@ -356,49 +407,77 @@ export const listMembers = async (
       avatarUrl: row.profile.avatarUrl,
       provider: row.profile.provider,
       role: readAdminRole(row.role) ?? "member",
+      menus: readAdminMenus(row.menus ?? []),
       joinedAt: row.profile.createdAt.toISOString(),
     })),
     total: totalRows[0]?.count ?? 0,
     counts: countBy({
       rows: roleRows,
-      keys: ["manager", "member"] as const,
+      keys: ["super", "manager", "member"] as const,
     }),
   };
 };
 
-export const setManager = async (params: SetManagerParams) => {
-  const { id, isManager } = params;
-  const self = await assertOwner();
+/**
+ * 권한 바꾸기. 슈퍼 관리자는 회원↔관리자와 관리자 메뉴를, 슈퍼 관리자 지정·해제는 오너만 한다
+ */
+export const setMemberRole = async (params: SetMemberRoleParams) => {
+  const { id, role, menus } = params;
+  const self = await assertSuper();
+  if (id === self.id) {
+    throw new Error("내 권한은 바꿀 수 없어요.");
+  }
   const db = getDb();
   const current = await readMemberRole({ id });
   if (current === "owner") {
     throw new Error("이 계정의 권한은 바꿀 수 없어요.");
   }
-  if (!isManager) {
-    await db
-      .delete(adminMembers)
-      .where(
-        and(eq(adminMembers.userId, id), eq(adminMembers.role, "manager")),
-      );
-    return;
+  if ((current === "super" || role === "super") && self.role !== "owner") {
+    throw new Error("슈퍼 관리자 지정·해제는 오너만 할 수 있어요.");
   }
   const profile = await db
-    .select({ id: profiles.id })
+    .select({ name: profiles.name })
     .from(profiles)
     .where(eq(profiles.id, id))
     .limit(1);
   if (!profile[0]) {
     throw new Error("회원을 찾지 못했어요.");
   }
+  const memberName = profile[0].name || "이름 없음";
+  const action = readRoleAction({ current, role });
+  if (role === "member") {
+    await db.delete(adminMembers).where(eq(adminMembers.userId, id));
+    await writeLog({ self, menu: "permissions", action, target: memberName });
+    return;
+  }
+  const savedMenus = role === "manager" ? readAdminMenus(menus) : [];
+  const values = {
+    role,
+    menus: savedMenus,
+    grantedBy: self.id,
+    updatedAt: new Date(),
+  };
   await db
     .insert(adminMembers)
-    .values({ userId: id, role: "manager", grantedBy: self.id })
-    .onConflictDoNothing();
+    .values({ userId: id, ...values })
+    .onConflictDoUpdate({ target: adminMembers.userId, set: values });
+  await writeLog({
+    self,
+    menu: "permissions",
+    action,
+    target:
+      role === "manager"
+        ? `${memberName} (${savedMenus.map(menu => ADMIN_MENU_LABEL[menu]).join(", ")})`
+        : memberName,
+  });
 };
 
+/**
+ * 회원 삭제. 관리자 계정은 오너·슈퍼 관리자만, 슈퍼 관리자 계정은 오너만 지운다
+ */
 export const deleteMember = async (params: IdParams) => {
   const { id } = params;
-  const self = await assertAdmin();
+  const self = await assertMenu("members");
   if (id === self.id) {
     throw new Error("내 계정은 삭제할 수 없습니다.");
   }
@@ -406,14 +485,26 @@ export const deleteMember = async (params: IdParams) => {
   if (target === "owner") {
     throw new Error("이 계정은 삭제할 수 없어요.");
   }
-  if (target === "manager" && self.role !== "owner") {
-    throw new Error("관리자 계정은 삭제할 수 없어요.");
+  if (target === "super" && self.role !== "owner") {
+    throw new Error("슈퍼 관리자 계정은 오너만 삭제할 수 있어요.");
+  }
+  if (target === "manager" && !isSuperRole(self.role)) {
+    throw new Error("관리자 계정은 슈퍼 관리자만 삭제할 수 있어요.");
   }
   const deleted = await createAdminClient().auth.admin.deleteUser(id);
   if (deleted.error) {
     throw new Error(deleted.error.message);
   }
-  await getDb().delete(profiles).where(eq(profiles.id, id));
+  const removed = await getDb()
+    .delete(profiles)
+    .where(eq(profiles.id, id))
+    .returning({ name: profiles.name, email: profiles.email });
+  await writeLog({
+    self,
+    menu: "members",
+    action: "회원 삭제",
+    target: readMemberTarget(removed[0]),
+  });
 };
 
 /**
@@ -423,7 +514,7 @@ export const listMemberPosts = async (
   params: ListMemberPostsParams,
 ): Promise<ListResult<MemberPost, Exclude<MemberPostFilter, "all">>> => {
   const { search, page, filter } = params;
-  await assertAdmin();
+  await assertMenu("posts");
   const db = getDb();
   const searchFilter = matchKeyword({
     search,
@@ -479,7 +570,7 @@ export const listMemberComments = async (
   params: ListMemberCommentsParams,
 ): Promise<MemberComment[]> => {
   const { postId } = params;
-  await assertAdmin();
+  await assertMenu("posts");
   const rows = await getDb()
     .select()
     .from(boardComments)
@@ -500,23 +591,48 @@ export const setMemberPostPublished = async (
   params: SetMemberPostPublishedParams,
 ) => {
   const { id, isPublished } = params;
-  await assertAdmin();
-  await getDb()
+  const self = await assertMenu("posts");
+  const updated = await getDb()
     .update(boardPosts)
     .set({ published: isPublished })
-    .where(eq(boardPosts.id, id));
+    .where(eq(boardPosts.id, id))
+    .returning({ title: boardPosts.title });
+  await writeLog({
+    self,
+    menu: "posts",
+    action: isPublished ? "게시글 공개" : "게시글 숨김",
+    target: updated[0]?.title,
+  });
 };
 
 export const deleteMemberPost = async (params: IdParams) => {
   const { id } = params;
-  await assertAdmin();
-  await getDb().delete(boardPosts).where(eq(boardPosts.id, id));
+  const self = await assertMenu("posts");
+  const removed = await getDb()
+    .delete(boardPosts)
+    .where(eq(boardPosts.id, id))
+    .returning({ title: boardPosts.title });
+  await writeLog({
+    self,
+    menu: "posts",
+    action: "게시글 삭제",
+    target: removed[0]?.title,
+  });
 };
 
 export const deleteMemberComment = async (params: IdParams) => {
   const { id } = params;
-  await assertAdmin();
-  await getDb().delete(boardComments).where(eq(boardComments.id, id));
+  const self = await assertMenu("posts");
+  const removed = await getDb()
+    .delete(boardComments)
+    .where(eq(boardComments.id, id))
+    .returning({ body: boardComments.body });
+  await writeLog({
+    self,
+    menu: "posts",
+    action: "댓글 삭제",
+    target: removed[0]?.body,
+  });
 };
 
 /**
@@ -530,7 +646,7 @@ export const listNewsItems = async (
   }
 > => {
   const { search, page, kind, pressStatus } = params;
-  await assertAdmin();
+  await assertMenu("news");
   const noticeWhere = matchKeyword({
     search,
     columns: [notices.title, notices.body],
@@ -593,7 +709,7 @@ export const listNewsItems = async (
  */
 export const approvePress = async (params: IdParams) => {
   const { id } = params;
-  await assertAdmin();
+  const self = await assertMenu("news");
   const db = getDb();
   const rows = await db
     .select()
@@ -627,6 +743,12 @@ export const approvePress = async (params: IdParams) => {
       .set({ status: "approved", postId: saved[0]?.id ?? null })
       .where(eq(pressCandidates.id, id));
   });
+  await writeLog({
+    self,
+    menu: "news",
+    action: "언론 보도 승인",
+    target: candidate.title,
+  });
 };
 
 /**
@@ -634,10 +756,10 @@ export const approvePress = async (params: IdParams) => {
  */
 export const hidePress = async (params: IdParams) => {
   const { id } = params;
-  await assertAdmin();
+  const self = await assertMenu("news");
   const db = getDb();
   const rows = await db
-    .select({ postId: pressCandidates.postId })
+    .select({ postId: pressCandidates.postId, title: pressCandidates.title })
     .from(pressCandidates)
     .where(eq(pressCandidates.id, id))
     .limit(1);
@@ -651,11 +773,24 @@ export const hidePress = async (params: IdParams) => {
       .set({ status: "hidden", postId: null })
       .where(eq(pressCandidates.id, id));
   });
+  await writeLog({
+    self,
+    menu: "news",
+    action: "언론 보도 숨김",
+    target: rows[0]?.title,
+  });
 };
 
 export const collectPressNow = async (): Promise<CollectPressResult> => {
-  await assertAdmin();
-  return collectPress();
+  const self = await assertMenu("news");
+  const result = await collectPress();
+  await writeLog({
+    self,
+    menu: "news",
+    action: "언론 보도 수집",
+    target: `기사 ${result.fetched}건 중 새 기사 ${result.added}건`,
+  });
+  return result;
 };
 
 /**
@@ -665,7 +800,7 @@ export const listPosts = async (
   params: ListPostsParams,
 ): Promise<ListResult<Post, BoardId>> => {
   const { search, page, board } = params;
-  await assertAdmin();
+  await assertMenu("disclosures");
   const db = getDb();
   const searchFilter = matchKeyword({
     search,
@@ -702,7 +837,7 @@ export const listPosts = async (
  */
 export const saveNotice = async (params: SaveNoticeParams): Promise<Notice> => {
   const { id, isPinned, isPublished } = params;
-  await assertAdmin();
+  const self = await assertMenu("news");
   const title = params.title.trim();
   const body = params.body.trim();
   if (!title) {
@@ -730,13 +865,28 @@ export const saveNotice = async (params: SaveNoticeParams): Promise<Notice> => {
   if (!row) {
     throw new Error("공지를 찾지 못했습니다.");
   }
+  await writeLog({
+    self,
+    menu: "news",
+    action: id ? "공지 수정" : "공지 작성",
+    target: row.title,
+  });
   return toNotice(row);
 };
 
 export const deleteNotice = async (params: IdParams) => {
   const { id } = params;
-  await assertAdmin();
-  await getDb().delete(notices).where(eq(notices.id, id));
+  const self = await assertMenu("news");
+  const removed = await getDb()
+    .delete(notices)
+    .where(eq(notices.id, id))
+    .returning({ title: notices.title });
+  await writeLog({
+    self,
+    menu: "news",
+    action: "공지 삭제",
+    target: removed[0]?.title,
+  });
 };
 
 /**
@@ -744,7 +894,7 @@ export const deleteNotice = async (params: IdParams) => {
  * 필드: id, board, category, year, title, summary, body, externalUrl, isPinned, isPublished, files
  */
 export const savePost = async (formData: FormData): Promise<Post> => {
-  await assertAdmin();
+  const self = await assertMenu("news", "disclosures");
   const id = formText({ formData, key: "id" });
   const board = formText({ formData, key: "board" });
   const categoryValue = formText({ formData, key: "category" });
@@ -802,26 +952,46 @@ export const savePost = async (formData: FormData): Promise<Post> => {
     throw new Error("글을 찾지 못했습니다.");
   }
   await uploadAttachments({ postId: row.id, files });
+  await writeLog({
+    self,
+    menu: readPostMenu(row.board),
+    action: id ? "글 수정" : "글 작성",
+    target:
+      files.length > 0 ? `${row.title} (첨부 ${files.length}개)` : row.title,
+  });
   return toPost(row);
 };
 
 export const deletePost = async (params: IdParams) => {
   const { id } = params;
-  await assertAdmin();
+  const self = await assertMenu("news", "disclosures");
   const db = getDb();
   const files = await db
     .select()
     .from(postFiles)
     .where(eq(postFiles.postId, id));
   await removeStoredFiles(files);
-  await db.delete(posts).where(eq(posts.id, id));
+  const removed = await db
+    .delete(posts)
+    .where(eq(posts.id, id))
+    .returning({ title: posts.title, board: posts.board });
+  const row = removed[0];
+  if (!row) {
+    return;
+  }
+  await writeLog({
+    self,
+    menu: readPostMenu(row.board),
+    action: "글 삭제",
+    target: row.title,
+  });
 };
 
 export const listPostFiles = async (
   params: ListPostFilesParams,
 ): Promise<PostFile[]> => {
   const { postId } = params;
-  await assertAdmin();
+  await assertMenu("news", "disclosures");
   const rows = await getDb()
     .select()
     .from(postFiles)
@@ -838,11 +1008,31 @@ export const listPostFiles = async (
 
 export const deletePostFile = async (params: IdParams) => {
   const { id } = params;
-  await assertAdmin();
+  const self = await assertMenu("news", "disclosures");
   const db = getDb();
-  const files = await db.select().from(postFiles).where(eq(postFiles.id, id));
+  const files = await db
+    .select({
+      bucket: postFiles.bucket,
+      path: postFiles.path,
+      fileName: postFiles.fileName,
+      postTitle: posts.title,
+      board: posts.board,
+    })
+    .from(postFiles)
+    .innerJoin(posts, eq(posts.id, postFiles.postId))
+    .where(eq(postFiles.id, id));
   await removeStoredFiles(files);
   await db.delete(postFiles).where(eq(postFiles.id, id));
+  const file = files[0];
+  if (!file) {
+    return;
+  }
+  await writeLog({
+    self,
+    menu: readPostMenu(file.board),
+    action: "첨부파일 삭제",
+    target: `${file.postTitle} · ${file.fileName}`,
+  });
 };
 
 /**
@@ -852,7 +1042,7 @@ export const listInquiries = async (
   params: ListInquiriesParams,
 ): Promise<ListResult<Inquiry, never>> => {
   const { search, page } = params;
-  await assertAdmin();
+  await assertMenu("inquiries");
   const where = matchKeyword({
     search,
     columns: [
@@ -891,28 +1081,44 @@ export const listInquiries = async (
 
 export const deleteInquiry = async (params: IdParams) => {
   const { id } = params;
-  await assertAdmin();
-  await getDb().delete(donationInquiries).where(eq(donationInquiries.id, id));
+  const self = await assertMenu("inquiries");
+  const removed = await getDb()
+    .delete(donationInquiries)
+    .where(eq(donationInquiries.id, id))
+    .returning({
+      name: donationInquiries.name,
+      createdAt: donationInquiries.createdAt,
+    });
+  const row = removed[0];
+  await writeLog({
+    self,
+    menu: "inquiries",
+    action: "후원 문의 삭제",
+    target: row
+      ? `${row.name} (${row.createdAt.toISOString().slice(0, 10)} 접수)`
+      : "",
+  });
 };
 
 /**
  * actions — 조직도 (웹사이트 재단소개 조직도)
  */
 export const readOrganization = async (): Promise<OrganizationChart> => {
-  await assertAdmin();
+  await assertMenu("organization");
   return getOrganizationChart();
 };
 
 export const saveOrganization = async (chart: OrganizationChart) => {
-  await assertAdmin();
+  const self = await assertMenu("organization");
   await saveOrganizationChart(chart);
+  await writeLog({ self, menu: "organization", action: "조직도 저장" });
 };
 
 /**
  * actions — 정관. 올린 판을 모두 남기고 노출은 1건만
  */
 export const listBylaws = async (): Promise<Bylaw[]> => {
-  await assertAdmin();
+  await assertMenu("bylaws");
   const rows = await getDb()
     .select()
     .from(bylaws)
@@ -934,7 +1140,7 @@ export const listBylaws = async (): Promise<Bylaw[]> => {
  * 정관 추가. 필드: title, revisedOn(YYYY-MM-DD), isPublished, file
  */
 export const addBylaw = async (formData: FormData) => {
-  await assertAdmin();
+  const self = await assertMenu("bylaws");
   const title = formText({ formData, key: "title" });
   const revisedOn = formText({ formData, key: "revisedOn" });
   const file = formData.get("file");
@@ -982,19 +1188,37 @@ export const addBylaw = async (formData: FormData) => {
     })
     .returning({ id: bylaws.id });
   const id = saved[0]?.id;
-  if (id && formData.get("isPublished") === "true") {
+  const isPublished = Boolean(id) && formData.get("isPublished") === "true";
+  if (id && isPublished) {
     await markBylawPublished({ id });
   }
+  await writeLog({
+    self,
+    menu: "bylaws",
+    action: isPublished ? "정관 추가·노출" : "정관 추가",
+    target: title,
+  });
 };
 
 export const publishBylaw = async (params: IdParams) => {
-  await assertAdmin();
+  const self = await assertMenu("bylaws");
   await markBylawPublished(params);
+  const rows = await getDb()
+    .select({ title: bylaws.title })
+    .from(bylaws)
+    .where(eq(bylaws.id, params.id))
+    .limit(1);
+  await writeLog({
+    self,
+    menu: "bylaws",
+    action: "정관 노출",
+    target: rows[0]?.title,
+  });
 };
 
 export const deleteBylaw = async (params: IdParams) => {
   const { id } = params;
-  await assertAdmin();
+  const self = await assertMenu("bylaws");
   const db = getDb();
   const rows = await db.select().from(bylaws).where(eq(bylaws.id, id));
   const row = rows[0];
@@ -1008,18 +1232,24 @@ export const deleteBylaw = async (params: IdParams) => {
   }
   await removeStoredFiles([row]);
   await db.delete(bylaws).where(eq(bylaws.id, id));
+  await writeLog({
+    self,
+    menu: "bylaws",
+    action: "정관 삭제",
+    target: row.title,
+  });
 };
 
 /**
  * actions — 기본 정보 (웹사이트 하단 연락처)
  */
 export const readContact = async (): Promise<SiteContact> => {
-  await assertAdmin();
+  await assertMenu("settings");
   return getSiteContact();
 };
 
 export const saveContact = async (contact: SiteContact) => {
-  await assertAdmin();
+  const self = await assertMenu("settings");
   await saveSiteContact({
     representative: contact.representative.trim(),
     address: contact.address.trim(),
@@ -1027,12 +1257,107 @@ export const saveContact = async (contact: SiteContact) => {
     email: contact.email.trim(),
     registrationNumber: contact.registrationNumber.trim(),
   });
+  await writeLog({ self, menu: "settings", action: "기본 정보 저장" });
+};
+
+/**
+ * actions — 관리 기록. 운영자 활동 기록을 새것부터 읽는다
+ */
+export const listLogs = async (
+  params: ListLogsParams,
+): Promise<ListResult<AdminLog, AdminLogMenu>> => {
+  const { search, page, menu } = params;
+  await assertMenu("logs");
+  const db = getDb();
+  const searchFilter = matchKeyword({
+    search,
+    columns: [adminLogs.actorName, adminLogs.action, adminLogs.target],
+  });
+  const where = and(
+    searchFilter,
+    menu === "all" ? undefined : eq(adminLogs.menu, menu),
+  );
+  const [rows, totalRows, menuRows] = await Promise.all([
+    db
+      .select()
+      .from(adminLogs)
+      .where(where)
+      .orderBy(desc(adminLogs.createdAt))
+      .limit(ADMIN_PAGE_SIZE)
+      .offset(pageOffset(page)),
+    db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(adminLogs)
+      .where(where),
+    db
+      .select({ key: adminLogs.menu, count: sql<number>`count(*)::int` })
+      .from(adminLogs)
+      .where(searchFilter)
+      .groupBy(adminLogs.menu),
+  ]);
+  return {
+    items: rows.map(row => ({
+      id: row.id,
+      actorName: row.actorName || "알 수 없음",
+      menu: row.menu as AdminLogMenu,
+      action: row.action,
+      target: row.target,
+      createdAt: row.createdAt.toISOString(),
+    })),
+    total: totalRows[0]?.count ?? 0,
+    counts: countBy({
+      rows: menuRows,
+      keys: [...ADMIN_LOG_MENUS],
+    }),
+  };
 };
 
 /**
  * utils
  */
 const pageOffset = (page: number) => (Math.max(1, page) - 1) * ADMIN_PAGE_SIZE;
+
+/**
+ * 활동 기록 한 줄. 기록이 실패해도 이미 끝난 작업은 그대로 두고 서버 로그에만 남긴다
+ */
+const writeLog = async (params: WriteLogParams) => {
+  const { self, menu, action, target = "" } = params;
+  try {
+    await getDb()
+      .insert(adminLogs)
+      .values({
+        actorId: self.id,
+        actorName: self.name,
+        menu,
+        action,
+        target: target.replace(/\s+/g, " ").trim().slice(0, LOG_TARGET_LIMIT),
+      });
+  } catch (logError) {
+    console.error("[admin log]", action, logError);
+  }
+};
+
+const readRoleAction = (params: ReadRoleActionParams) => {
+  const { current, role } = params;
+  if (role === "member") {
+    return current === "super" ? "슈퍼 관리자 해제" : "관리자 해제";
+  }
+  if (role === "super") {
+    return "슈퍼 관리자 지정";
+  }
+  return current === "manager" ? "메뉴 권한 변경" : "관리자 지정";
+};
+
+const readMemberTarget = (member: MemberTargetRow | undefined) => {
+  if (!member) {
+    return "";
+  }
+  const name = member.name || "이름 없음";
+  return member.email ? `${name} (${member.email})` : name;
+};
+
+const readPostMenu = (board: string): AdminLogMenu =>
+  board === "news" ? "news" : "disclosures";
 
 const readMemberRole = async (params: IdParams): Promise<MemberRole> => {
   const { id } = params;
@@ -1060,10 +1385,10 @@ const readRoleFilter = (params: ReadRoleFilterParams) => {
   if (role === "all") {
     return undefined;
   }
-  if (role === "manager") {
-    return sql`${memberRole} in ('owner', 'manager')`;
+  if (role === "super") {
+    return sql`${memberRole} in ('owner', 'super')`;
   }
-  return sql`${memberRole} = 'member'`;
+  return sql`${memberRole} = ${role}`;
 };
 
 const matchKeyword = (params: MatchKeywordParams) => {

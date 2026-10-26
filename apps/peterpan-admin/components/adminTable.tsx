@@ -27,17 +27,17 @@ type Props<T> = {
   emptyText: string;
   isLoading: boolean;
   readRowKey: (row: T) => string;
-  onRowClick: (row: T) => void;
+  onRowClick?: (row: T) => void;
 };
 
 /**
- * 관리 목록 표. 행을 누르면 편집 패널을 연다
+ * 관리 목록 표. `onRowClick`이 있으면 행을 눌러 편집 패널을 연다
  * @param columns 열 정의. `render`가 칸 내용을 그린다
  * @param rows 행 데이터
  * @param emptyText 행이 없을 때 문구
  * @param isLoading 불러오는 중. 첫 로딩에는 자리 표시를 보인다
  * @param readRowKey 행 key
- * @param onRowClick 행 클릭
+ * @param onRowClick 행 클릭. 없으면 읽기 전용 표
  */
 const AdminTable = <T,>({
   columns,
@@ -95,12 +95,16 @@ const AdminTable = <T,>({
           {rows.map(row => (
             <tr
               key={readRowKey(row)}
-              className="cursor-pointer border-b border-gray-100 transition-colors duration-150 last:border-b-0 hover:bg-gray-50"
-              tabIndex={0}
-              onClick={() => onRowClick(row)}
+              className={cn(
+                "border-b border-gray-100 last:border-b-0",
+                onRowClick &&
+                  "cursor-pointer transition-colors duration-150 hover:bg-gray-50",
+              )}
+              tabIndex={onRowClick ? 0 : undefined}
+              onClick={onRowClick ? () => onRowClick(row) : undefined}
               onKeyDown={event => {
                 if (event.key === "Enter") {
-                  onRowClick(row);
+                  onRowClick?.(row);
                 }
               }}>
               {columns.map(column => (

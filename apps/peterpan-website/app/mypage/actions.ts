@@ -52,13 +52,13 @@ export const updateMyProfile = async (formData: FormData) => {
   const phone = normalizePhone(String(formData.get("phone") ?? ""));
   const birthDate = String(formData.get("birthDate") ?? "").trim();
   if (!name || name.length > PROFILE_LIMIT.name) {
-    redirect(`${MYPAGE_PATH}?error=name#settings`);
+    redirect(`${MYPAGE_PATH}?error=name`);
   }
   if (phone === null) {
-    redirect(`${MYPAGE_PATH}?error=phone#settings`);
+    redirect(`${MYPAGE_PATH}?error=phone`);
   }
   if (birthDate && !isBirthDate(birthDate)) {
-    redirect(`${MYPAGE_PATH}?error=birthDate#settings`);
+    redirect(`${MYPAGE_PATH}?error=birthDate`);
   }
   await getDb().transaction(async tx => {
     await tx
@@ -75,7 +75,7 @@ export const updateMyProfile = async (formData: FormData) => {
       .where(eq(boardComments.authorId, user.id));
   });
   revalidatePath("/", "layout");
-  redirect(`${MYPAGE_PATH}?saved=${Date.now()}#settings`);
+  redirect(`${MYPAGE_PATH}?saved=${Date.now()}`);
 };
 
 export const updateMyAvatar = async (
@@ -151,7 +151,7 @@ export const deleteMyInquiry = async (formData: FormData) => {
       );
   }
   revalidatePath(MYPAGE_PATH);
-  redirect(`${MYPAGE_PATH}#inquiries`);
+  redirect(`${MYPAGE_PATH}?tab=inquiries`);
 };
 
 export const deleteMyBoardPost = async (formData: FormData) => {
@@ -164,7 +164,7 @@ export const deleteMyBoardPost = async (formData: FormData) => {
   }
   revalidatePath(MYPAGE_PATH);
   revalidatePath("/board");
-  redirect(`${MYPAGE_PATH}#posts`);
+  redirect(`${MYPAGE_PATH}?tab=posts`);
 };
 
 /**

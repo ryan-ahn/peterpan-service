@@ -17,6 +17,7 @@ const ICONS = {
   "chevron-left": { d: "M15 5.5 8.5 12 15 18.5" },
   "chevron-right": { d: "M9 5.5 15.5 12 9 18.5" },
   "chevron-up": { d: "M5.5 15 12 8.5 18.5 15" },
+  clock: { d: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 4.5V12l3 2" },
   close: { d: "M6 6l12 12M18 6 6 18" },
   edit: { d: "M4 20h4L19 9l-4-4L4 16v4Zm9-13 4 4" },
   "external-link": {

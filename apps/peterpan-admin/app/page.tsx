@@ -13,11 +13,13 @@ import {
   adminTextHeadingColor,
   adminTextLabelColor,
 } from "@constants/adminUi";
+import { readAdminHome } from "@lib/adminMenu";
+import { readAdminSelf } from "@lib/adminSession";
 
 /**
  * constants
  */
-const HOME_PATH = "/members";
+const LOGIN_NEXT_PATH = "/";
 
 /**
  * types
@@ -27,18 +29,22 @@ type Props = {
 };
 
 type DeniedSectionProps = {
-  email: string | null;
+  message: string;
 };
 
 /**
- * screen — 관리자 로그인. 카카오·구글로 들어오고, 운영자면 관리 화면으로 보낸다
+ * screen — 관리자 로그인. 카카오·구글로 들어오고, 운영자면 쓸 수 있는 첫 관리 화면으로 보낸다
  */
 const LoginScreen = async ({ searchParams }: Props) => {
   // variables
   const params = await searchParams;
-  const profile = await getSessionProfile();
-  if (profile?.role) {
-    redirect(HOME_PATH);
+  const [profile, self] = await Promise.all([
+    getSessionProfile(),
+    readAdminSelf(),
+  ]);
+  const home = self ? readAdminHome(self) : null;
+  if (home) {
+    redirect(home);
   }
   // render
   return (
@@ -71,7 +77,13 @@ const LoginScreen = async ({ searchParams }: Props) => {
           </Text>
         ) : null}
         {profile ? (
-          <DeniedSection email={profile.email} />
+          <DeniedSection
+            message={
+              self
+                ? "아직 쓸 수 있는 관리 메뉴가 없어요. 슈퍼 관리자에게 메뉴 권한을 요청해 주세요."
+                : `${profile.email ?? "이 계정"}에는 관리자 권한이 없어요. 다른 계정으로 로그인해 주세요.`
+            }
+          />
         ) : (
           <ProviderSection />
         )}
@@ -90,7 +102,7 @@ const ProviderSection = () => (
       color="kakao"
       text="카카오로 로그인"
       leftChildren={<SocialLogo provider="kakao" />}
-      href={`/auth/kakao?next=${HOME_PATH}`}
+      href={`/auth/kakao?next=${LOGIN_NEXT_PATH}`}
       isFullWidth
     />
     <Button
@@ -98,7 +110,7 @@ const ProviderSection = () => (
       color="gray"
       text="구글로 로그인"
       leftChildren={<SocialLogo provider="google" />}
-      href={`/auth/google?next=${HOME_PATH}`}
+      href={`/auth/google?next=${LOGIN_NEXT_PATH}`}
       isFullWidth
     />
     <Text variant="caption-2" color={adminTextLabelColor}>
@@ -108,12 +120,9 @@ const ProviderSection = () => (
   </>
 );
 
-const DeniedSection = ({ email }: DeniedSectionProps) => (
+const DeniedSection = ({ message }: DeniedSectionProps) => (
   <>
-    <Text variant="body-3">
-      {email ?? "이 계정"}에는 관리자 권한이 없어요. 다른 계정으로 로그인해
-      주세요.
-    </Text>
+    <Text variant="body-3">{message}</Text>
     <form action="/auth/logout" method="post">
       <Button
         variant="line"

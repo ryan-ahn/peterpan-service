@@ -21,45 +21,21 @@ import cn from "@repo/ui/lib/cn";
 import Text from "@repo/ui/text";
 
 import { adminTextHeadingColor, adminTextLabelColor } from "@constants/adminUi";
+import {
+  ADMIN_MENUS,
+  PERMISSIONS_MENU,
+  canUseMenu,
+  findMenuByPath,
+  isSuperRole,
+} from "@lib/adminMenu";
 import type { AdminSelf } from "@lib/adminSession";
 
 /**
  * constants
  */
-const NAV_LINKS: {
-  href: string;
-  label: string;
-  icon: IconName;
-  isOwnerOnly: boolean;
-}[] = [
-  { href: "/members", label: "회원 관리", icon: "users", isOwnerOnly: false },
-  { href: "/inquiries", label: "후원 문의", icon: "mail", isOwnerOnly: false },
-  { href: "/news", label: "소식 관리", icon: "megaphone", isOwnerOnly: false },
-  { href: "/posts", label: "게시물 관리", icon: "edit", isOwnerOnly: false },
-  {
-    href: "/disclosures",
-    label: "공시 관리",
-    icon: "file-text",
-    isOwnerOnly: false,
-  },
-  {
-    href: "/organization",
-    label: "조직도 관리",
-    icon: "sitemap",
-    isOwnerOnly: false,
-  },
-  {
-    href: "/bylaws",
-    label: "정관 관리",
-    icon: "file-text",
-    isOwnerOnly: false,
-  },
-  { href: "/settings", label: "기본 정보", icon: "home", isOwnerOnly: false },
-  { href: "/permissions", label: "권한 관리", icon: "user", isOwnerOnly: true },
-];
-
 const ROLE_LABEL: Record<AdminSelf["role"], string> = {
-  owner: "관리자",
+  owner: "슈퍼 관리자",
+  super: "슈퍼 관리자",
   manager: "관리자",
 };
 
@@ -95,6 +71,19 @@ type Props = {
 type SessionWarningToastProps = {
   seconds: number;
   onExtend: () => void;
+};
+
+type NavItem = {
+  href: string;
+  label: string;
+  icon: IconName;
+  isAllowed: boolean;
+};
+
+type NavLinkProps = {
+  item: NavItem;
+  isActive: boolean;
+  onClick: () => void;
 };
 
 /**
@@ -208,6 +197,23 @@ const AdminShell = ({ self, headerSearch, children }: Props) => {
   // states
   const [isNavOpen, setIsNavOpen] = useState(false);
   // variables
+  const navItems: NavItem[] = [
+    ...ADMIN_MENUS.map(menu => ({
+      href: menu.href,
+      label: menu.label,
+      icon: menu.icon,
+      isAllowed: canUseMenu({
+        role: self.role,
+        menus: self.menus,
+        menu: menu.id,
+      }),
+    })),
+    { ...PERMISSIONS_MENU, isAllowed: isSuperRole(self.role) },
+  ];
+  const currentMenu = findMenuByPath({ pathname });
+  const isPageAllowed = currentMenu
+    ? canUseMenu({ role: self.role, menus: self.menus, menu: currentMenu.id })
+    : true;
   const isExtendVisible =
     remainingSeconds !== null &&
     remainingSeconds > 0 &&
@@ -297,37 +303,16 @@ const AdminShell = ({ self, headerSearch, children }: Props) => {
         </div>
         <div className="-mx-5 my-4 border-b border-gray-200" />
         <nav className="flex flex-col gap-1" aria-label="관리 메뉴">
-          {NAV_LINKS.map(item => {
-            const isActive =
-              pathname === item.href || pathname.startsWith(`${item.href}/`);
-            if (item.isOwnerOnly && self.role !== "owner") {
-              return (
-                <span
-                  key={item.href}
-                  className="flex cursor-not-allowed items-center gap-2.5 rounded-medium px-3 py-2.5 text-4 leading-5 text-gray-300"
-                  aria-disabled="true">
-                  <Icon name={item.icon} size={18} />
-                  {item.label}
-                </span>
-              );
-            }
-            return (
-              <Link
-                key={item.href}
-                className={cn(
-                  "flex items-center gap-2.5 rounded-medium px-3 py-2.5 text-4 leading-5 transition-colors duration-150",
-                  isActive
-                    ? "bg-primary-100 font-medium text-primary-600"
-                    : "text-gray-500 hover:bg-gray-100 hover:text-gray-800",
-                )}
-                href={item.href}
-                aria-current={isActive ? "page" : undefined}
-                onClick={handleNavClose}>
-                <Icon name={item.icon} size={18} />
-                {item.label}
-              </Link>
-            );
-          })}
+          {navItems.map(item => (
+            <NavLink
+              key={item.href}
+              item={item}
+              isActive={
+                pathname === item.href || pathname.startsWith(`${item.href}/`)
+              }
+              onClick={handleNavClose}
+            />
+          ))}
         </nav>
         <div className="mt-auto flex flex-col gap-2 pt-4">
           <Button
@@ -392,7 +377,17 @@ const AdminShell = ({ self, headerSearch, children }: Props) => {
           ) : null}
         </header>
         <main className="flex-1 overflow-auto px-4 py-4 md:px-8 md:py-6">
-          {children}
+          {isPageAllowed ? (
+            children
+          ) : (
+            <Text
+              variant="body-3"
+              color={adminTextLabelColor}
+              className="py-10">
+              이 메뉴를 쓸 권한이 없어요. 슈퍼 관리자에게 메뉴 권한을 요청해
+              주세요.
+            </Text>
+          )}
         </main>
       </div>
     </div>
@@ -402,6 +397,41 @@ const AdminShell = ({ self, headerSearch, children }: Props) => {
 /**
  * inner components
  */
+/**
+ * 왼쪽 메뉴 한 줄. 권한이 없으면 흐리게 두고 누를 수 없다
+ * @param item 메뉴
+ * @param isActive 지금 화면인지
+ * @param onClick 눌렀을 때(모바일 메뉴 닫기)
+ */
+const NavLink = ({ item, isActive, onClick }: NavLinkProps) => {
+  // render
+  if (!item.isAllowed) {
+    return (
+      <span
+        className="flex cursor-not-allowed items-center gap-2.5 rounded-medium px-3 py-2.5 text-4 leading-5 text-gray-300"
+        aria-disabled="true">
+        <Icon name={item.icon} size={18} />
+        {item.label}
+      </span>
+    );
+  }
+  return (
+    <Link
+      className={cn(
+        "flex items-center gap-2.5 rounded-medium px-3 py-2.5 text-4 leading-5 transition-colors duration-150",
+        isActive
+          ? "bg-primary-100 font-medium text-primary-600"
+          : "text-gray-500 hover:bg-gray-100 hover:text-gray-800",
+      )}
+      href={item.href}
+      aria-current={isActive ? "page" : undefined}
+      onClick={onClick}>
+      <Icon name={item.icon} size={18} />
+      {item.label}
+    </Link>
+  );
+};
+
 /**
  * 자동 로그아웃 직전 화면 위에 뜨는 알림
  * @param seconds 남은 초

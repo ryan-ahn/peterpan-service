@@ -8,9 +8,9 @@ alwaysApply: false
 
 `apps/peterpan-admin/` 작업 시 `apps/peterpan-admin/app/CONVENTIONS.md`와 루트 `CONVENTIONS.md`를 따른다.
 
-- `/` 운영진 로그인(카카오·구글). 관리 화면은 `app/(manage)/` (`/posts`, `/notices`, `/inquiries`, `/members`, `/permissions`, `/settings`). 메뉴는 `adminShell.tsx`의 `NAV_LINKS` 한 곳.
-- 권한은 `admin_members`의 `owner`(한 명 고정)·`manager`. 매니저 지정·해제는 오너만 `/permissions`에서.
-- 그룹 레이아웃이 `requireAdmin()`으로 확인한다. 데이터는 `@lib/adminData` 서버 액션만 부르고, 액션은 첫 줄에서 `assertAdmin()`(오너 전용은 `requireOwner()`·`assertOwner()`).
+- `/` 운영진 로그인(카카오·구글). 관리 화면은 `app/(manage)/` (`/posts`, `/notices`, `/inquiries`, `/members`, `/permissions`, `/settings`). 메뉴는 `lib/adminMenu.ts`의 `ADMIN_MENUS` 한 곳.
+- 권한은 `admin_members`의 `owner`(한 명 고정)·`super`·`manager`(`menus`에 든 메뉴만). 슈퍼 관리자 지정·해제는 오너만, 관리자 등록·메뉴 권한·회원으로 내리기는 오너·슈퍼 관리자가 `/permissions`에서.
+- 그룹 레이아웃이 `requireAdmin()`으로 확인한다. 데이터는 `@lib/adminData` 서버 액션만 부르고, 액션은 첫 줄에서 `assertMenu(메뉴 id)`(권한 관리는 `requireSuper()`·`assertSuper()`).
 - 공지는 `posts` 테이블의 `board: "news"`, `category: "notice"`. 첨부 저장은 `FormData`로 `savePost`.
 - 화면 구성: `AdminPageHeader` → 필터 → `AdminTable` → `AdminPager`. 상세는 `AdminDrawer` 안 `*EditorSection`.
 - 삭제는 `Modal`로 확인, 결과는 `useToast`. 패널·제목·라벨 클래스는 `@constants/adminUi`.

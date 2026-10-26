@@ -41,7 +41,8 @@ export const profiles = pgTable(
 );
 
 /**
- * 어드민 권한. 오너는 한 명으로 고정하고, 매니저는 오너가 지정·해제한다. 행이 없으면 일반 회원.
+ * 어드민 권한. 행이 없으면 일반 회원.
+ * owner 한 명 고정 / super 오너가 지정·해제, 모든 메뉴와 관리자 관리 / manager 슈퍼 관리자가 지정, `menus`에 든 메뉴만
  */
 export const adminMembers = pgTable("admin_members", {
   userId: uuid("user_id")
@@ -51,6 +52,7 @@ export const adminMembers = pgTable("admin_members", {
       onDelete: "cascade",
     }),
   role: text("role").notNull(),
+  menus: text("menus").array().notNull().default([]),
   grantedBy: uuid("granted_by").references(() => profiles.id, {
     onUpdate: "cascade",
     onDelete: "set null",
@@ -182,6 +184,25 @@ export const pressCandidates = pgTable("press_candidates", {
   keyword: text("keyword").notNull().default(""),
   status: text("status").notNull().default("pending"),
   postId: uuid("post_id").references(() => posts.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+/**
+ * 어드민 활동 기록. 운영자가 바꾼 일을 한 줄씩 쌓고 지우지 않는다.
+ * 계정이 지워져도 남도록 그때 이름(`actorName`)과 대상 이름(`target`)을 글로 함께 적는다
+ */
+export const adminLogs = pgTable("admin_logs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  actorId: uuid("actor_id").references(() => profiles.id, {
+    onUpdate: "cascade",
+    onDelete: "set null",
+  }),
+  actorName: text("actor_name").notNull().default(""),
+  menu: text("menu").notNull(),
+  action: text("action").notNull(),
+  target: text("target").notNull().default(""),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

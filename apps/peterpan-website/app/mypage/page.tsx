@@ -47,11 +47,11 @@ const ERROR_MESSAGES: Record<string, string> = {
   owner: "재단 오너 계정은 권한을 넘긴 뒤에 탈퇴할 수 있습니다.",
 };
 
-const SECTION_LINKS = [
-  { href: "#settings", label: "개인정보 설정" },
-  { href: "#inquiries", label: "내 문의 내역" },
-  { href: "#posts", label: "내 게시글" },
-];
+const TABS = [
+  { id: "settings", label: "개인정보 설정" },
+  { id: "inquiries", label: "내 문의 내역" },
+  { id: "posts", label: "내 게시글" },
+] as const;
 
 const FIELD_CLASS =
   "h-12 rounded-xlarge border border-beige bg-white px-4 outline-none focus:border-pine read-only:bg-paper read-only:text-muted";
@@ -60,7 +60,13 @@ const FIELD_CLASS =
  * types
  */
 type Props = {
-  searchParams: Promise<{ saved?: string; error?: string }>;
+  searchParams: Promise<{ tab?: string; saved?: string; error?: string }>;
+};
+
+type TabId = (typeof TABS)[number]["id"];
+
+type TabNavProps = {
+  activeId: TabId;
 };
 
 type Profile = NonNullable<Awaited<ReturnType<typeof getMyProfile>>>;
@@ -126,7 +132,7 @@ type DeleteButtonProps = {
 };
 
 /**
- * screen — 마이페이지. 프로필, 개인정보 설정, 내 문의·게시글, 회원 탈퇴
+ * screen — 마이페이지. 프로필 아래 탭(`?tab=`)으로 개인정보 설정(회원 탈퇴 포함)·내 문의·내 게시글 중 하나만 보인다
  */
 const MyPageScreen = async ({ searchParams }: Props) => {
   // variables
@@ -146,29 +152,27 @@ const MyPageScreen = async ({ searchParams }: Props) => {
   const error = params.error ? (ERROR_MESSAGES[params.error] ?? null) : null;
   const isWithdrawError =
     params.error === "confirm" || params.error === "owner";
+  const activeTab = readTab(params.tab);
   // render
   return (
     <section className="page-article flex flex-col gap-8 py-12">
       <PageIntro eyebrow="내 계정" title="마이페이지" />
       <ProfileSection profile={profile} isAdmin={user.role !== null} />
-      <nav aria-label="마이페이지 메뉴" className="flex flex-wrap gap-2">
-        {SECTION_LINKS.map(link => (
-          <a
-            key={link.href}
-            href={link.href}
-            className="rounded-full border border-beige bg-white px-4 py-2 text-4 leading-5 text-ink hover:border-pine hover:text-pine">
-            {link.label}
-          </a>
-        ))}
-      </nav>
-      <SettingsSection
-        profile={profile}
-        savedAt={params.saved ?? null}
-        error={isWithdrawError ? null : error}
-      />
-      <InquirySection inquiries={inquiries} />
-      <PostSection posts={posts} />
-      <WithdrawSection error={isWithdrawError ? error : null} />
+      <TabNav activeId={activeTab} />
+      {activeTab === "settings" ? (
+        <>
+          <SettingsSection
+            profile={profile}
+            savedAt={params.saved ?? null}
+            error={isWithdrawError ? null : error}
+          />
+          <WithdrawSection error={isWithdrawError ? error : null} />
+        </>
+      ) : null}
+      {activeTab === "inquiries" ? (
+        <InquirySection inquiries={inquiries} />
+      ) : null}
+      {activeTab === "posts" ? <PostSection posts={posts} /> : null}
     </section>
   );
 };
@@ -176,6 +180,31 @@ const MyPageScreen = async ({ searchParams }: Props) => {
 /**
  * section
  */
+const TabNav = ({ activeId }: TabNavProps) => (
+  <nav
+    aria-label="마이페이지 메뉴"
+    className="flex gap-1 rounded-full border border-beige bg-white p-1">
+    {TABS.map(tab => {
+      const isActive = tab.id === activeId;
+      return (
+        <Link
+          key={tab.id}
+          href={tab.id === "settings" ? "/mypage" : `/mypage?tab=${tab.id}`}
+          aria-current={isActive ? "page" : undefined}
+          scroll={false}
+          className={cn(
+            "flex-1 rounded-full px-2 py-2.5 text-center text-3.5 leading-5 whitespace-nowrap transition-colors duration-150 md:px-3 md:text-4",
+            isActive
+              ? "bg-pine font-semibold text-paper"
+              : "text-muted hover:bg-paper hover:text-pine",
+          )}>
+          {tab.label}
+        </Link>
+      );
+    })}
+  </nav>
+);
+
 const ProfileSection = ({ profile, isAdmin }: ProfileSectionProps) => (
   <div className="flex flex-col items-center gap-6 rounded-3xlarge border border-beige bg-white p-6 md:flex-row md:items-center md:p-8">
     <div className="flex flex-col items-center gap-1">
@@ -511,5 +540,11 @@ const DeleteButton = ({ id, action, question }: DeleteButtonProps) => (
     </form>
   </details>
 );
+
+/**
+ * utils
+ */
+const readTab = (value: string | undefined): TabId =>
+  TABS.find(tab => tab.id === value)?.id ?? "settings";
 
 export default MyPageScreen;
