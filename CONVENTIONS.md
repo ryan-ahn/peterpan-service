@@ -203,7 +203,7 @@ export default MembersScreen;
 - Tailwind 기본 색·글자·모서리·그림자는 `initial`로 지웠다. 등록한 이름만 쓴다.
 - 간격은 4px 단위 (`p-4` = 16px). 글자는 `text-N` = (2N+6)px (`text-5` = 16px), 줄간격은 `leading-N` = (2N+10)px. 모서리는 `rounded-tiny`·`small`·`medium`·`large`·`xlarge`·`sheet`·`2xlarge`·`3xlarge`·`full`.
 - 색은 시스템(`gray`·`primary`·`green`·`orange`·`red`)과 브랜드(`pine`·`pine-deep`·`sage`·`gold`·`gold-deep`·`bark`·`beige`·`paper`·`paper-light`·`ink`·`muted`), 외부 브랜드(`kakao`·`kakao-ink`)로 나뉜다.
-- 화면은 `sm` 640, `md` 768, `lg` 1024, `xl` 1280, `2xl` 1536. 모바일 스타일이 기본이고 커질 때만 `md:` `lg:` `xl:`을 붙인다.
+- 화면은 `sm` 640, `md` 768, `lg` 1024, `xl` 1280, `2xl` 1536. 모바일 스타일이 기본이고 커질 때만 `md:` `lg:` `xl:`을 붙인다. 웹사이트는 큰 제목용으로 `xs` 500을 더 둔다.
 - 앱 `globals.css`는 `@source "../../../packages/ui/src"`로 UI 패키지 클래스를 스캔한다.
 - 클래스 조합은 `@repo/ui/lib/cn`, variant 묶음은 `@repo/ui/lib/tv`. 둘 다 커스텀 글자 크기를 아는 `tailwind-merge` 설정을 쓴다.
 - 글자는 `@repo/ui/text`의 `Text`, 버튼은 `@repo/ui/components/button`의 `Button`.

@@ -3,10 +3,10 @@ import { redirect } from "next/navigation";
 
 import { getSessionProfile } from "@repo/auth/session";
 import Button from "@repo/ui/components/button";
-import SocialLogo from "@repo/ui/components/socialLogo";
 import cn from "@repo/ui/lib/cn";
 import Text from "@repo/ui/text";
 
+import SocialLoginButtons from "@components/socialLoginButtons";
 import {
   adminPanelClass,
   adminTextErrorColor,
@@ -97,22 +97,7 @@ const LoginScreen = async ({ searchParams }: Props) => {
  */
 const ProviderSection = () => (
   <>
-    <Button
-      variant="solid"
-      color="kakao"
-      text="카카오로 로그인"
-      leftChildren={<SocialLogo provider="kakao" />}
-      href={`/auth/kakao?next=${LOGIN_NEXT_PATH}`}
-      isFullWidth
-    />
-    <Button
-      variant="line"
-      color="gray"
-      text="구글로 로그인"
-      leftChildren={<SocialLogo provider="google" />}
-      href={`/auth/google?next=${LOGIN_NEXT_PATH}`}
-      isFullWidth
-    />
+    <SocialLoginButtons nextPath={LOGIN_NEXT_PATH} />
     <Text variant="caption-2" color={adminTextLabelColor}>
       관리자로 지정된 계정만 들어올 수 있어요. 처음이라면 한 번 로그인한 뒤 재단
       담당자에게 지정을 요청하세요.

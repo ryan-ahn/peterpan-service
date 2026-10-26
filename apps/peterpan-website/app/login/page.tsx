@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { getSessionProfile } from "@repo/auth/session";
-import Button from "@repo/ui/components/button";
-import SocialLogo from "@repo/ui/components/socialLogo";
 
 import PageIntro from "@components/pageIntro";
+import SocialLoginButtons from "@components/socialLoginButtons";
 
 export const metadata: Metadata = {
   title: "로그인",
@@ -17,10 +16,6 @@ export const metadata: Metadata = {
  */
 type Props = {
   searchParams: Promise<{ next?: string; error?: string }>;
-};
-
-type ProviderSectionProps = {
-  nextPath: string;
 };
 
 /**
@@ -46,35 +41,9 @@ const LoginScreen = async ({ searchParams }: Props) => {
           {params.error}
         </p>
       ) : null}
-      <ProviderSection nextPath={nextPath ?? "/"} />
+      <SocialLoginButtons nextPath={nextPath ?? "/"} />
     </section>
   );
 };
-
-/**
- * section
- */
-const ProviderSection = ({ nextPath }: ProviderSectionProps) => (
-  <div className="flex flex-col gap-3">
-    <Button
-      variant="solid"
-      color="kakao"
-      text="카카오로 로그인"
-      leftChildren={<SocialLogo provider="kakao" />}
-      href={`/auth/kakao?next=${encodeURIComponent(nextPath)}`}
-      isRound
-      isFullWidth
-    />
-    <Button
-      variant="line"
-      color="paper"
-      text="구글로 로그인"
-      leftChildren={<SocialLogo provider="google" />}
-      href={`/auth/google?next=${encodeURIComponent(nextPath)}`}
-      isRound
-      isFullWidth
-    />
-  </div>
-);
 
 export default LoginScreen;
