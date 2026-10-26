@@ -1,16 +1,11 @@
 "use client";
 
-import { type ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { BOARDS, type BoardId, NEWS_CATEGORIES } from "@repo/db/boards";
 import Button from "@repo/ui/components/button";
-import Checkbox from "@repo/ui/components/checkbox";
 import Chip from "@repo/ui/components/chip";
-import Input from "@repo/ui/components/input";
 import Modal from "@repo/ui/components/modal";
-import Select from "@repo/ui/components/select";
 import Tab from "@repo/ui/components/tab";
-import Textarea from "@repo/ui/components/textarea";
 import { useToast } from "@repo/ui/components/toast";
 import Toggle from "@repo/ui/components/toggle";
 import Icon from "@repo/ui/icon";
@@ -28,13 +23,14 @@ import {
   adminTextLabelColor,
 } from "@constants/adminUi";
 import {
-  type Post,
-  type PostFile,
-  deletePost,
-  deletePostFile,
-  listPostFiles,
-  listPosts,
-  savePost,
+  type MemberComment,
+  type MemberPost,
+  type MemberPostFilter,
+  deleteMemberComment,
+  deleteMemberPost,
+  listMemberComments,
+  listMemberPosts,
+  setMemberPostPublished,
 } from "@lib/adminData";
 import { formatAdminDate } from "@lib/formatDate";
 import useAdminList from "@lib/useAdminList";
@@ -42,47 +38,39 @@ import useAdminList from "@lib/useAdminList";
 /**
  * constants
  */
-const TITLE_MAX = 120;
+const FILTER_TABS: { id: MemberPostFilter; label: string }[] = [
+  { id: "all", label: "전체" },
+  { id: "published", label: "공개" },
+  { id: "hidden", label: "숨김" },
+];
 
-const SUMMARY_MAX = 200;
-
-const BODY_MAX = 20000;
-
-const BOARD_LABEL = Object.fromEntries(
-  BOARDS.map(board => [board.id, board.label]),
-) as Record<BoardId, string>;
-
-const BOARD_OPTIONS = BOARDS.map(board => ({
-  value: board.id,
-  label: board.label,
-}));
-
-const CATEGORY_OPTIONS = NEWS_CATEGORIES.filter(
-  category => category.id !== "notice",
-).map(category => ({ value: category.id, label: category.label }));
-
-const COLUMNS: AdminColumn<Post>[] = [
+const COLUMNS: AdminColumn<MemberPost>[] = [
   {
     key: "title",
     label: "제목",
     render: post => (
-      <div className="flex max-w-120 items-center gap-1.5">
-        {post.isPinned ? (
-          <Icon name="pin" size={16} className="shrink-0 text-primary-500" />
-        ) : null}
-        <Text variant="label-3" numberOfLines={1}>
-          {post.title}
-        </Text>
-      </div>
+      <Text variant="label-3" numberOfLines={1} className="max-w-120">
+        {post.title}
+      </Text>
     ),
   },
   {
-    key: "category",
-    label: "분류",
-    className: "whitespace-nowrap",
-    render: post => (
-      <Chip variant="line" color="gray" size="small" text={formatGroup(post)} />
-    ),
+    key: "authorName",
+    label: "글쓴이",
+    className: "whitespace-nowrap text-gray-700",
+    render: post => post.authorName,
+  },
+  {
+    key: "commentCount",
+    label: "댓글",
+    className: "whitespace-nowrap text-gray-600",
+    render: post => post.commentCount,
+  },
+  {
+    key: "likeCount",
+    label: "좋아요",
+    className: "whitespace-nowrap text-gray-600",
+    render: post => post.likeCount,
   },
   {
     key: "isPublished",
@@ -93,7 +81,7 @@ const COLUMNS: AdminColumn<Post>[] = [
         variant="tint"
         color={post.isPublished ? "green" : "gray"}
         size="small"
-        text={post.isPublished ? "공개" : "비공개"}
+        text={post.isPublished ? "공개" : "숨김"}
       />
     ),
   },
@@ -103,81 +91,59 @@ const COLUMNS: AdminColumn<Post>[] = [
     className: "whitespace-nowrap text-gray-600",
     render: post => formatAdminDate({ value: post.createdAt }),
   },
-  {
-    key: "updatedAt",
-    label: "수정일",
-    className: "whitespace-nowrap text-gray-600",
-    render: post => formatAdminDate({ value: post.updatedAt }),
-  },
 ];
 
 /**
  * types
  */
-type Editor = { post: Post | null } | null;
-
-type ReadPostsParams = {
+type ReadMemberPostsParams = {
   search: string;
   page: number;
-  filter: BoardId;
+  filter: MemberPostFilter;
 };
 
-type PostEditorSectionProps = {
-  post: Post | null;
-  board: BoardId;
+type MemberPostDetailSectionProps = {
+  post: MemberPost;
   onClose: () => void;
   onChanged: () => void;
-};
-
-type AttachmentListProps = {
-  files: PostFile[];
-  newFiles: File[];
-  onFileDelete: (file: PostFile) => void;
-  onNewFilesChange: (event: ChangeEvent<HTMLInputElement>) => void;
 };
 
 /**
  * pre-root runtime
  */
-const readPosts = (params: ReadPostsParams) => {
+const readMemberPosts = (params: ReadMemberPostsParams) => {
   const { search, page, filter } = params;
-  return listPosts({ search, page, board: filter });
+  return listMemberPosts({ search, page, filter });
 };
 
 /**
- * screen — 게시물 관리. 재단소식(활동·언론보도), 경영공시, 기부금 공시
+ * screen — 게시물 관리. 웹사이트 게시판에 회원이 올린 글과 댓글
  */
 const PostsScreen = () => {
   // hooks
-  const list = useAdminList({ initialFilter: "news", load: readPosts });
+  const list = useAdminList({ initialFilter: "all", load: readMemberPosts });
   useAdminHeader({
     value: list.search,
-    placeholder: "제목, 본문",
+    placeholder: "제목, 본문, 글쓴이",
     onChange: list.setSearch,
     onSubmit: list.handleSearchSubmit,
   });
   // states
-  const [editor, setEditor] = useState<Editor>(null);
+  const [selected, setSelected] = useState<MemberPost | null>(null);
   // variables
   const total = list.result?.total ?? 0;
   const pageCount = Math.max(1, Math.ceil(total / ADMIN_PAGE_SIZE));
-  const tabs = BOARDS.map(board => ({
-    id: board.id,
-    label: board.label,
-    count: list.result?.counts[board.id],
+  const tabs = FILTER_TABS.map(tab => ({
+    id: tab.id,
+    label: tab.label,
+    count: list.result?.counts[tab.id],
   }));
   // handlers
-  const handleCreateClick = () => {
-    setEditor({ post: null });
+  const handleDetailClose = () => {
+    setSelected(null);
   };
-  const handleRowClick = (post: Post) => {
-    setEditor({ post });
-  };
-  const handleEditorClose = () => {
-    setEditor(null);
-  };
-  const handleEditorChanged = () => {
-    setEditor(null);
+  const handleDetailChanged = () => {
+    setSelected(null);
     list.handleReload();
   };
   // render
@@ -185,17 +151,7 @@ const PostsScreen = () => {
     <div className="flex flex-col gap-5">
       <AdminPageHeader
         title="게시물 관리"
-        description="재단소식과 경영공시·기부금 공시를 올립니다. 공시 자료는 첨부파일로 웹사이트에 열려요."
-        actions={
-          <Button
-            variant="solid"
-            color="primary"
-            size="small"
-            text="게시물 작성"
-            leftChildren={<Icon name="plus" size={16} />}
-            onClick={handleCreateClick}
-          />
-        }
+        description="웹사이트 게시판에 회원이 올린 글입니다. 문제가 있는 글은 숨기거나 삭제하고, 댓글도 여기서 지울 수 있어요."
       />
       {list.error ? (
         <Text variant="caption-1" color={adminTextErrorColor}>
@@ -207,7 +163,7 @@ const PostsScreen = () => {
           className="px-2"
           items={tabs}
           activeId={list.filter}
-          label="게시판"
+          label="공개 상태"
           onChange={list.handleFilterChange}
         />
         <AdminTable
@@ -216,7 +172,7 @@ const PostsScreen = () => {
           emptyText="조건에 맞는 게시물이 없어요."
           isLoading={list.isLoading}
           readRowKey={post => post.id}
-          onRowClick={handleRowClick}
+          onRowClick={setSelected}
         />
         <AdminPager
           page={list.page}
@@ -226,13 +182,12 @@ const PostsScreen = () => {
           onChange={list.setPage}
         />
       </section>
-      {editor ? (
-        <PostEditorSection
-          key={editor.post?.id ?? "new"}
-          post={editor.post}
-          board={list.filter}
-          onClose={handleEditorClose}
-          onChanged={handleEditorChanged}
+      {selected ? (
+        <MemberPostDetailSection
+          key={selected.id}
+          post={selected}
+          onClose={handleDetailClose}
+          onChanged={handleDetailChanged}
         />
       ) : null}
     </div>
@@ -240,61 +195,32 @@ const PostsScreen = () => {
 };
 
 /**
- * section — 게시물 작성·수정
+ * section — 회원 글 상세. 공개·숨김, 댓글 지우기, 글 삭제
  */
-const PostEditorSection = ({
+const MemberPostDetailSection = ({
   post,
-  board: initialBoard,
   onClose,
   onChanged,
-}: PostEditorSectionProps) => {
+}: MemberPostDetailSectionProps) => {
   // hooks
   const toast = useToast();
   // states
-  const [board, setBoard] = useState<BoardId>(post?.board ?? initialBoard);
-  const [category, setCategory] = useState(post?.category ?? "activity");
-  const [year, setYear] = useState(post?.year ? String(post.year) : "");
-  const [title, setTitle] = useState(post?.title ?? "");
-  const [summary, setSummary] = useState(post?.summary ?? "");
-  const [body, setBody] = useState(post?.body ?? "");
-  const [externalUrl, setExternalUrl] = useState(post?.externalUrl ?? "");
-  const [isPinned, setIsPinned] = useState(post?.isPinned ?? false);
-  const [isPublished, setIsPublished] = useState(post?.isPublished ?? true);
-  const [files, setFiles] = useState<PostFile[]>([]);
-  const [newFiles, setNewFiles] = useState<File[]>([]);
-  const [titleError, setTitleError] = useState<string | null>(null);
+  const [isPublished, setIsPublished] = useState(post.isPublished);
+  const [comments, setComments] = useState<MemberComment[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   // variables
-  const isNew = !post;
-  const isNews = board === "news";
+  const isChanged = isPublished !== post.isPublished;
   // handlers
   const handleSave = async () => {
-    const nextTitleError = title.trim() ? null : "제목을 입력해 주세요.";
-    setTitleError(nextTitleError);
-    if (nextTitleError) {
-      return;
-    }
-    const formData = new FormData();
-    formData.set("id", post?.id ?? "");
-    formData.set("board", board);
-    formData.set("category", isNews ? category : "");
-    formData.set("year", isNews ? "" : year);
-    formData.set("title", title);
-    formData.set("summary", summary);
-    formData.set("body", body);
-    formData.set("externalUrl", externalUrl);
-    formData.set("isPinned", String(isPinned));
-    formData.set("isPublished", String(isPublished));
-    newFiles.forEach(file => formData.append("files", file));
     setIsSaving(true);
     setError(null);
     try {
-      await savePost(formData);
+      await setMemberPostPublished({ id: post.id, isPublished });
       toast.show({
-        text: isNew ? "게시물을 등록했어요." : "게시물을 저장했어요.",
+        text: isPublished ? "글을 다시 공개했어요." : "글을 숨겼어요.",
         variant: "success",
       });
       onChanged();
@@ -305,13 +231,25 @@ const PostEditorSection = ({
       setIsSaving(false);
     }
   };
-  const handleDelete = async () => {
-    if (!post) {
-      return;
+  const handleCommentDelete = async (comment: MemberComment) => {
+    try {
+      await deleteMemberComment({ id: comment.id });
+      setComments(current =>
+        (current ?? []).filter(item => item.id !== comment.id),
+      );
+      toast.show({ text: "댓글을 지웠어요.", variant: "success" });
+    } catch (deleteError) {
+      setError(
+        deleteError instanceof Error
+          ? deleteError.message
+          : "댓글을 지우지 못했어요.",
+      );
     }
+  };
+  const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await deletePost({ id: post.id });
+      await deleteMemberPost({ id: post.id });
       toast.show({ text: "게시물을 삭제했어요.", variant: "success" });
       onChanged();
     } catch (deleteError) {
@@ -324,22 +262,6 @@ const PostEditorSection = ({
       setIsDeleteOpen(false);
     }
   };
-  const handleFileDelete = async (file: PostFile) => {
-    try {
-      await deletePostFile({ id: file.id });
-      setFiles(current => current.filter(item => item.id !== file.id));
-      toast.show({ text: "첨부파일을 지웠어요.", variant: "success" });
-    } catch (deleteError) {
-      setError(
-        deleteError instanceof Error
-          ? deleteError.message
-          : "첨부파일을 지우지 못했어요.",
-      );
-    }
-  };
-  const handleNewFilesChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setNewFiles(Array.from(event.target.files ?? []));
-  };
   const handleDeleteOpen = () => {
     setIsDeleteOpen(true);
   };
@@ -348,129 +270,109 @@ const PostEditorSection = ({
   };
   // effects
   useEffect(() => {
-    if (!post) {
-      return;
-    }
     let isCancelled = false;
-    listPostFiles({ postId: post.id })
+    listMemberComments({ postId: post.id })
       .then(result => {
         if (!isCancelled) {
-          setFiles(result);
+          setComments(result);
         }
       })
       .catch(() => {
         if (!isCancelled) {
-          setError("첨부파일을 불러오지 못했어요.");
+          setError("댓글을 불러오지 못했어요.");
         }
       });
     return () => {
       isCancelled = true;
     };
-  }, [post]);
+  }, [post.id]);
   // render
   return (
     <>
       <AdminDrawer
         isOpen
-        title={isNew ? "게시물 작성" : "게시물 수정"}
-        subtitle={
-          post
-            ? `마지막 수정 ${formatAdminDate({ value: post.updatedAt, hasTime: true })}`
-            : "공개로 저장하면 웹사이트에 바로 보여요."
-        }
+        title={post.title}
+        subtitle={`${post.authorName} · ${formatAdminDate({ value: post.createdAt, hasTime: true })}`}
         footer={
           <>
             <Button
               variant="solid"
               color="black"
               size="small"
-              text={isNew ? "등록" : "저장"}
+              text="저장"
               isLoading={isSaving}
+              isDisabled={!isChanged}
               onClick={handleSave}
             />
-            {isNew ? null : (
-              <Button
-                variant="ghost"
-                color="danger"
-                size="small"
-                text="삭제"
-                className="ml-auto"
-                onClick={handleDeleteOpen}
-              />
-            )}
+            <Button
+              variant="ghost"
+              color="danger"
+              size="small"
+              text="게시물 삭제"
+              className="ml-auto"
+              onClick={handleDeleteOpen}
+            />
           </>
         }
         onClose={onClose}>
-        <div className="grid grid-cols-2 gap-3">
-          <Select
-            label="게시판"
-            value={board}
-            options={BOARD_OPTIONS}
-            onChange={setBoard}
-          />
-          {isNews ? (
-            <Select
-              label="분류"
-              value={category}
-              options={CATEGORY_OPTIONS}
-              onChange={setCategory}
-            />
-          ) : (
-            <Input
-              label="연도"
-              value={year}
-              maxLength={4}
-              placeholder="2026"
-              onChange={setYear}
-            />
-          )}
-        </div>
-        <Input
-          label="제목"
-          value={title}
-          maxLength={TITLE_MAX}
-          errorMessage={titleError ?? undefined}
-          onChange={setTitle}
+        <dl className="grid grid-cols-[--spacing(22)_1fr] gap-x-3 gap-y-2.5 rounded-large bg-gray-50 px-4 py-3.5 text-4 leading-5">
+          <dt className="text-gray-500">좋아요</dt>
+          <dd>{post.likeCount}</dd>
+          <dt className="text-gray-500">댓글</dt>
+          <dd>{comments?.length ?? post.commentCount}</dd>
+          <dt className="text-gray-500">마지막 수정</dt>
+          <dd>{formatAdminDate({ value: post.updatedAt, hasTime: true })}</dd>
+        </dl>
+        <Text variant="body-3" className="break-all whitespace-pre-wrap">
+          {post.body}
+        </Text>
+        <Toggle
+          label="웹사이트에 공개"
+          isOn={isPublished}
+          onChange={setIsPublished}
         />
-        <Input
-          label="요약"
-          value={summary}
-          maxLength={SUMMARY_MAX}
-          onChange={setSummary}
-        />
-        <Textarea
-          label="본문"
-          value={body}
-          rows={10}
-          maxLength={BODY_MAX}
-          helperText="빈 줄로 문단을 나눠요."
-          hasCounter
-          onChange={setBody}
-        />
-        <Input
-          label="외부 링크"
-          type="url"
-          value={externalUrl}
-          placeholder="https://"
-          onChange={setExternalUrl}
-        />
-        <AttachmentList
-          files={files}
-          newFiles={newFiles}
-          onFileDelete={handleFileDelete}
-          onNewFilesChange={handleNewFilesChange}
-        />
-        <div className="flex flex-col gap-3">
-          <Checkbox
-            label="상단 고정"
-            isChecked={isPinned}
-            onChange={setIsPinned}
-          />
-          <Toggle
-            label="웹사이트에 공개"
-            isOn={isPublished}
-            onChange={setIsPublished}
-          />
+        <div className="flex flex-col gap-2">
+          <Text as="span" variant="label-3">
+            댓글 {comments?.length ?? post.commentCount}
+          </Text>
+          {comments === null ? (
+            <Text variant="caption-1" color={adminTextLabelColor}>
+              불러오는 중…
+            </Text>
+          ) : null}
+          {comments?.length === 0 ? (
+            <Text variant="caption-1" color={adminTextLabelColor}>
+              댓글이 없어요.
+            </Text>
+          ) : null}
+          {comments && comments.length > 0 ? (
+            <ul className="flex flex-col gap-1.5">
+              {comments.map(comment => (
+                <li
+                  key={comment.id}
+                  className="flex items-start gap-2 rounded-medium bg-gray-50 px-3 py-2.5">
+                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <Text variant="caption-1" color={adminTextLabelColor}>
+                      {comment.authorName} ·{" "}
+                      {formatAdminDate({ value: comment.createdAt })}
+                    </Text>
+                    <Text
+                      variant="body-3"
+                      className="break-all whitespace-pre-wrap">
+                      {comment.body}
+                    </Text>
+                  </div>
+                  <button
+                    type="button"
+                    aria-label="댓글 지우기"
+                    className="grid size-7 shrink-0 place-items-center rounded-small text-gray-500 hover:bg-gray-100"
+                    onClick={() => handleCommentDelete(comment)}>
+                    <Icon name="trash" size={16} />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </div>
         {error ? (
           <Text
@@ -484,7 +386,7 @@ const PostEditorSection = ({
       <Modal
         isOpen={isDeleteOpen}
         title="게시물을 삭제할까요?"
-        description="삭제한 게시물과 첨부파일은 웹사이트에서 사라지고 되돌릴 수 없어요."
+        description="글과 댓글·좋아요가 모두 지워지고 되돌릴 수 없어요. 잠시 가리기만 하려면 숨김으로 저장해 주세요."
         secondaryButton={{
           text: "취소",
           isDisabled: isDeleting,
@@ -499,70 +401,6 @@ const PostEditorSection = ({
         onClose={handleDeleteClose}
       />
     </>
-  );
-};
-
-/**
- * inner components
- */
-const AttachmentList = ({
-  files,
-  newFiles,
-  onFileDelete,
-  onNewFilesChange,
-}: AttachmentListProps) => (
-  <div className="flex flex-col gap-2">
-    <Text as="span" variant="label-3">
-      첨부파일
-    </Text>
-    {files.length > 0 ? (
-      <ul className="flex flex-col gap-1.5">
-        {files.map(file => (
-          <li
-            key={file.id}
-            className="flex items-center gap-2 rounded-medium bg-gray-50 px-3 py-2 text-4 leading-5">
-            <a
-              href={file.url}
-              target="_blank"
-              rel="noreferrer"
-              className="min-w-0 flex-1 truncate text-primary-600 underline">
-              {file.fileName}
-            </a>
-            <button
-              type="button"
-              aria-label={`${file.fileName} 지우기`}
-              className="grid size-7 shrink-0 place-items-center rounded-small text-gray-500 hover:bg-gray-100"
-              onClick={() => onFileDelete(file)}>
-              <Icon name="trash" size={16} />
-            </button>
-          </li>
-        ))}
-      </ul>
-    ) : null}
-    <input
-      type="file"
-      multiple
-      className="text-4 leading-5 text-gray-700 file:mr-3 file:rounded-medium file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-gray-800"
-      onChange={onNewFilesChange}
-    />
-    <Text variant="caption-2" color={adminTextLabelColor}>
-      {newFiles.length > 0
-        ? `저장할 때 ${newFiles.length}개를 올려요.`
-        : "파일당 20MB까지. 이미지는 media, 문서는 documents 버킷에 저장돼요."}
-    </Text>
-  </div>
-);
-
-/**
- * utils
- */
-const formatGroup = (post: Post) => {
-  if (post.board !== "news") {
-    return post.year ? `${post.year}년` : BOARD_LABEL[post.board];
-  }
-  return (
-    NEWS_CATEGORIES.find(category => category.id === post.category)?.label ??
-    "소식"
   );
 };
 

@@ -31,9 +31,14 @@ export const createServerSupabase = async () => {
         return cookieStore.getAll();
       },
       setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) => {
-          cookieStore.set(name, value, options);
-        });
+        // 서버 컴포넌트 렌더 중에는 쿠키를 쓸 수 없다. 읽기만 하고 넘긴다
+        try {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
+        } catch {
+          return;
+        }
       },
     },
   });

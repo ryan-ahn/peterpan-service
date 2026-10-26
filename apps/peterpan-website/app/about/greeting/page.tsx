@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
 
-import ArticlePage from "@components/articlePage";
-import { GREETING_SECTIONS } from "@lib/foundation";
+import FoundationHeader from "@components/foundationHeader";
 
 export const metadata: Metadata = { title: "대표 인사말" };
 
 /**
- * screen — 대표 인사말
+ * screen — 대표 인사말. 인사말을 받기 전까지 준비 중으로 둔다
  */
 const GreetingScreen = () => (
-  <ArticlePage
-    eyebrow="재단소개"
-    title="대표 인사말"
-    lead="설립발기인 대표 변경희. 아래 글은 설립취지서의 지향을 재단의 인사로 옮긴 것입니다. 등기 이후 이사장 인사가 정해지면 이 면을 바꿉니다."
-    sections={GREETING_SECTIONS}
-  />
+  <article>
+    <FoundationHeader
+      overline="Greeting"
+      title="대표 인사말"
+      lead="준비 중입니다."
+    />
+  </article>
 );
 
 export default GreetingScreen;

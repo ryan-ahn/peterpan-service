@@ -19,13 +19,47 @@ import type { AdminSelf } from "@lib/adminSession";
 /**
  * constants
  */
-const NAV_LINKS: { href: string; label: string; icon: IconName }[] = [
-  { href: "/posts", label: "게시물 관리", icon: "file-text" },
-  { href: "/notices", label: "공지사항 관리", icon: "megaphone" },
-  { href: "/inquiries", label: "후원 문의", icon: "mail" },
-  { href: "/members", label: "회원 관리", icon: "users" },
-  { href: "/settings", label: "기본정보", icon: "home" },
+const NAV_LINKS: {
+  href: string;
+  label: string;
+  icon: IconName;
+  isOwnerOnly: boolean;
+}[] = [
+  {
+    href: "/posts",
+    label: "게시물 관리",
+    icon: "edit",
+    isOwnerOnly: false,
+  },
+  {
+    href: "/news",
+    label: "소식 관리",
+    icon: "megaphone",
+    isOwnerOnly: false,
+  },
+  {
+    href: "/disclosures",
+    label: "공시 관리",
+    icon: "file-text",
+    isOwnerOnly: false,
+  },
+  {
+    href: "/organization",
+    label: "조직도",
+    icon: "sitemap",
+    isOwnerOnly: false,
+  },
+  { href: "/bylaws", label: "정관", icon: "file-text", isOwnerOnly: false },
+  { href: "/inquiries", label: "후원 문의", icon: "mail", isOwnerOnly: false },
+  { href: "/members", label: "회원 관리", icon: "users", isOwnerOnly: false },
+  { href: "/permissions", label: "권한 관리", icon: "user", isOwnerOnly: true },
+  { href: "/settings", label: "기본정보", icon: "home", isOwnerOnly: false },
 ];
+
+const ROLE_LABEL: Record<AdminSelf["role"], string> = {
+  owner: "관리자",
+  manager: "관리자",
+};
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -96,7 +130,7 @@ const AdminShell = ({ self, headerSearch, children }: Props) => {
             <Avatar name={self.name} size="small" />
             <div className="flex min-w-0 flex-col">
               <Text variant="label-4" numberOfLines={1}>
-                {self.name}
+                {self.name}({ROLE_LABEL[self.role]})
               </Text>
               <Text
                 variant="caption-2"
@@ -112,6 +146,17 @@ const AdminShell = ({ self, headerSearch, children }: Props) => {
           {NAV_LINKS.map(item => {
             const isActive =
               pathname === item.href || pathname.startsWith(`${item.href}/`);
+            if (item.isOwnerOnly && self.role !== "owner") {
+              return (
+                <span
+                  key={item.href}
+                  className="flex cursor-not-allowed items-center gap-2.5 rounded-medium px-3 py-2.5 text-4 leading-5 text-gray-300"
+                  aria-disabled="true">
+                  <Icon name={item.icon} size={18} />
+                  {item.label}
+                </span>
+              );
+            }
             return (
               <Link
                 key={item.href}

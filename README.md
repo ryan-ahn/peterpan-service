@@ -17,15 +17,12 @@
 
 루트 `.env` 하나를 두 앱과 `packages/db` 스크립트가 함께 읽는다. 예시는 [`.env.example`](.env.example).
 
-| 이름                                                    | 용도                                         |
-| ------------------------------------------------------- | -------------------------------------------- |
-| `DATABASE_URL`                                          | Supabase Postgres 연결 문자열 (Drizzle)      |
-| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_KEY`  | Supabase 프로젝트 주소·공개 키               |
-| `SUPABASE_SERVICE_ROLE_KEY`                             | 서버 전용. 로그인 세션 발급·파일 업로드      |
-| `NEXT_PUBLIC_KAKAO_REST_API_KEY`, `KAKAO_CLIENT_SECRET` | 카카오 로그인. 시크릿은 콘솔에서 켠 경우에만 |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`  | 구글 로그인                                  |
-| `ADMIN_EMAILS`                                          | 운영자 이메일. 쉼표로 여러 명                |
-| `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_ADMIN_URL`         | 두 앱이 서로 링크할 주소                     |
+| 이름                                                   | 용도                                    |
+| ------------------------------------------------------ | --------------------------------------- |
+| `DATABASE_URL`                                         | Supabase Postgres 연결 문자열 (Drizzle) |
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_KEY` | Supabase 프로젝트 주소·공개 키          |
+| `SUPABASE_SERVICE_ROLE_KEY`                            | 서버 전용. 회원 삭제·파일 업로드        |
+| `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_ADMIN_URL`        | 두 앱이 서로 링크할 주소                |
 
 ---
 
@@ -49,22 +46,23 @@ npm run dev
 
 ## 로그인
 
-두 앱 모두 카카오·구글 OAuth로 로그인한다. 로직은 `packages/auth` 하나다. `ADMIN_EMAILS`에 있는 이메일은 로그인할 때마다 운영자로 올라가고, 어드민은 운영자만 들어간다.
+두 앱 모두 Supabase Auth의 카카오·구글 로그인이다. 버튼은 `/auth/{kakao,google}`로 가고, 돌아온 코드는 `/auth/callback`에서 세션으로 바꾼다. 로직은 `packages/auth` 하나다.
 
-카카오·구글 콘솔에 아래 리다이렉트 주소를 모두 등록한다. 배포 도메인도 같은 경로다.
+어드민은 `admin_members` 테이블의 오너·매니저만 들어간다. 오너는 한 명으로 고정이고 `0002_admin_members.sql`이 지정한다. 매니저는 오너가 어드민 권한 관리(`/permissions`)에서 지정·해제한다. 새 매니저는 먼저 한 번 로그인해 회원으로 잡혀야 지정할 수 있다.
 
-- `http://localhost:3000/auth/kakao/callback`
-- `http://localhost:3000/auth/google/callback`
-- `http://localhost:3001/auth/kakao/callback`
-- `http://localhost:3001/auth/google/callback`
+카카오 REST API 키·클라이언트 시크릿, 구글 클라이언트 ID·시크릿은 Supabase의 Authentication → Providers에 넣는다. 카카오·구글 콘솔에 등록하는 리다이렉트는 Supabase 콜백 하나다.
 
-카카오 동의 항목은 닉네임, 프로필 사진, 이메일이다.
+- `https://<프로젝트-ref>.supabase.co/auth/v1/callback`
+
+로그인이 끝난 뒤 돌아오는 주소는 Supabase의 Redirect URLs에 둔다. `https://www.peterpan.or.kr/**`, `https://admin.peterpan.or.kr/**`, `https://dev.peterpan.or.kr/**`, `http://localhost:3000/**`, `http://localhost:3001/**`.
+
+카카오 동의 항목은 닉네임, 프로필 사진이다. 이메일은 비즈 앱 권한이 열린 뒤에 동의 항목과 scope에 넣는다.
 
 ---
 
 ## 데이터
 
-재단소식(공지·활동·언론보도), 경영공시, 기부금 공시, 후원 문의, 하단 연락처는 Supabase Postgres에 있다. 첨부는 `documents`, 이미지는 `media` 공개 버킷이다. 정관 PDF는 `apps/peterpan-website/public/docs/bylaws.pdf`와 버킷에 함께 있다.
+재단소식(공지·활동·언론보도), 경영공시, 기부금 공시, 후원 문의, 하단 연락처는 Supabase Postgres에 있다. 공지는 `notices`, 나머지 글은 `posts` 테이블이다. 첨부는 `documents`, 이미지는 `media` 공개 버킷이다. 정관은 어드민 `/bylaws`에서 판마다 `documents` 버킷에 올리고, `bylaws` 테이블에서 노출 1건을 고른다. 조직도는 어드민 `/organization`에서 짜고 `site_settings`의 `organization_chart`에 JSON으로 저장한다.
 
 홈과 마을 사진 일부는 실제 마을 촬영본이 생기기 전의 예시다.
 

@@ -17,7 +17,9 @@ const getSql = (): Sql => {
   if (!sqlClient) {
     sqlClient = postgres(databaseUrl, {
       prepare: false,
-      max: 1,
+      max: 5,
+      idle_timeout: 20,
+      connect_timeout: 10,
       ssl: "require",
     });
   }

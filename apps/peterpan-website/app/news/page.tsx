@@ -8,7 +8,7 @@ import cn from "@repo/ui/lib/cn";
 import BrandText from "@components/brandText";
 import PageIntro from "@components/pageIntro";
 import { formatDate } from "@lib/format";
-import { listPosts } from "@lib/posts";
+import { listNews } from "@lib/posts";
 
 export const metadata: Metadata = { title: "재단소식" };
 
@@ -24,7 +24,7 @@ type Props = {
   searchParams: Promise<{ category?: string; q?: string; page?: string }>;
 };
 
-type NewsResult = NonNullable<Awaited<ReturnType<typeof listPosts>>>;
+type NewsResult = NonNullable<Awaited<ReturnType<typeof listNews>>>;
 
 type ListSectionProps = {
   result: NewsResult | null;
@@ -50,8 +50,7 @@ const NewsScreen = async ({ searchParams }: Props) => {
   const category = params.category ?? "all";
   const page = Number(params.page ?? "1");
   const query = params.q ?? "";
-  const result = await listPosts({
-    board: "news",
+  const result = await listNews({
     category,
     query,
     page: Number.isFinite(page) ? page : 1,

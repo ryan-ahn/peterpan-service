@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { buttonStyle } from "@repo/ui/components/button";
 import Icon from "@repo/ui/icon";
+import cn from "@repo/ui/lib/cn";
 
 import Logo from "@components/logo";
 import { NAV } from "@lib/nav";
@@ -66,7 +67,10 @@ const SiteHeader = ({ userName }: Props) => {
         <div className="flex items-center gap-2">
           <Link
             href="/login"
-            className="hidden text-4 leading-5 text-muted md:inline">
+            className={cn(
+              buttonStyle({ variant: "line", color: "pine", size: "small" }),
+              "hidden md:inline-flex",
+            )}>
             {userName ?? "로그인"}
           </Link>
           <Link

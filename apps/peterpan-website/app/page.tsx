@@ -52,21 +52,27 @@ const HeroSection = () => (
           Peter Pan Foundation
         </BrandText>
         <div className="mt-4 w-10 border-t-2 border-gold" />
-        <BrandText as="h1" variant="display" color="pine" className="mt-5">
-          자폐인의 오늘,
+        <BrandText
+          as="h1"
+          variant="title"
+          color="pine"
+          className="mt-5 leading-20">
+          홀로 남겨지지 않는 삶,
           <br />
-          더 넓은 내일로
+          존엄이 지켜지는 안전한 삶,
+          <br />
+          그것을 지키는 작은 마을
         </BrandText>
         <BrandText variant="body" color="muted" className="mt-6 max-w-md">
-          피터팬 재단은 성인 중증 자폐성장애인이 부모의 생애주기 변화와 관계없이
-          안정된 환경에서 자신의 삶을 지속할 수 있는 생활주거공동체를
-          만들어갑니다.
+          피터팬 재단은 성인 중증 자폐성장애인의 생명과 존엄을 지키고, 가족의
+          생애주기 변화와 관계없이 안정된 환경에서 자신의 삶을 이어 갈 수 있는
+          항구적인 생활 기반을 만들어 갑니다.
         </BrandText>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             href="/about"
             className={buttonStyle({ variant: "solid", color: "pine" })}>
-            재단 소개
+            재단소개
           </Link>
           <Link
             href="/donate"

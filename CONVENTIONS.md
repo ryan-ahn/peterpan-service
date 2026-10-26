@@ -184,7 +184,7 @@ export default MembersScreen;
 
 - DB는 `@repo/db`의 `getDb()`·스키마로 Drizzle 쿼리를 짠다. 게시판·소식 분류·후원 방식 이름은 `@repo/db/boards` 한 곳이다.
 - Supabase 클라이언트·세션·OAuth는 `@repo/auth`. 앱에서 Supabase 클라이언트를 따로 만들지 않는다.
-- 두 앱의 `/auth/{kakao,google}`·콜백 라우트는 `beginOAuth`·`finishOAuth`에 `loginPath`만 다르게 넘긴다.
+- 두 앱의 `/auth/{kakao,google}`는 Supabase Auth로 보내고, `/auth/callback`이 세션을 받은 뒤 프로필을 맞춘다. `loginPath`만 앱마다 다르다.
 - 환경 변수는 루트 `.env` 하나. 각 앱 `next.config.ts`가 `loadEnvConfig`로 루트를 읽는다.
 
 ---

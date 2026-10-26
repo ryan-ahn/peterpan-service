@@ -6,6 +6,9 @@
   "exports": {
     ".": "./src/index.ts",
     "./boards": "./src/boards.ts",
+    "./bylawOutline": "./src/bylawOutline.ts",
+    "./bylawPdf": "./src/bylawPdf.ts",
+    "./organization": "./src/organization.ts",
     "./siteContact": "./src/siteContact.ts"
   },
   "scripts": {
@@ -15,7 +18,8 @@
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",
-    "postgres": "^3.4.7"
+    "postgres": "^3.4.7",
+    "unpdf": "^1.9.1"
   },
   "devDependencies": {
     "@repo/typescript-config": "*",

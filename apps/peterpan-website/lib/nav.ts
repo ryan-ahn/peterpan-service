@@ -11,7 +11,8 @@ export const NAV: NavItem[] = [
     children: [
       { label: "설립 배경과 목적", href: "/about" },
       { label: "대표 인사말", href: "/about/greeting" },
-      { label: "재단 정보", href: "/about/organization" },
+      { label: "상징과 가치", href: "/about/brand" },
+      { label: "조직도", href: "/about/organization" },
       { label: "정관", href: "/about/bylaws" },
     ],
   },
@@ -24,7 +25,14 @@ export const NAV: NavItem[] = [
       { label: "운영 방향", href: "/village/operation" },
     ],
   },
-  { label: "소식", href: "/news" },
+  {
+    label: "소통",
+    href: "/news",
+    children: [
+      { label: "소식", href: "/news" },
+      { label: "게시판", href: "/board" },
+    ],
+  },
   {
     label: "정보공개",
     href: "/disclosure",
@@ -38,8 +46,10 @@ export const NAV: NavItem[] = [
 
 export const FOOTER_LINKS = [
   { label: "설립 배경", href: "/about" },
+  { label: "정관", href: "/about/bylaws" },
   { label: "피터팬마을", href: "/village" },
   { label: "재단소식", href: "/news" },
+  { label: "게시판", href: "/board" },
   { label: "경영공시", href: "/disclosure/management" },
   { label: "기부금 공시", href: "/disclosure/donations" },
   { label: "개인정보처리방침", href: "/privacy" },

@@ -44,7 +44,11 @@ export default async function RootLayout({
     getSiteContact(),
   ]);
   return (
-    <html lang="ko" className={`${nanumPen.variable} ${montserrat.variable}`}>
+    <html
+      lang="ko"
+      data-scroll-behavior="smooth"
+      className={`${nanumPen.variable} ${montserrat.variable}`}
+      suppressHydrationWarning>
       <head>
         <link
           rel="stylesheet"
@@ -58,7 +62,9 @@ export default async function RootLayout({
           본문으로
         </a>
         <SiteHeader userName={user?.name ?? null} />
-        <main id="content">{children}</main>
+        <main id="content" className="pb-8 lg:pb-10">
+          {children}
+        </main>
         <SiteFooter contact={contact} />
       </body>
     </html>

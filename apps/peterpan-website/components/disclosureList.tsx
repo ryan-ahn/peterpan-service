@@ -59,8 +59,9 @@ const DisclosureList = ({
   return (
     <section className="page-article py-16">
       <PageIntro eyebrow="정보공개" title={title} lead={lead} />
-      <div className="mt-8 flex flex-wrap gap-2 text-4 leading-5">
-        <span className="py-2 text-muted">연도</span>
+      <nav
+        aria-label="연도"
+        className="mt-8 flex flex-wrap gap-2 text-4 leading-5">
         <YearLink href={basePath} label="전체" isActive={!currentYear} />
         {years.map(year => (
           <YearLink
@@ -70,7 +71,7 @@ const DisclosureList = ({
             isActive={currentYear === year}
           />
         ))}
-      </div>
+      </nav>
       <div className="mt-6 flex flex-col gap-3">
         {rows.length === 0 ? (
           <BrandText

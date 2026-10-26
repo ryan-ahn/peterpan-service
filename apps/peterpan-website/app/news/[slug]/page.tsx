@@ -6,7 +6,7 @@ import { categoryLabel, publicStorageUrl } from "@repo/db/boards";
 
 import BrandText from "@components/brandText";
 import { formatDate } from "@lib/format";
-import { getPostBySlug, listPostFiles } from "@lib/posts";
+import { getNewsBySlug, listPostFiles } from "@lib/posts";
 
 /**
  * types
@@ -19,7 +19,7 @@ export const generateMetadata = async ({
   params,
 }: Props): Promise<Metadata> => {
   const { slug } = await params;
-  const post = await getPostBySlug(slug).catch(() => null);
+  const post = await getNewsBySlug(slug).catch(() => null);
   return { title: post?.title ?? "소식" };
 };
 
@@ -29,8 +29,8 @@ export const generateMetadata = async ({
 const NewsDetailScreen = async ({ params }: Props) => {
   // variables
   const { slug } = await params;
-  const post = await getPostBySlug(slug).catch(() => null);
-  if (!post || post.board !== "news" || !post.published) {
+  const post = await getNewsBySlug(slug).catch(() => null);
+  if (!post) {
     notFound();
   }
   const files = await listPostFiles(post.id).catch(() => []);
@@ -38,6 +38,7 @@ const NewsDetailScreen = async ({ params }: Props) => {
     .split(/\n{2,}/)
     .map(item => item.trim())
     .filter(Boolean);
+  const isPress = post.category === "press";
   // render
   return (
     <article className="page-reading py-16">
@@ -51,7 +52,9 @@ const NewsDetailScreen = async ({ params }: Props) => {
         {post.title}
       </BrandText>
       <BrandText variant="caption" color="muted" className="mt-3">
-        {formatDate(post.createdAt)}
+        {isPress && post.summary
+          ? `${post.summary} · ${formatDate(post.createdAt)}`
+          : formatDate(post.createdAt)}
       </BrandText>
       <div className="mt-8 flex flex-col gap-5">
         {paragraphs.map(paragraph => (
@@ -66,7 +69,7 @@ const NewsDetailScreen = async ({ params }: Props) => {
           target="_blank"
           rel="noreferrer"
           className="mt-8 inline-flex text-pine underline">
-          관련 링크
+          {isPress ? "원문 기사 보기" : "관련 링크"}
         </a>
       ) : null}
       {files.length > 0 ? (

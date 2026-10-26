@@ -17,6 +17,12 @@ export const NEWS_CATEGORIES = [
   { id: "press", label: "언론보도" },
 ] as const;
 
+export const BOARD_POST_LIMIT = {
+  title: 100,
+  body: 10000,
+  comment: 1000,
+} as const;
+
 export const DONATION_KINDS = [
   { id: "founding", label: "창립발기" },
   { id: "monthly", label: "정기 후원" },

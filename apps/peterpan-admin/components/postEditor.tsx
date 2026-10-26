@@ -1,0 +1,354 @@
+"use client";
+
+import { type ChangeEvent, useEffect, useState } from "react";
+
+import { BOARDS, type BoardId } from "@repo/db/boards";
+import Button from "@repo/ui/components/button";
+import Checkbox from "@repo/ui/components/checkbox";
+import Input from "@repo/ui/components/input";
+import Modal from "@repo/ui/components/modal";
+import Textarea from "@repo/ui/components/textarea";
+import { useToast } from "@repo/ui/components/toast";
+import Toggle from "@repo/ui/components/toggle";
+import Icon from "@repo/ui/icon";
+import Text from "@repo/ui/text";
+
+import AdminDrawer from "@components/adminDrawer";
+import { adminTextErrorColor, adminTextLabelColor } from "@constants/adminUi";
+import {
+  type Post,
+  type PostFile,
+  deletePost,
+  deletePostFile,
+  listPostFiles,
+  savePost,
+} from "@lib/adminData";
+import { formatAdminDate } from "@lib/formatDate";
+
+/**
+ * constants
+ */
+const TITLE_MAX = 120;
+
+const SUMMARY_MAX = 200;
+
+const BODY_MAX = 20000;
+
+/**
+ * types
+ */
+type Props = {
+  post: Post | null;
+  board: BoardId;
+  onClose: () => void;
+  onChanged: () => void;
+};
+
+type AttachmentListProps = {
+  files: PostFile[];
+  newFiles: File[];
+  onFileDelete: (file: PostFile) => void;
+  onNewFilesChange: (event: ChangeEvent<HTMLInputElement>) => void;
+};
+
+/**
+ * posts 테이블 글 작성·수정 드로어. 소식(활동)과 공시(경영·기부금)가 같이 쓴다.
+ * 게시판은 화면이 정해서 넘기고, 공시는 연도를 함께 받는다
+ * @param post 고칠 글. 없으면 새 글
+ * @param board 저장할 게시판
+ * @param onClose 닫기
+ * @param onChanged 저장·삭제 뒤 목록 새로 읽기
+ */
+const PostEditor = ({ post, board, onClose, onChanged }: Props) => {
+  // hooks
+  const toast = useToast();
+  // states
+  const [year, setYear] = useState(post?.year ? String(post.year) : "");
+  const [title, setTitle] = useState(post?.title ?? "");
+  const [summary, setSummary] = useState(post?.summary ?? "");
+  const [body, setBody] = useState(post?.body ?? "");
+  const [externalUrl, setExternalUrl] = useState(post?.externalUrl ?? "");
+  const [isPinned, setIsPinned] = useState(post?.isPinned ?? false);
+  const [isPublished, setIsPublished] = useState(post?.isPublished ?? true);
+  const [files, setFiles] = useState<PostFile[]>([]);
+  const [newFiles, setNewFiles] = useState<File[]>([]);
+  const [titleError, setTitleError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  // variables
+  const isNew = !post;
+  const isNews = board === "news";
+  const boardLabel = isNews
+    ? "활동"
+    : (BOARDS.find(item => item.id === board)?.label ?? "게시물");
+  // handlers
+  const handleSave = async () => {
+    const nextTitleError = title.trim() ? null : "제목을 입력해 주세요.";
+    setTitleError(nextTitleError);
+    if (nextTitleError) {
+      return;
+    }
+    const formData = new FormData();
+    formData.set("id", post?.id ?? "");
+    formData.set("board", board);
+    formData.set("category", isNews ? (post?.category ?? "activity") : "");
+    formData.set("year", isNews ? "" : year);
+    formData.set("title", title);
+    formData.set("summary", summary);
+    formData.set("body", body);
+    formData.set("externalUrl", externalUrl);
+    formData.set("isPinned", String(isPinned));
+    formData.set("isPublished", String(isPublished));
+    newFiles.forEach(file => formData.append("files", file));
+    setIsSaving(true);
+    setError(null);
+    try {
+      await savePost(formData);
+      toast.show({
+        text: isNew ? `${boardLabel} 글을 등록했어요.` : "저장했어요.",
+        variant: "success",
+      });
+      onChanged();
+    } catch (saveError) {
+      setError(
+        saveError instanceof Error ? saveError.message : "저장하지 못했어요.",
+      );
+      setIsSaving(false);
+    }
+  };
+  const handleDelete = async () => {
+    if (!post) {
+      return;
+    }
+    setIsDeleting(true);
+    try {
+      await deletePost({ id: post.id });
+      toast.show({ text: "삭제했어요.", variant: "success" });
+      onChanged();
+    } catch (deleteError) {
+      setError(
+        deleteError instanceof Error
+          ? deleteError.message
+          : "삭제하지 못했어요.",
+      );
+      setIsDeleting(false);
+      setIsDeleteOpen(false);
+    }
+  };
+  const handleFileDelete = async (file: PostFile) => {
+    try {
+      await deletePostFile({ id: file.id });
+      setFiles(current => current.filter(item => item.id !== file.id));
+      toast.show({ text: "첨부파일을 지웠어요.", variant: "success" });
+    } catch (deleteError) {
+      setError(
+        deleteError instanceof Error
+          ? deleteError.message
+          : "첨부파일을 지우지 못했어요.",
+      );
+    }
+  };
+  const handleNewFilesChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setNewFiles(Array.from(event.target.files ?? []));
+  };
+  const handleDeleteOpen = () => {
+    setIsDeleteOpen(true);
+  };
+  const handleDeleteClose = () => {
+    setIsDeleteOpen(false);
+  };
+  // effects
+  useEffect(() => {
+    if (!post) {
+      return;
+    }
+    let isCancelled = false;
+    listPostFiles({ postId: post.id })
+      .then(result => {
+        if (!isCancelled) {
+          setFiles(result);
+        }
+      })
+      .catch(() => {
+        if (!isCancelled) {
+          setError("첨부파일을 불러오지 못했어요.");
+        }
+      });
+    return () => {
+      isCancelled = true;
+    };
+  }, [post]);
+  // render
+  return (
+    <>
+      <AdminDrawer
+        isOpen
+        title={isNew ? `${boardLabel} 작성` : `${boardLabel} 수정`}
+        subtitle={
+          post
+            ? `마지막 수정 ${formatAdminDate({ value: post.updatedAt, hasTime: true })}`
+            : "공개로 저장하면 웹사이트에 바로 보여요."
+        }
+        footer={
+          <>
+            <Button
+              variant="solid"
+              color="black"
+              size="small"
+              text={isNew ? "등록" : "저장"}
+              isLoading={isSaving}
+              onClick={handleSave}
+            />
+            {isNew ? null : (
+              <Button
+                variant="ghost"
+                color="danger"
+                size="small"
+                text="삭제"
+                className="ml-auto"
+                onClick={handleDeleteOpen}
+              />
+            )}
+          </>
+        }
+        onClose={onClose}>
+        {isNews ? null : (
+          <Input
+            label="연도"
+            value={year}
+            maxLength={4}
+            placeholder="2026"
+            onChange={setYear}
+          />
+        )}
+        <Input
+          label="제목"
+          value={title}
+          maxLength={TITLE_MAX}
+          errorMessage={titleError ?? undefined}
+          onChange={setTitle}
+        />
+        <Input
+          label="요약"
+          value={summary}
+          maxLength={SUMMARY_MAX}
+          onChange={setSummary}
+        />
+        <Textarea
+          label="본문"
+          value={body}
+          rows={10}
+          maxLength={BODY_MAX}
+          helperText="빈 줄로 문단을 나눠요."
+          hasCounter
+          onChange={setBody}
+        />
+        <Input
+          label="외부 링크"
+          type="url"
+          value={externalUrl}
+          placeholder="https://"
+          onChange={setExternalUrl}
+        />
+        <AttachmentList
+          files={files}
+          newFiles={newFiles}
+          onFileDelete={handleFileDelete}
+          onNewFilesChange={handleNewFilesChange}
+        />
+        <div className="flex flex-col gap-3">
+          <Checkbox
+            label="상단 고정"
+            isChecked={isPinned}
+            onChange={setIsPinned}
+          />
+          <Toggle
+            label="웹사이트에 공개"
+            isOn={isPublished}
+            onChange={setIsPublished}
+          />
+        </div>
+        {error ? (
+          <Text
+            variant="caption-1"
+            color={adminTextErrorColor}
+            className="rounded-medium bg-red-50 px-3 py-2">
+            {error}
+          </Text>
+        ) : null}
+      </AdminDrawer>
+      <Modal
+        isOpen={isDeleteOpen}
+        title="글을 삭제할까요?"
+        description="삭제한 글과 첨부파일은 웹사이트에서 사라지고 되돌릴 수 없어요."
+        secondaryButton={{
+          text: "취소",
+          isDisabled: isDeleting,
+          onClick: handleDeleteClose,
+        }}
+        primaryButton={{
+          text: "삭제",
+          color: "danger",
+          isLoading: isDeleting,
+          onClick: handleDelete,
+        }}
+        onClose={handleDeleteClose}
+      />
+    </>
+  );
+};
+
+/**
+ * inner components
+ */
+const AttachmentList = ({
+  files,
+  newFiles,
+  onFileDelete,
+  onNewFilesChange,
+}: AttachmentListProps) => (
+  <div className="flex flex-col gap-2">
+    <Text as="span" variant="label-3">
+      첨부파일
+    </Text>
+    {files.length > 0 ? (
+      <ul className="flex flex-col gap-1.5">
+        {files.map(file => (
+          <li
+            key={file.id}
+            className="flex items-center gap-2 rounded-medium bg-gray-50 px-3 py-2 text-4 leading-5">
+            <a
+              href={file.url}
+              target="_blank"
+              rel="noreferrer"
+              className="min-w-0 flex-1 truncate text-primary-600 underline">
+              {file.fileName}
+            </a>
+            <button
+              type="button"
+              aria-label={`${file.fileName} 지우기`}
+              className="grid size-7 shrink-0 place-items-center rounded-small text-gray-500 hover:bg-gray-100"
+              onClick={() => onFileDelete(file)}>
+              <Icon name="trash" size={16} />
+            </button>
+          </li>
+        ))}
+      </ul>
+    ) : null}
+    <input
+      type="file"
+      multiple
+      className="text-4 leading-5 text-gray-700 file:mr-3 file:rounded-medium file:border-0 file:bg-gray-100 file:px-3 file:py-2 file:text-gray-800"
+      onChange={onNewFilesChange}
+    />
+    <Text variant="caption-2" color={adminTextLabelColor}>
+      {newFiles.length > 0
+        ? `저장할 때 ${newFiles.length}개를 올려요.`
+        : "파일당 20MB까지. 이미지는 media, 문서는 documents 버킷에 저장돼요."}
+    </Text>
+  </div>
+);
+
+export default PostEditor;

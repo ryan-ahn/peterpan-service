@@ -36,7 +36,7 @@ const LoginScreen = async ({ searchParams }: Props) => {
   // variables
   const params = await searchParams;
   const profile = await getSessionProfile();
-  if (profile?.role === "admin") {
+  if (profile?.role) {
     redirect(HOME_PATH);
   }
   // render
@@ -99,8 +99,8 @@ const ProviderSection = () => (
       isFullWidth
     />
     <Text variant="caption-2" color={adminTextLabelColor}>
-      운영자 권한은 ADMIN_EMAILS에 적힌 이메일로 로그인하면 붙고, 회원 관리에서
-      다른 회원에게 줄 수 있어요.
+      관리자로 지정된 계정만 들어올 수 있어요. 처음이라면 한 번 로그인한 뒤 재단
+      담당자에게 지정을 요청하세요.
     </Text>
   </>
 );
