@@ -82,7 +82,7 @@ const VillageAerial = () => {
   }, [selectedId]);
   // render
   return (
-    <figure ref={containerRef}>
+    <figure ref={containerRef} data-spot-open={selectedSpot ? "" : undefined}>
       <div className="relative">
         <Image
           src={AERIAL.src}

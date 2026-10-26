@@ -17,7 +17,7 @@ import {
 } from "@lib/foundation";
 
 export const metadata: Metadata = {
-  title: "상징과 가치",
+  title: "상징과 미션",
   description:
     "피터팬 재단 로고에 담긴 상징과 재단이 지키는 가치를 소개합니다.",
 };
@@ -34,6 +34,12 @@ const SYMBOL = {
 };
 
 const KEYWORDS = ["존엄", "자립", "포용", "연결", "성장", "희망"] as const;
+
+const DIRECTIONS = [
+  "안정적인 주거",
+  "지속적인 돌봄",
+  "지역사회와의 연결",
+] as const;
 
 const COLORS = [
   {
@@ -89,13 +95,13 @@ type LogoCardProps = {
 };
 
 /**
- * screen — 상징과 가치. 미션·비전, 로고와 그 뜻, 색·글꼴
+ * screen — 상징과 미션. 미션·비전, 로고와 그 뜻, 색·글꼴
  */
 const BrandScreen = () => (
   <article>
     <FoundationHeader
       overline="Symbol & Values"
-      title="상징과 가치"
+      title="상징과 미션"
       lead="피터팬 재단이 지향하는 가치와 그것이 담긴 상징과 디자인입니다."
     />
     <div className="page-article flex flex-col divide-y divide-beige py-10 lg:py-12">
@@ -127,6 +133,12 @@ const IdentitySection = () => (
         <dt className="w-20 shrink-0 text-4 leading-7 text-muted">비전</dt>
         <dd className="text-4 leading-7 font-medium text-ink">
           {CREED_HORIZON}
+        </dd>
+      </div>
+      <div className="flex flex-col gap-1 py-4 md:flex-row md:gap-4">
+        <dt className="w-20 shrink-0 text-4 leading-7 text-muted">핵심 방향</dt>
+        <dd className="text-4 leading-7 font-medium text-ink">
+          {DIRECTIONS.join(" · ")}
         </dd>
       </div>
       <div className="flex flex-col gap-2 py-4 md:flex-row md:gap-4">

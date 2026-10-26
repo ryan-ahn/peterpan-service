@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
 import BandSection from "@components/bandSection";
-import BrandText from "@components/brandText";
 import FoundationHeader from "@components/foundationHeader";
 import InfoCard from "@components/infoCard";
 import VillageAerial from "@components/villageAerial";
@@ -17,7 +16,7 @@ import {
 export const metadata: Metadata = {
   title: "조감과 공간",
   description:
-    "약 2,000평 부지에 주거 10세대, 커뮤니티동, 텃밭과 산책로를 담은 피터팬의 네버랜드 조감도와 공간 구성.",
+    "약 2,000평 부지에 주택 10채, 커뮤니티동, 텃밭과 산책로를 담을 피터팬의 네버랜드 조감도와 공간 구성 계획.",
 };
 
 /**
@@ -28,7 +27,7 @@ const SpacesScreen = () => (
     <FoundationHeader
       overline="Spaces"
       title="조감과 주요 공간"
-      lead="약 2,000평의 자연 속에 집과 돌봄, 일과 쉼을 한 마을로 담았습니다. 20명이 각자의 집에서 살며, 하루에 필요한 모든 것을 마을 안에서 누립니다."
+      lead="약 2,000평의 자연 속에 집과 돌봄, 일과 쉼을 한 마을로 담으려 합니다. 입주민 20명이 10채의 집에서 생활하며, 하루에 필요한 돌봄과 활동을 마을 안에서 누릴 수 있도록 계획하고 있습니다."
     />
     <ZoneSection />
     <HomeSection />
@@ -46,6 +45,9 @@ const ZoneSection = () => (
     title="치유 마을 조감도"
     description="약 2,000평 부지를 주거, 커뮤니티, 치유와 일터, 운동장과 산책로의 네 구역으로 나눕니다.">
     <VillageAerial />
+    <p className="mt-4 rounded-large bg-paper px-4 py-3 text-4 leading-6 text-ink/90">
+      {VILLAGE_NOTE}
+    </p>
     <dl className="mt-8 grid gap-px overflow-hidden rounded-xlarge border border-beige bg-beige sm:grid-cols-3">
       {VILLAGE_FACTS.map(fact => (
         <div key={fact.label} className="bg-white px-5 py-5">
@@ -69,9 +71,6 @@ const ZoneSection = () => (
         />
       ))}
     </div>
-    <BrandText variant="smallCompact" color="muted" className="mt-5">
-      {VILLAGE_NOTE}
-    </BrandText>
   </BandSection>
 );
 
@@ -79,7 +78,7 @@ const HomeSection = () => (
   <BandSection
     overline="Homes"
     title="한 사람의 속도를 지키는 집"
-    description="성인 중증 자폐성장애인 20명이 10세대로 나눠 삽니다."
+    description="성인 중증 자폐성장애인 20명이 10채의 주택에서 생활할 수 있도록 계획하고 있습니다. 한 주택에는 두 사람이 거주하되, 각자의 독립된 침실을 두어 개인의 특성과 사생활을 존중합니다."
     tone="paper">
     <dl className="flex flex-col divide-y divide-beige border-t border-beige">
       {VILLAGE_HOME.map(item => (

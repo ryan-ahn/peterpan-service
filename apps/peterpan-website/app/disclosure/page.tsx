@@ -6,7 +6,8 @@ import FoundationHeader from "@components/foundationHeader";
 
 export const metadata: Metadata = {
   title: "정보공개",
-  description: "피터팬 재단의 경영 공시와 기부금 공시를 투명하게 공개합니다.",
+  description:
+    "피터팬 재단의 경영 공시와 기부금 공시. 설립 등기 이후의 회계연도 자료를 투명하게 공개하겠습니다.",
 };
 
 /**
@@ -32,8 +33,8 @@ const DisclosureScreen = () => (
   <article>
     <FoundationHeader
       overline="Disclosure"
-      title="경영과 기부를 공개합니다"
-      lead="정관은 기부금 모금액과 활용실적, 사업실적을 홈페이지에 공개하도록 정하고 있습니다. 설립 등기 이후의 회계연도 자료를 파일로 올립니다."
+      title="경영과 기부를 공개하겠습니다"
+      lead="정관은 기부금 모금액과 활용실적, 사업실적을 홈페이지에 공개하도록 정하고 있습니다. 지금은 설립을 준비하는 단계로, 설립 등기 이후의 회계연도 자료부터 파일로 올리겠습니다."
     />
     <div className="page-article grid gap-4 py-10 md:grid-cols-2 lg:py-12">
       {BOARDS.map(board => (

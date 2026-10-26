@@ -42,7 +42,7 @@ const DonationsDisclosureScreen = async ({ searchParams }: Props) => {
     <DisclosureList
       overline="Donation disclosure"
       title="기부금 공시"
-      lead="기부금 모금액과 활용실적을 연도별 파일로 공개합니다."
+      lead="기부금 모금액과 활용실적을 회계연도가 마감되면 연도별 파일로 공개하겠습니다."
       years={years}
       currentYear={selectedYear}
       basePath="/disclosure/donations"

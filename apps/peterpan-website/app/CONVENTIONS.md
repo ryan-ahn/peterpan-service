@@ -9,7 +9,7 @@
 | 경로                                                     | 화면                                                       |
 | -------------------------------------------------------- | ---------------------------------------------------------- |
 | `/`                                                      | 홈 (비전·가치·하는 일·최근 소식)                           |
-| `/about`, `/about/{greeting,brand,organization,bylaws}`  | 설립 배경과 목적·대표 인사말·상징과 가치·조직도·정관       |
+| `/about`, `/about/{greeting,brand,organization,bylaws}`  | 설립 배경과 목적·대표 인사말·상징과 미션·조직도·정관       |
 | `/village`, `/village/{spaces,operation}`                | 피터팬 마을 소개·공간·운영                                 |
 | `/news`, `/news/[slug]`                                  | 재단 소식 목록(공지·활동·언론 보도)·본문                   |
 | `/board`, `/board/[id]`, `/board/write`                  | 회원 게시판 목록·본문·글쓰기(`?id=` 고치기)                |
@@ -22,7 +22,7 @@
 
 - 메뉴는 헤더에만 두고 `lib/nav.ts` 한 곳에서 관리한다. 하단에는 재단 법정 표기와 개인정보처리방침 링크만 둔다.
 - 개인정보처리방침의 보호책임자·담당 부서·시행일은 `app/privacy/page.tsx` 위쪽 상수에서 채운다. 비어 있으면 〔작성 필요〕로 보인다. 수집 항목·위탁사가 바뀌면 이 페이지도 함께 고친다.
-- `layout.tsx`가 세션(`getSessionProfile`)과 하단 연락처(`getSiteContact`)를 읽어 `SiteHeader`·`SiteFooter`에 넘긴다.
+- `layout.tsx`가 세션(`getSessionProfile`)과 하단 연락처(`getSiteContact`)를 읽어 `SiteHeader`·`SiteFooter`에 넘긴다. 헤더(`SessionHeader`)와 푸터(`ContactFooter`)를 각각 `<Suspense>`로 감싸고 본문은 감싸지 않는다. 그래서 첫 접속 때 헤더 줄 스켈레톤과 본문이 화면별 폭으로 먼저 나간다.
 - SEO: 사이트 주소·이름·대표 설명·키워드는 `@lib/site` 한 곳. 페이지마다 `metadata`에 `title`과 `description`을 둔다(OG·트위터는 여기서 자동으로 채워진다). 검색에 안 보일 화면은 `robots: { index: false }`. 새 고정 화면을 만들면 `sitemap.ts`의 `STATIC_ROUTES`에도 더한다. 아이콘·공유 이미지는 `app/{favicon.ico,icon.png,apple-icon.png,opengraph-image.png}`.
 - 관리 기능은 이 앱에 두지 않는다. 운영자는 `peterpan-admin`(`NEXT_PUBLIC_ADMIN_URL`)에서 관리한다. 예외로 게시판 글은 어드민 권한 회원이 본문 화면에서 바로 지울 수 있다.
 
@@ -34,6 +34,7 @@
 - 서버 컴포넌트가 기본이다. 데이터가 필요하면 screen을 `async`로 두고 `@lib/posts`의 함수를 기다린다.
 - 메뉴 화면(재단소개·마을소개·소통·정보공개·후원하기)의 첫머리는 `FoundationHeader`(영문 overline·제목·금색 선·lead, 아래 선)이고 본문은 `page-article` 칼럼에 `py-10 lg:py-12`으로 놓는다. 글 본문·글쓰기도 `page-article`. 그 밖의 화면(로그인·마이페이지·처리방침)은 `PageIntro`(eyebrow·title·lead). 마을소개·후원하기 본문은 `BandSection` 띠 구역, 공시 목록은 `DisclosureList`.
 - 후원은 1구좌 단위 없이 공식 후원 계좌로 받는다. 계좌 정보는 `app/donate/page.tsx`의 `DONATION_ACCOUNT`에 적고, 비어 있으면 "공개 준비 중"으로 보인다. 양식은 보낸 후원을 알리는 후원 알림(`donation_inquiries`)이다. 지금은 계좌이체 일시 후원만 받고(`DONATION_FORM_KINDS`), 정기 후원·카드 결제는 재단 설립과 PG 심사 뒤 결제 연동과 함께 연다.
+- 데이터를 기다리는 화면은 그 라우트에 `loading.tsx`를 두고 화면 모양을 닮은 스켈레톤(`BrandSkeleton`)을 보인다. 루트 `app/loading.tsx`는 홈 모양(`page-wide`)이다. 그래서 다른 화면은 모두 자기 `loading.tsx`를 둔다. 소개형 화면(재단소개·마을·개인정보처리방침)은 `PageSkeleton`을 쓴다. 화면 일부만 기다리면(홈 소식 목록) 그 부분만 `<Suspense>`로 감싼다.
 - 메뉴·캐러셀처럼 브라우저 상태가 필요한 UI만 `components/`에 `"use client"`로 둔다.
 - 폼 제출은 그 라우트의 `actions.ts` 서버 액션. 입력값은 `@repo/db/boards`의 `is*` 가드로 거른다.
 
@@ -52,25 +53,31 @@
 
 ## 컴포넌트
 
-| 위치                               | 내용                                                                      |
-| ---------------------------------- | ------------------------------------------------------------------------- |
-| `@repo/ui`                         | Button, Chip, Icon, Text 등 공용 원자                                     |
-| `components/brandText.tsx`         | `Text` 위에 브랜드 크기·색을 얹은 본문 글자                               |
-| `components/pageIntro.tsx`         | 화면 첫머리 eyebrow·제목·리드                                             |
-| `components/foundationHeader.tsx`  | 재단소개·마을소개·소통·정보공개 공통 머리 (page-article)                  |
-| `components/foundationHeading.tsx` | 재단소개 탭 본문의 구역 제목·한 줄 설명                                   |
-| `components/bandSection.tsx`       | 마을소개 가로 띠 구역 (영문 소제목·제목)                                  |
-| `components/infoCard.tsx`          | 마을소개 흰 카드 (분류·제목·설명)                                         |
-| `components/numberedList.tsx`      | 01·02 번호 제목·설명 목록                                                 |
-| `components/villageAerial.tsx`     | 치유 마을 조감도 (자리 이름·설명 창, client). 홈 첫 화면·조감과 공간      |
-| `components/siteHeader.tsx`        | 상단 메뉴·모바일 메뉴·후원하기. 로그인하면 사진·닉네임(마이페이지 링크)   |
-| `components/avatarPicker.tsx`      | 마이페이지 프로필 사진. 눌러서 골라 바로 올림 (client)                    |
-| `components/flashToast.tsx`        | 서버 액션이 쿼리로 넘긴 결과를 토스트로 한 번 띄우고 쿼리를 지움 (client) |
-| `components/siteFooter.tsx`        | 하단 재단 정보·개인정보처리방침 링크                                      |
-| `components/logo.tsx`              | 로고 링크 (`horizontal`·`symbol`)                                         |
-| `components/logoEmblem.tsx`        | 로고 네 모양 선 아이콘 (상징과 가치)                                      |
-| `components/workCarousel.tsx`      | 홈 하는 일 캐러셀                                                         |
-| `components/disclosureList.tsx`    | 연도별 공시 목록                                                          |
+| 위치                               | 내용                                                                        |
+| ---------------------------------- | --------------------------------------------------------------------------- |
+| `@repo/ui`                         | Button, Chip, Icon, Text 등 공용 원자                                       |
+| `components/brandText.tsx`         | `Text` 위에 브랜드 크기·색을 얹은 본문 글자                                 |
+| `components/pageIntro.tsx`         | 화면 첫머리 eyebrow·제목·리드                                               |
+| `components/foundationHeader.tsx`  | 재단소개·마을소개·소통·정보공개 공통 머리 (page-article)                    |
+| `components/foundationHeading.tsx` | 재단소개 탭 본문의 구역 제목·한 줄 설명                                     |
+| `components/bandSection.tsx`       | 마을소개 가로 띠 구역 (영문 소제목·제목)                                    |
+| `components/infoCard.tsx`          | 마을소개 흰 카드 (분류·제목·설명)                                           |
+| `components/numberedList.tsx`      | 01·02 번호 제목·설명 목록                                                   |
+| `components/villageAerial.tsx`     | 치유 마을 조감도 (자리 이름·설명 창, client). 홈 첫 화면·조감과 공간        |
+| `components/siteHeader.tsx`        | 상단 메뉴·모바일 메뉴·후원하기. 로그인하면 사진·닉네임(마이페이지 링크)     |
+| `components/avatarPicker.tsx`      | 마이페이지 프로필 사진. 눌러서 골라 바로 올림 (client)                      |
+| `components/flashToast.tsx`        | 서버 액션이 쿼리로 넘긴 결과를 토스트로 한 번 띄우고 쿼리를 지움 (client)   |
+| `components/siteFooter.tsx`        | 하단 재단 정보·개인정보처리방침 링크                                        |
+| `components/logo.tsx`              | 로고 링크 (`horizontal`·`symbol`)                                           |
+| `components/logoEmblem.tsx`        | 로고 네 모양 선 아이콘 (상징과 미션)                                        |
+| `components/introSplash.tsx`       | 초록 스플래시. 로고 조각이 뜻대로 모이는 애니메이션 (client, 지금은 미사용) |
+| `components/brandSkeleton.tsx`     | `Skeleton` 위에 베이지 톤을 얹은 자리 블록                                  |
+| `components/headerSkeleton.tsx`    | `FoundationHeader` 자리 스켈레톤                                            |
+| `components/pageSkeleton.tsx`      | 소개형 화면 스켈레톤 (머리 + 본문 글·카드)                                  |
+| `components/rowListSkeleton.tsx`   | 소식·게시판 목록 표 스켈레톤                                                |
+| `components/articleSkeleton.tsx`   | 소식·게시판 글 본문 스켈레톤                                                |
+| `components/workCarousel.tsx`      | 홈 하는 일 캐러셀                                                           |
+| `components/disclosureList.tsx`    | 연도별 공시 목록                                                            |
 
 - 글자는 `BrandText`의 `variant`로 고른다. `display`·`title`·`section`·`heading`·`cardTitle`·`lead`·`body`·`bodyCompact`·`small`·`smallCompact`·`caption`·`overline`·`pen`(손글씨).
 - 글자 색은 `color`로 고른다. `ink`·`inkSoft`·`muted`·`pine`·`pineDeep`·`gold`·`goldDeep`·`sage`·`beige`·`paper`·`white`·`whiteSoft`.

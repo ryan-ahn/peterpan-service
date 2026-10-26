@@ -33,7 +33,7 @@ const ManagementScreen = async ({ searchParams }: Props) => {
     <DisclosureList
       overline="Management disclosure"
       title="경영 공시"
-      lead="사업계획 및 예산, 결산서 및 재무제표, 감사보고서를 연도별로 올립니다."
+      lead="사업계획 및 예산, 결산서 및 재무제표, 감사보고서를 설립 등기 이후 연도별로 올리겠습니다."
       years={years}
       currentYear={selectedYear}
       basePath="/disclosure/management"

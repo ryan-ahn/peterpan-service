@@ -20,7 +20,7 @@ import {
 export const metadata: Metadata = {
   title: "피터팬마을",
   description:
-    "피터팬의 네버랜드 마을 소개. 성인 중증 자폐성장애인이 각자의 집에서 살며 돌봄과 일, 쉼을 함께 누리는 생활주거공동체입니다.",
+    "피터팬의 네버랜드 마을 소개. 성인 중증 자폐성장애인이 각자의 집에서 살며 돌봄과 일, 쉼을 함께 누리도록 계획한 생활주거공동체입니다.",
 };
 
 /**
@@ -45,7 +45,11 @@ const VillageScreen = () => (
  * section
  */
 const BackgroundSection = () => (
-  <BandSection overline="Why Neverland" title="왜 네버랜드인가" tone="paper">
+  <BandSection
+    id="story"
+    overline="Why Neverland"
+    title="왜 네버랜드인가"
+    tone="paper">
     <BrandText
       variant="body"
       color="inkSoft"
@@ -97,7 +101,7 @@ const PillarSection = () => (
   <BandSection
     overline="What we build"
     title="자립과 치유의 융합 복지 모델"
-    description="피터팬 자폐인복지재단이 마을에서 펼칠 네 가지 핵심 사업입니다."
+    description="피터팬 자폐인복지재단이 마을에서 추진할 네 가지 핵심 사업입니다."
     tone="paper">
     <div className="grid gap-4 md:grid-cols-2">
       {VILLAGE_PILLARS.map(pillar => (
@@ -120,7 +124,7 @@ const RoadmapSection = () => (
   <BandSection
     overline="Roadmap"
     title="사업 추진 로드맵"
-    description="단계별 목표를 이뤄 1호 마을을 안착시키고, 전국 권역으로 넓힙니다.">
+    description="2026년 10월 사업 제안 기준의 추진 계획입니다. 기간은 재단 설립 인가를 기준으로 한 예상이며, 진행 상황에 따라 달라질 수 있습니다.">
     <ol className="grid gap-4 sm:grid-cols-2">
       {VILLAGE_ROADMAP.map(stage => (
         <li

@@ -58,7 +58,7 @@ const SupportSection = () => (
   <BandSection
     overline="365 days"
     title="365일, 공백 없는 지원"
-    description="지금의 24시간 통합돌봄 정책에는 이런 빈자리가 있습니다.">
+    description="현행 최중증 발달장애인 24시간 통합돌봄 서비스의 운영 조건을 기준으로 본 빈자리입니다. 세부 대상과 기간은 연도별 사업지침에 따라 달라질 수 있습니다.">
     <NumberedList items={OPERATION_GAPS} />
     <h3 className="mt-12 text-7 leading-10 font-semibold text-pine">
       네버랜드가 채우는 방식
@@ -144,7 +144,7 @@ const RequestSection = () => (
   <BandSection
     overline="Policy"
     title="정부에 요청하는 것"
-    description="민간이 먼저 실증한 모델이 국가 제도로 이어지도록 세 가지를 제안합니다.">
+    description="민간에서 먼저 운영해 본 모델이 제도적으로 확산될 수 있도록 세 가지를 제안합니다.">
     <NumberedList items={POLICY_REQUESTS} />
   </BandSection>
 );

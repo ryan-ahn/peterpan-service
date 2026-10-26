@@ -55,9 +55,10 @@ const WorkCarousel = () => {
               우리가 만들어가는 변화
             </BrandText>
             <BrandText variant="bodyCompact" color="muted" className="mt-4">
-              피터팬 재단은 단순한 수용이 아닌, 삶을 지속하기 위한 주거와 돌봄의
-              모델을 만들어 성인 중증 자폐성장애인과 그 가족의 더 나은 내일을
-              함께 만들어갑니다.
+              피터팬 재단은 단순한 보호를 넘어, 성인 중증 자폐성장애인이 자신의
+              삶을 지속할 수 있는 주거와 돌봄의 모델을 구축합니다. 이를 통해
+              당사자와 가족이 더 나은 내일을 함께 그려 갈 수 있도록
+              돕겠습니다.
             </BrandText>
           </div>
           <div className="flex items-center gap-3">
