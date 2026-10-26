@@ -126,9 +126,6 @@ const VillageAerial = () => {
           <SpotCard spot={selectedSpot} onClose={handleCardClose} />
         </div>
       ) : null}
-      <figcaption className="mt-3 text-center text-4 leading-6 text-muted">
-        이름을 누르면 공간 설명이 열립니다 · 제안 단계 구상안
-      </figcaption>
     </figure>
   );
 };

@@ -18,7 +18,10 @@ import FoundationHeader from "@components/foundationHeader";
 import FoundationHeading from "@components/foundationHeading";
 import { formatDate } from "@lib/format";
 
-export const metadata: Metadata = { title: "정관" };
+export const metadata: Metadata = {
+  title: "정관",
+  description: "재단법인 피터팬 자폐인복지재단 정관 전문을 공개합니다.",
+};
 
 /**
  * constants

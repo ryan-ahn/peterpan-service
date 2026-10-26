@@ -39,11 +39,3 @@ export const colors = {
     muted: "var(--color-muted)",
   },
 } as const;
-
-export const fontWeights = {
-  light: 300,
-  normal: 400,
-  medium: 500,
-  semibold: 600,
-  bold: 700,
-} as const;

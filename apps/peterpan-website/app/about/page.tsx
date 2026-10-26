@@ -15,7 +15,11 @@ import {
   FOUNDING_WORKS,
 } from "@lib/foundation";
 
-export const metadata: Metadata = { title: "설립 배경과 목적" };
+export const metadata: Metadata = {
+  title: "설립 배경과 목적",
+  description:
+    "피터팬 재단의 설립 배경과 목적. 부모가 떠난 뒤에도 성인 중증 자폐성장애인이 혼자가 아닌 삶을 이어 가도록 재단을 세운 이유를 소개합니다.",
+};
 
 /**
  * types

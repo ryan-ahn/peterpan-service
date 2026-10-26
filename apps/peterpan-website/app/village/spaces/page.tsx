@@ -14,7 +14,11 @@ import {
   VILLAGE_ZONES,
 } from "@lib/foundation";
 
-export const metadata: Metadata = { title: "조감과 공간" };
+export const metadata: Metadata = {
+  title: "조감과 공간",
+  description:
+    "약 2,000평 부지에 주거 10세대, 커뮤니티동, 텃밭과 산책로를 담은 피터팬의 네버랜드 조감도와 공간 구성.",
+};
 
 /**
  * screen — 조감과 공간. 조감도와 규모·네 구역, 집, 커뮤니티동, 치유 공간

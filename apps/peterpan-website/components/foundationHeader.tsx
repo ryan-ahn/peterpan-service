@@ -10,7 +10,7 @@ type Props = {
 };
 
 /**
- * 재단소개 탭 공통 머리. 본문과 같은 가운데 칼럼(page-article)에 놓는다
+ * 하위 페이지 공통 머리(재단소개·마을소개·소통·정보공개). 본문과 같은 가운데 칼럼(page-article)에 놓는다
  * @param overline 제목 위 영문 분류
  * @param title 페이지 제목
  * @param lead 제목 아래 요약

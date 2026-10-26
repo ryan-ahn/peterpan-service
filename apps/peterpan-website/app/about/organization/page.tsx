@@ -9,7 +9,10 @@ import cn from "@repo/ui/lib/cn";
 import BrandText from "@components/brandText";
 import FoundationHeader from "@components/foundationHeader";
 
-export const metadata: Metadata = { title: "조직도" };
+export const metadata: Metadata = {
+  title: "조직도",
+  description: "재단법인 피터팬 자폐인복지재단의 조직도와 구성원을 소개합니다.",
+};
 
 /**
  * constants

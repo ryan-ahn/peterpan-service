@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { getSessionProfile } from "@repo/auth/session";
 import Button from "@repo/ui/components/button";
+import SocialLogo from "@repo/ui/components/socialLogo";
 import cn from "@repo/ui/lib/cn";
 import Text from "@repo/ui/text";
 
@@ -16,7 +17,7 @@ import {
 /**
  * constants
  */
-const HOME_PATH = "/posts";
+const HOME_PATH = "/members";
 
 /**
  * types
@@ -88,6 +89,7 @@ const ProviderSection = () => (
       variant="solid"
       color="kakao"
       text="카카오로 로그인"
+      leftChildren={<SocialLogo provider="kakao" />}
       href={`/auth/kakao?next=${HOME_PATH}`}
       isFullWidth
     />
@@ -95,6 +97,7 @@ const ProviderSection = () => (
       variant="line"
       color="gray"
       text="구글로 로그인"
+      leftChildren={<SocialLogo provider="google" />}
       href={`/auth/google?next=${HOME_PATH}`}
       isFullWidth
     />

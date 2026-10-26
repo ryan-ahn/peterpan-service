@@ -17,7 +17,11 @@ import {
   VILLAGE_TARGETS,
 } from "@lib/foundation";
 
-export const metadata: Metadata = { title: "피터팬마을" };
+export const metadata: Metadata = {
+  title: "피터팬마을",
+  description:
+    "피터팬의 네버랜드 마을 소개. 성인 중증 자폐성장애인이 각자의 집에서 살며 돌봄과 일, 쉼을 함께 누리는 생활주거공동체입니다.",
+};
 
 /**
  * screen — 마을 소개. 제안 배경, 약속, 대상, 핵심 사업, 로드맵. 조감과 규모는 /village/spaces

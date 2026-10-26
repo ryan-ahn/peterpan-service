@@ -38,7 +38,7 @@ export const requireAdmin = async (): Promise<AdminSelf> => {
 export const requireOwner = async (): Promise<AdminSelf> => {
   const self = await requireAdmin();
   if (self.role !== "owner") {
-    redirect("/posts");
+    redirect("/members");
   }
   return self;
 };

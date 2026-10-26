@@ -7,11 +7,15 @@ import Icon from "@repo/ui/icon";
 import cn from "@repo/ui/lib/cn";
 
 import BrandText from "@components/brandText";
-import PageIntro from "@components/pageIntro";
+import FoundationHeader from "@components/foundationHeader";
 import { listBoardPosts } from "@lib/board";
 import { formatDate } from "@lib/format";
 
-export const metadata: Metadata = { title: "게시판" };
+export const metadata: Metadata = {
+  title: "게시판",
+  description:
+    "피터팬 재단 게시판. 후원자와 가족, 이웃이 소식과 마음을 나누는 공간입니다.",
+};
 
 /**
  * types
@@ -56,45 +60,47 @@ const BoardScreen = async ({ searchParams }: Props) => {
     : `/login?next=${encodeURIComponent("/board/write")}`;
   // render
   return (
-    <section className="page-list py-16">
-      <PageIntro
-        eyebrow="게시판"
+    <article>
+      <FoundationHeader
+        overline="Community"
         title="함께 나누는 이야기"
         lead="회원 누구나 글을 남길 수 있습니다. 서로를 배려하는 말로 마음을 나눠 주세요."
       />
-      <div className="mt-8 flex flex-col gap-3 md:flex-row md:items-center">
-        <form className="flex flex-1 gap-2" action="/board">
-          <input
-            name="q"
-            defaultValue={query}
-            placeholder="검색어 입력"
-            className="h-12 min-w-0 flex-1 rounded-full border border-beige bg-white px-5 outline-none focus:border-pine"
-          />
-          <Button
-            variant="line"
-            color="pine"
-            type="submit"
-            text="검색"
-            isRound
-          />
-        </form>
-        <Link
-          href={writeHref}
-          className={buttonStyle({
-            variant: "solid",
-            color: "pine",
-            size: "medium",
-            isRound: true,
-          })}>
-          <Icon name="edit" size={18} />
-          {user ? "글쓰기" : "로그인하고 글쓰기"}
-        </Link>
+      <div className="page-article py-14 lg:py-16">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center">
+          <form className="flex flex-1 gap-2" action="/board">
+            <input
+              name="q"
+              defaultValue={query}
+              placeholder="검색어 입력"
+              className="h-12 min-w-0 flex-1 rounded-full border border-beige bg-white px-5 outline-none focus:border-pine"
+            />
+            <Button
+              variant="line"
+              color="pine"
+              type="submit"
+              text="검색"
+              isRound
+            />
+          </form>
+          <Link
+            href={writeHref}
+            className={buttonStyle({
+              variant: "solid",
+              color: "pine",
+              size: "medium",
+              isRound: true,
+            })}>
+            <Icon name="edit" size={18} />
+            {user ? "글쓰기" : "로그인하고 글쓰기"}
+          </Link>
+        </div>
+        <ListSection result={result} />
+        {result && result.pageCount > 1 ? (
+          <PagerSection result={result} query={query} />
+        ) : null}
       </div>
-      <ListSection result={result} />
-      {result && result.pageCount > 1 ? (
-        <PagerSection result={result} query={query} />
-      ) : null}
-    </section>
+    </article>
   );
 };
 
@@ -115,13 +121,13 @@ const ListSection = ({ result }: ListSectionProps) => {
       <BrandText
         variant="bodyCompact"
         color="muted"
-        className="mt-8 rounded-2xlarge bg-white px-6 py-10">
+        className="mt-8 rounded-2xlarge border border-beige bg-white px-6 py-10">
         아직 글이 없습니다. 첫 이야기를 남겨 주세요.
       </BrandText>
     );
   }
   return (
-    <div className="mt-8 overflow-hidden rounded-2xlarge bg-white">
+    <div className="mt-8 overflow-hidden rounded-2xlarge border border-beige bg-white">
       <div className="hidden grid-cols-[5rem_1fr_8rem_5rem_7rem] gap-3 border-b border-beige px-6 py-3 text-4 leading-5 text-muted md:grid">
         <span>번호</span>
         <span>제목</span>
@@ -176,8 +182,10 @@ const PagerSection = ({ result, query }: PagerSectionProps) => (
           key={number}
           href={`/board?q=${encodeURIComponent(query)}&page=${number}`}
           className={cn(
-            "grid size-9 place-items-center rounded-full text-4 leading-5",
-            number === result.page ? "bg-pine text-white" : "bg-white",
+            "grid size-9 place-items-center rounded-full border text-4 leading-5",
+            number === result.page
+              ? "border-pine bg-pine text-white"
+              : "border-beige bg-white",
           )}>
           {number}
         </Link>

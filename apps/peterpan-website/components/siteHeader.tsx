@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import Link from "next/link";
 
+import Avatar from "@repo/ui/components/avatar";
 import { buttonStyle } from "@repo/ui/components/button";
 import Icon from "@repo/ui/icon";
 import cn from "@repo/ui/lib/cn";
@@ -14,15 +15,24 @@ import { NAV } from "@lib/nav";
 /**
  * types
  */
+type HeaderUser = {
+  name: string;
+  avatarUrl: string | null;
+};
+
 type Props = {
-  userName: string | null;
+  user: HeaderUser | null;
+};
+
+type UserBadgeProps = {
+  user: HeaderUser;
 };
 
 /**
  * 상단 메뉴. 넓은 화면은 드롭다운, 좁은 화면은 펼침 메뉴
- * @param userName 로그인한 사용자 이름. 없으면 로그인 링크
+ * @param user 로그인한 사용자. 있으면 사진·닉네임이 마이페이지 링크, 없으면 로그인 링크
  */
-const SiteHeader = ({ userName }: Props) => {
+const SiteHeader = ({ user }: Props) => {
   // states
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   // handlers
@@ -54,7 +64,7 @@ const SiteHeader = ({ userName }: Props) => {
                       <Link
                         key={child.href}
                         href={child.href}
-                        className="block rounded-large px-3 py-2 text-4 leading-5 text-ink/80 hover:bg-paper hover:text-pine">
+                        className="block rounded-large px-3 py-2 text-center text-4 leading-5 text-ink/80 hover:bg-paper hover:text-pine">
                         {child.label}
                       </Link>
                     ))}
@@ -65,14 +75,22 @@ const SiteHeader = ({ userName }: Props) => {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Link
-            href="/login"
-            className={cn(
-              buttonStyle({ variant: "line", color: "pine", size: "small" }),
-              "hidden md:inline-flex",
-            )}>
-            {userName ?? "로그인"}
-          </Link>
+          {user ? (
+            <Link
+              href="/mypage"
+              className="mr-2 hidden items-center gap-2 text-4 leading-5 font-medium text-ink transition hover:text-pine md:inline-flex">
+              <UserBadge user={user} />
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className={cn(
+                buttonStyle({ variant: "line", color: "pine", size: "small" }),
+                "hidden md:inline-flex",
+              )}>
+              로그인
+            </Link>
+          )}
           <Link
             href="/donate"
             className={buttonStyle({
@@ -120,15 +138,30 @@ const SiteHeader = ({ userName }: Props) => {
             </div>
           ))}
           <Link
-            href="/login"
-            className="mt-3 block text-4 leading-5"
+            href={user ? "/mypage" : "/login"}
+            className="mt-3 flex items-center gap-2 text-4 leading-5"
             onClick={handleMenuClose}>
-            {userName ?? "로그인"}
+            {user ? <UserBadge user={user} /> : "로그인"}
           </Link>
         </nav>
       ) : null}
     </header>
   );
 };
+
+/**
+ * inner components
+ */
+const UserBadge = ({ user }: UserBadgeProps) => (
+  <>
+    <Avatar
+      name={user.name}
+      src={user.avatarUrl}
+      size="medium"
+      className="bg-beige text-pine"
+    />
+    <span>{user.name}</span>
+  </>
+);
 
 export default SiteHeader;

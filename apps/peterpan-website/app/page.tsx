@@ -1,10 +1,11 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { categoryLabel } from "@repo/db/boards";
 import { buttonStyle } from "@repo/ui/components/button";
+import Icon from "@repo/ui/icon";
 
 import BrandText from "@components/brandText";
+import VillageAerial from "@components/villageAerial";
 import WorkCarousel from "@components/workCarousel";
 import { formatDate } from "@lib/format";
 import { VALUES } from "@lib/foundation";
@@ -46,7 +47,7 @@ const HomeScreen = async () => {
  */
 const HeroSection = () => (
   <section className="border-b border-beige">
-    <div className="page-wide grid items-center gap-10 py-14 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-16 lg:py-20">
+    <div className="page-wide grid items-center gap-10 py-14 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-12 lg:py-20">
       <div>
         <BrandText variant="overline" color="pine">
           Peter Pan Foundation
@@ -81,23 +82,14 @@ const HeroSection = () => (
           </Link>
         </div>
       </div>
-      <div className="relative min-h-120 overflow-hidden rounded-2xlarge lg:min-h-140">
-        <Image
-          src="/images/hero.jpg"
-          alt="나무 사이에 자리한 낮은 집들"
-          fill
-          priority
-          className="object-cover"
-          sizes="(min-width: 1024px) 50vw, 100vw"
-        />
-        <div className="absolute inset-x-0 bottom-0 bg-pine-deep/92 px-6 py-5">
-          <BrandText variant="caption" color="gold">
-            재단의 약속
-          </BrandText>
-          <BrandText variant="cardTitle" color="paper" className="mt-1">
-            혼자가 되어도, 혼자가 아닌 삶.
-          </BrandText>
-        </div>
+      <div className="flex flex-col items-center gap-1 lg:pt-12">
+        <VillageAerial />
+        <Link
+          href="/village/spaces"
+          className="inline-flex items-center gap-1 text-4 leading-5 font-medium text-pine hover:text-pine-deep">
+          조감도 자세히
+          <Icon name="chevron-right" size={16} />
+        </Link>
       </div>
     </div>
   </section>

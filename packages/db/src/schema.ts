@@ -15,6 +15,7 @@ import type { BylawOutline } from "./bylawOutline";
 
 /**
  * 로그인 사용자. id는 Supabase Auth 사용자 id와 같다.
+ * 이름·사진은 처음 가입할 때 소셜 계정에서 한 번 채우고, 이후에는 회원이 마이페이지에서 고친다.
  */
 export const profiles = pgTable(
   "profiles",
@@ -23,9 +24,14 @@ export const profiles = pgTable(
     email: text("email"),
     name: text("name").notNull().default(""),
     avatarUrl: text("avatar_url"),
+    phone: text("phone").notNull().default(""),
+    birthDate: date("birth_date"),
     provider: text("provider").notNull(),
     providerUserId: text("provider_user_id").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
   },
@@ -220,13 +226,23 @@ export const bylaws = pgTable("bylaws", {
     .defaultNow(),
 });
 
+/**
+ * 후원 알림. 공식 계좌로 보낸 뒤 남긴다. 로그인한 회원이 남기면 user_id가 붙어 마이페이지 문의 내역에 보인다.
+ * wall_name은 재단 승인 뒤 이름 벽에 올릴 이름이다 (비우면 올리지 않는다).
+ */
 export const donationInquiries = pgTable("donation_inquiries", {
   id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").references(() => profiles.id, {
+    onUpdate: "cascade",
+    onDelete: "set null",
+  }),
   name: text("name").notNull(),
   phone: text("phone").notNull().default(""),
   email: text("email").notNull(),
   kind: text("kind").notNull(),
   amount: text("amount").notNull().default(""),
+  depositorName: text("depositor_name").notNull().default(""),
+  wallName: text("wall_name").notNull().default(""),
   message: text("message").notNull().default(""),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()

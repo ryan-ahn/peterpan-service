@@ -27,15 +27,3 @@ const getSql = (): Sql => {
 };
 
 export const getDb = () => drizzle(getSql(), { schema });
-
-export const findAuthUserIdByEmail = async (params: {
-  email: string;
-}): Promise<string | null> => {
-  const rows = await getSql()<{ id: string }[]>`
-    select id
-    from auth.users
-    where lower(email) = lower(${params.email})
-    limit 1
-  `;
-  return rows[0]?.id ?? null;
-};

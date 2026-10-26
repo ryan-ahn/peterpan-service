@@ -32,18 +32,10 @@ const NAV_LINKS: {
   icon: IconName;
   isOwnerOnly: boolean;
 }[] = [
-  {
-    href: "/posts",
-    label: "게시물 관리",
-    icon: "edit",
-    isOwnerOnly: false,
-  },
-  {
-    href: "/news",
-    label: "소식 관리",
-    icon: "megaphone",
-    isOwnerOnly: false,
-  },
+  { href: "/members", label: "회원 관리", icon: "users", isOwnerOnly: false },
+  { href: "/inquiries", label: "후원 문의", icon: "mail", isOwnerOnly: false },
+  { href: "/news", label: "소식 관리", icon: "megaphone", isOwnerOnly: false },
+  { href: "/posts", label: "게시물 관리", icon: "edit", isOwnerOnly: false },
   {
     href: "/disclosures",
     label: "공시 관리",
@@ -52,15 +44,18 @@ const NAV_LINKS: {
   },
   {
     href: "/organization",
-    label: "조직도",
+    label: "조직도 관리",
     icon: "sitemap",
     isOwnerOnly: false,
   },
-  { href: "/bylaws", label: "정관", icon: "file-text", isOwnerOnly: false },
-  { href: "/inquiries", label: "후원 문의", icon: "mail", isOwnerOnly: false },
-  { href: "/members", label: "회원 관리", icon: "users", isOwnerOnly: false },
+  {
+    href: "/bylaws",
+    label: "정관 관리",
+    icon: "file-text",
+    isOwnerOnly: false,
+  },
+  { href: "/settings", label: "기본 정보", icon: "home", isOwnerOnly: false },
   { href: "/permissions", label: "권한 관리", icon: "user", isOwnerOnly: true },
-  { href: "/settings", label: "기본정보", icon: "home", isOwnerOnly: false },
 ];
 
 const ROLE_LABEL: Record<AdminSelf["role"], string> = {
@@ -412,7 +407,10 @@ const AdminShell = ({ self, headerSearch, children }: Props) => {
  * @param seconds 남은 초
  * @param onExtend 연장 버튼을 눌렀을 때
  */
-const SessionWarningToast = ({ seconds, onExtend }: SessionWarningToastProps) => (
+const SessionWarningToast = ({
+  seconds,
+  onExtend,
+}: SessionWarningToastProps) => (
   <div className="pointer-events-none fixed inset-x-0 top-4 z-60 flex justify-center px-4">
     <div
       className="pointer-events-auto flex w-full max-w-120 animate-pop-in items-center justify-between gap-4 rounded-full bg-gray-900 py-3 pr-3 pl-6 shadow-large"

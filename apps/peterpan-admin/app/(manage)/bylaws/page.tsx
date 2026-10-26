@@ -159,7 +159,7 @@ const BylawsScreen = () => {
   return (
     <div className="flex flex-col gap-5">
       <AdminPageHeader
-        title="정관"
+        title="정관 관리"
         description="올린 정관은 모두 남아요. 웹사이트 재단소개 › 정관에는 노출 중인 1건만 내려받을 수 있게 보여요."
         actions={
           <Button

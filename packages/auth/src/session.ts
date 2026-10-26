@@ -20,7 +20,8 @@ export type SessionProfile = {
 };
 
 /**
- * 로그인한 사용자와 profiles 행, 어드민 권한. 일반 회원은 role이 null. 로그인하지 않았거나 읽지 못하면 null.
+ * 로그인한 사용자와 profiles 행, 어드민 권한. 이름·사진·이메일은 profiles에서만 읽는다. 일반 회원은 role이 null.
+ * 로그인하지 않았거나 profiles 행이 없거나 읽지 못하면 null.
  * 한 요청 안에서는 한 번만 읽는다. 세션 확인은 `getClaims()`(비대칭 서명 키면 Auth 서버를 부르지 않고 JWT를 검증)
  */
 export const getSessionProfile = cache(
@@ -39,12 +40,15 @@ export const getSessionProfile = cache(
         .where(eq(profiles.id, claims.sub))
         .limit(1);
       const row = rows[0];
+      if (!row) {
+        return null;
+      }
       return {
         id: claims.sub,
-        email: row?.profile.email ?? claims.email ?? null,
-        name: row?.profile.name || readMetadataName(claims.user_metadata),
-        role: readAdminRole(row?.role),
-        avatarUrl: row?.profile.avatarUrl ?? null,
+        email: row.profile.email,
+        name: row.profile.name || "회원",
+        role: readAdminRole(row.role),
+        avatarUrl: row.profile.avatarUrl,
       };
     } catch {
       return null;
@@ -60,19 +64,6 @@ export const readAdminRole = (value: unknown): AdminRole | null => {
     return value;
   }
   return null;
-};
-
-const readMetadataName = (metadata: unknown) => {
-  if (
-    metadata &&
-    typeof metadata === "object" &&
-    "name" in metadata &&
-    typeof metadata.name === "string" &&
-    metadata.name
-  ) {
-    return metadata.name;
-  }
-  return "회원";
 };
 
 /**

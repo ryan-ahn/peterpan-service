@@ -19,7 +19,11 @@ import {
   VILLAGE_OUTCOMES,
 } from "@lib/foundation";
 
-export const metadata: Metadata = { title: "운영 방향" };
+export const metadata: Metadata = {
+  title: "운영 방향",
+  description:
+    "피터팬의 네버랜드가 어떻게 운영되는지, 입주인의 돌봄과 일상을 지키는 운영 방향을 소개합니다.",
+};
 
 /**
  * types

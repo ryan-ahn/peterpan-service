@@ -159,6 +159,8 @@ export type Inquiry = {
   phone: string;
   kind: string;
   amount: string;
+  depositorName: string;
+  wallName: string;
   message: string;
   createdAt: string;
 };
@@ -209,15 +211,11 @@ type ListPostsParams = {
   board: BoardId;
 };
 
-type ListNoticesParams = {
-  search: string;
-  page: number;
-};
-
 type ListNewsItemsParams = {
   search: string;
   page: number;
   kind: NewsKind;
+  pressStatus: PressStatus | null;
 };
 
 type ListMemberPostsParams = {
@@ -526,8 +524,12 @@ export const deleteMemberComment = async (params: IdParams) => {
  */
 export const listNewsItems = async (
   params: ListNewsItemsParams,
-): Promise<ListResult<NewsItem, NewsKind>> => {
-  const { search, page, kind } = params;
+): Promise<
+  ListResult<NewsItem, NewsKind> & {
+    pressCounts: Record<PressStatus | "all", number>;
+  }
+> => {
+  const { search, page, kind, pressStatus } = params;
   await assertAdmin();
   const noticeWhere = matchKeyword({
     search,
@@ -546,21 +548,43 @@ export const listNewsItems = async (
       pressCandidates.publisher,
     ],
   });
-  const [noticeCount, activityCount, pressCount, items] = await Promise.all([
-    countRows({ table: notices, where: noticeWhere }),
-    countRows({ table: posts, where: activityWhere }),
-    countRows({ table: pressCandidates, where: pressWhere }),
-    readNewsRows({ kind, page, noticeWhere, activityWhere, pressWhere }),
-  ]);
+  const [noticeCount, activityCount, pressStatusRows, items] =
+    await Promise.all([
+      countRows({ table: notices, where: noticeWhere }),
+      countRows({ table: posts, where: activityWhere }),
+      getDb()
+        .select({
+          key: pressCandidates.status,
+          count: sql<number>`count(*)::int`,
+        })
+        .from(pressCandidates)
+        .where(pressWhere)
+        .groupBy(pressCandidates.status),
+      readNewsRows({
+        kind,
+        page,
+        noticeWhere,
+        activityWhere,
+        pressWhere: and(
+          pressWhere,
+          pressStatus ? eq(pressCandidates.status, pressStatus) : undefined,
+        ),
+      }),
+    ]);
+  const pressCounts = countBy({
+    rows: pressStatusRows,
+    keys: ["pending", "approved", "hidden"] as const,
+  });
   const totals: Record<NewsKind, number> = {
     notice: noticeCount,
     activity: activityCount,
-    press: pressCount,
+    press: pressCounts.all,
   };
   return {
     items,
-    total: totals[kind],
-    counts: { all: noticeCount + activityCount + pressCount, ...totals },
+    total: kind === "press" ? pressCounts[pressStatus ?? "all"] : totals[kind],
+    counts: { all: noticeCount + activityCount + pressCounts.all, ...totals },
+    pressCounts,
   };
 };
 
@@ -676,28 +700,6 @@ export const listPosts = async (
 /**
  * actions — 공지사항. notices 테이블. 웹사이트 재단소식에 공지 분류로 함께 보인다
  */
-export const listNotices = async (
-  params: ListNoticesParams,
-): Promise<ListResult<Notice, never>> => {
-  const { search, page } = params;
-  await assertAdmin();
-  const where = matchKeyword({
-    search,
-    columns: [notices.title, notices.body],
-  });
-  const [rows, total] = await Promise.all([
-    getDb()
-      .select()
-      .from(notices)
-      .where(where)
-      .orderBy(desc(notices.pinned), desc(notices.createdAt))
-      .limit(ADMIN_PAGE_SIZE)
-      .offset(pageOffset(page)),
-    countRows({ table: notices, where }),
-  ]);
-  return { items: rows.map(toNotice), total, counts: { all: total } };
-};
-
 export const saveNotice = async (params: SaveNoticeParams): Promise<Notice> => {
   const { id, isPinned, isPublished } = params;
   await assertAdmin();
@@ -877,6 +879,8 @@ export const listInquiries = async (
       phone: row.phone,
       kind: row.kind,
       amount: row.amount,
+      depositorName: row.depositorName,
+      wallName: row.wallName,
       message: row.message,
       createdAt: row.createdAt.toISOString(),
     })),
@@ -1007,7 +1011,7 @@ export const deleteBylaw = async (params: IdParams) => {
 };
 
 /**
- * actions — 기본정보 (웹사이트 하단 연락처)
+ * actions — 기본 정보 (웹사이트 하단 연락처)
  */
 export const readContact = async (): Promise<SiteContact> => {
   await assertAdmin();

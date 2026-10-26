@@ -81,6 +81,8 @@ const PRESS_STATUS: Record<
   hidden: { label: "숨김", color: "gray" },
 };
 
+const PRESS_FILTERS: PressFilter[] = ["all", "pending", "approved", "hidden"];
+
 const PRESS_COLUMNS: AdminColumn<NewsItem>[] = [
   {
     key: "title",
@@ -179,10 +181,14 @@ const COLUMNS: AdminColumn<NewsItem>[] = [
  */
 type Editor = { kind: NewsKind; item: NewsItem | null } | null;
 
+type PressFilter = PressStatus | "all";
+
+type NewsFilter = Exclude<NewsKind, "press"> | `press-${PressFilter}`;
+
 type ReadNewsParams = {
   search: string;
   page: number;
-  filter: NewsKind;
+  filter: NewsFilter;
 };
 
 type NoticeEditorSectionProps = {
@@ -202,7 +208,13 @@ type PressReviewSectionProps = {
  */
 const readNews = (params: ReadNewsParams) => {
   const { search, page, filter } = params;
-  return listNewsItems({ search, page, kind: filter });
+  const pressFilter = readPressFilter(filter);
+  return listNewsItems({
+    search,
+    page,
+    kind: readNewsKind(filter),
+    pressStatus: pressFilter === "all" ? null : pressFilter,
+  });
 };
 
 /**
@@ -224,8 +236,10 @@ const NewsScreen = () => {
   // variables
   const total = list.result?.total ?? 0;
   const pageCount = Math.max(1, Math.ceil(total / ADMIN_PAGE_SIZE));
-  const activeTab = KIND_INFO[list.filter];
-  const isPressTab = list.filter === "press";
+  const activeKind = readNewsKind(list.filter);
+  const activeTab = KIND_INFO[activeKind];
+  const isPressTab = activeKind === "press";
+  const pressFilter = readPressFilter(list.filter);
   const tabs = KIND_ORDER.map(kind => ({
     id: kind,
     label: KIND_INFO[kind].label,
@@ -256,12 +270,18 @@ const NewsScreen = () => {
     setIsCollecting(false);
   };
   // handlers
+  const handleTabChange = (kind: NewsKind) => {
+    list.handleFilterChange(kind === "press" ? "press-all" : kind);
+  };
+  const handlePressFilterChange = (filter: PressFilter) => {
+    list.handleFilterChange(`press-${filter}`);
+  };
   const handleActionClick = () => {
     if (isPressTab) {
       void collect();
       return;
     }
-    setEditor({ kind: list.filter, item: null });
+    setEditor({ kind: activeKind, item: null });
   };
   const handleRowClick = (item: NewsItem) => {
     setEditor({ kind: item.kind, item });
@@ -306,14 +326,32 @@ const NewsScreen = () => {
         <Tab
           className="px-2"
           items={tabs}
-          activeId={list.filter}
+          activeId={activeKind}
           label="소식 분류"
-          onChange={list.handleFilterChange}
+          onChange={handleTabChange}
         />
+        {isPressTab ? (
+          <div className="flex flex-wrap gap-2 px-4 pt-4">
+            {PRESS_FILTERS.map(filter => (
+              <Chip
+                key={filter}
+                variant={pressFilter === filter ? "contain" : "line"}
+                color="gray"
+                text={`${filter === "all" ? "전체" : PRESS_STATUS[filter].label} ${list.result?.pressCounts[filter] ?? 0}`}
+                isSelected={pressFilter === filter}
+                onClick={() => handlePressFilterChange(filter)}
+              />
+            ))}
+          </div>
+        ) : null}
         <AdminTable
           columns={isPressTab ? PRESS_COLUMNS : COLUMNS}
           rows={list.result?.items ?? []}
-          emptyText={activeTab.empty}
+          emptyText={
+            isPressTab && pressFilter !== "all"
+              ? `${PRESS_STATUS[pressFilter].label} 기사가 없어요.`
+              : activeTab.empty
+          }
           isLoading={list.isLoading}
           readRowKey={item => item.id}
           onRowClick={handleRowClick}
@@ -639,6 +677,23 @@ const NoticeEditorSection = ({
       />
     </>
   );
+};
+
+/**
+ * utils
+ */
+const readNewsKind = (filter: NewsFilter): NewsKind => {
+  if (filter === "notice" || filter === "activity") {
+    return filter;
+  }
+  return "press";
+};
+
+const readPressFilter = (filter: NewsFilter): PressFilter => {
+  if (filter === "press-pending") return "pending";
+  if (filter === "press-approved") return "approved";
+  if (filter === "press-hidden") return "hidden";
+  return "all";
 };
 
 export default NewsScreen;

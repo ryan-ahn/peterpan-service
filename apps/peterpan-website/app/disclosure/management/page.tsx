@@ -4,7 +4,10 @@ import DisclosureList from "@components/disclosureList";
 import { formatDate } from "@lib/format";
 import { listDisclosureRows, listYears } from "@lib/posts";
 
-export const metadata: Metadata = { title: "경영공시" };
+export const metadata: Metadata = {
+  title: "경영공시",
+  description: "재단법인 피터팬 자폐인복지재단의 결산 등 경영공시 자료.",
+};
 
 /**
  * types
@@ -28,6 +31,7 @@ const ManagementScreen = async ({ searchParams }: Props) => {
   // render
   return (
     <DisclosureList
+      overline="Management disclosure"
       title="경영공시"
       lead="사업계획 및 예산, 결산서 및 재무제표, 감사보고서를 연도별로 올립니다."
       years={years}

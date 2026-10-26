@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
     "@repo/tailwind-config",
     "@repo/ui",
   ],
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "3mb",
+    },
+  },
   images: {
     remotePatterns: [
       {

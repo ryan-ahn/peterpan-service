@@ -16,7 +16,11 @@ import {
   CREED_STATEMENT,
 } from "@lib/foundation";
 
-export const metadata: Metadata = { title: "상징과 가치" };
+export const metadata: Metadata = {
+  title: "상징과 가치",
+  description:
+    "피터팬 재단 로고에 담긴 상징과 재단이 지키는 가치를 소개합니다.",
+};
 
 /**
  * constants

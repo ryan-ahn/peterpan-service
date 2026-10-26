@@ -41,16 +41,4 @@ export const NAV: NavItem[] = [
       { label: "기부금 공시", href: "/disclosure/donations" },
     ],
   },
-  { label: "기부하기", href: "/donate" },
-];
-
-export const FOOTER_LINKS = [
-  { label: "설립 배경", href: "/about" },
-  { label: "정관", href: "/about/bylaws" },
-  { label: "피터팬마을", href: "/village" },
-  { label: "재단소식", href: "/news" },
-  { label: "게시판", href: "/board" },
-  { label: "경영공시", href: "/disclosure/management" },
-  { label: "기부금 공시", href: "/disclosure/donations" },
-  { label: "개인정보처리방침", href: "/privacy" },
 ];

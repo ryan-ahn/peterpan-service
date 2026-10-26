@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { categoryLabel, publicStorageUrl } from "@repo/db/boards";
 
 import BrandText from "@components/brandText";
-import { formatDate } from "@lib/format";
+import { formatDate, summarize } from "@lib/format";
 import { getNewsBySlug, listPostFiles } from "@lib/posts";
 
 /**
@@ -20,7 +20,22 @@ export const generateMetadata = async ({
 }: Props): Promise<Metadata> => {
   const { slug } = await params;
   const post = await getNewsBySlug(slug).catch(() => null);
-  return { title: post?.title ?? "소식" };
+  if (!post) {
+    return { title: "소식" };
+  }
+  const description =
+    summarize(post.body) ||
+    `${categoryLabel(post.category)} · 피터팬 재단 소식`;
+  return {
+    title: post.title,
+    description,
+    openGraph: {
+      type: "article",
+      title: post.title,
+      description,
+      publishedTime: post.createdAt.toISOString(),
+    },
+  };
 };
 
 /**
@@ -41,7 +56,7 @@ const NewsDetailScreen = async ({ params }: Props) => {
   const isPress = post.category === "press";
   // render
   return (
-    <article className="page-reading py-16">
+    <article className="page-article py-14 lg:py-16">
       <Link href="/news" className="text-4 leading-5 text-pine">
         목록으로
       </Link>

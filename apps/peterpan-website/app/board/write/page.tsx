@@ -12,7 +12,10 @@ import { getBoardPost } from "@lib/board";
 
 import { saveBoardPost } from "../actions";
 
-export const metadata: Metadata = { title: "글쓰기" };
+export const metadata: Metadata = {
+  title: "글쓰기",
+  robots: { index: false, follow: false },
+};
 
 /**
  * types
@@ -40,7 +43,7 @@ const BoardWriteScreen = async ({ searchParams }: Props) => {
   const isEditing = Boolean(post);
   // render
   return (
-    <section className="page-reading py-16">
+    <section className="page-article py-14 lg:py-16">
       <Link
         href={post ? `/board/${post.id}` : "/board"}
         className="text-4 leading-5 text-pine">

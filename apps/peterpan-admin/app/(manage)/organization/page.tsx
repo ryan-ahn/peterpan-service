@@ -360,7 +360,7 @@ const OrganizationScreen = () => {
   return (
     <div className="flex flex-col gap-5">
       <AdminPageHeader
-        title="조직도"
+        title="조직도 관리"
         description="웹사이트 재단소개 › 조직도에 보이는 구조입니다. 손잡이(⋮⋮)를 끌어 순서와 위아래를 바꾸고, 저장해야 반영돼요."
         actions={
           <>

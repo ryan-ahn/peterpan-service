@@ -6,11 +6,14 @@ import Button from "@repo/ui/components/button";
 import cn from "@repo/ui/lib/cn";
 
 import BrandText from "@components/brandText";
-import PageIntro from "@components/pageIntro";
+import FoundationHeader from "@components/foundationHeader";
 import { formatDate } from "@lib/format";
 import { listNews } from "@lib/posts";
 
-export const metadata: Metadata = { title: "재단소식" };
+export const metadata: Metadata = {
+  title: "재단소식",
+  description: "피터팬 재단의 공지, 활동 소식, 언론보도를 모아 봅니다.",
+};
 
 /**
  * constants
@@ -57,48 +60,52 @@ const NewsScreen = async ({ searchParams }: Props) => {
   }).catch(() => null);
   // render
   return (
-    <section className="page-list py-16">
-      <PageIntro
-        eyebrow="재단소식"
-        title="소식 게시판"
+    <article>
+      <FoundationHeader
+        overline="News"
+        title="재단소식"
         lead="공지, 활동, 언론보도를 한 목록에서 봅니다."
       />
-      <div className="mt-8 flex flex-wrap gap-2">
-        {TABS.map(tab => (
-          <Link
-            key={tab.id}
-            href={tab.id === "all" ? "/news" : `/news?category=${tab.id}`}
-            className={cn(
-              "rounded-full px-4 py-2 text-4 leading-5",
-              category === tab.id ? "bg-pine text-white" : "bg-white text-ink",
-            )}>
-            {tab.label}
-          </Link>
-        ))}
-      </div>
-      <form className="mt-5 flex gap-2" action="/news">
-        {category !== "all" ? (
-          <input type="hidden" name="category" value={category} />
+      <div className="page-article py-14 lg:py-16">
+        <div className="flex flex-wrap gap-2">
+          {TABS.map(tab => (
+            <Link
+              key={tab.id}
+              href={tab.id === "all" ? "/news" : `/news?category=${tab.id}`}
+              className={cn(
+                "rounded-full border px-4 py-2 text-4 leading-5",
+                category === tab.id
+                  ? "border-pine bg-pine text-white"
+                  : "border-beige bg-white text-ink",
+              )}>
+              {tab.label}
+            </Link>
+          ))}
+        </div>
+        <form className="mt-5 flex gap-2" action="/news">
+          {category !== "all" ? (
+            <input type="hidden" name="category" value={category} />
+          ) : null}
+          <input
+            name="q"
+            defaultValue={query}
+            placeholder="검색어 입력"
+            className="h-12 flex-1 rounded-full border border-beige bg-white px-5 outline-none focus:border-pine"
+          />
+          <Button
+            variant="solid"
+            color="pine"
+            type="submit"
+            text="검색"
+            isRound
+          />
+        </form>
+        <ListSection result={result} />
+        {result && result.pageCount > 1 ? (
+          <PagerSection result={result} category={category} query={query} />
         ) : null}
-        <input
-          name="q"
-          defaultValue={query}
-          placeholder="검색어 입력"
-          className="h-12 flex-1 rounded-full border border-beige bg-white px-5 outline-none focus:border-pine"
-        />
-        <Button
-          variant="solid"
-          color="pine"
-          type="submit"
-          text="검색"
-          isRound
-        />
-      </form>
-      <ListSection result={result} />
-      {result && result.pageCount > 1 ? (
-        <PagerSection result={result} category={category} query={query} />
-      ) : null}
-    </section>
+      </div>
+    </article>
   );
 };
 
@@ -119,13 +126,13 @@ const ListSection = ({ result }: ListSectionProps) => {
       <BrandText
         variant="bodyCompact"
         color="muted"
-        className="mt-10 rounded-2xlarge bg-white px-6 py-10">
+        className="mt-10 rounded-2xlarge border border-beige bg-white px-6 py-10">
         등록된 소식이 없습니다.
       </BrandText>
     );
   }
   return (
-    <div className="mt-8 overflow-hidden rounded-2xlarge bg-white">
+    <div className="mt-8 overflow-hidden rounded-2xlarge border border-beige bg-white">
       <div className="hidden grid-cols-[5rem_6rem_1fr_8rem] gap-3 border-b border-beige px-6 py-3 text-4 leading-5 text-muted md:grid">
         <span>번호</span>
         <span>분류</span>
@@ -166,8 +173,10 @@ const PagerSection = ({ result, category, query }: PagerSectionProps) => (
           key={number}
           href={`/news?category=${category}&q=${encodeURIComponent(query)}&page=${number}`}
           className={cn(
-            "grid size-9 place-items-center rounded-full text-4 leading-5",
-            number === result.page ? "bg-pine text-white" : "bg-white",
+            "grid size-9 place-items-center rounded-full border text-4 leading-5",
+            number === result.page
+              ? "border-pine bg-pine text-white"
+              : "border-beige bg-white",
           )}>
           {number}
         </Link>

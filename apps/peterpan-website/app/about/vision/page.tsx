@@ -14,7 +14,11 @@ import {
   CREED_STATEMENT,
 } from "@lib/foundation";
 
-export const metadata: Metadata = { title: "이념" };
+export const metadata: Metadata = {
+  title: "이념",
+  description:
+    "피터팬 재단의 이념. 자폐인의 오늘을 지키고 더 넓은 내일을 여는 재단의 생각을 담았습니다.",
+};
 
 /**
  * constants

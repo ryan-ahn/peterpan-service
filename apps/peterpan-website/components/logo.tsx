@@ -34,7 +34,7 @@ const Logo = ({ variant = "horizontal" }: Props) => {
           <span className="text-4.5 leading-5 font-bold tracking-tight text-pine md:text-5 md:leading-6">
             피터팬 재단
           </span>
-          <span className="font-en hidden text-2 leading-3 font-medium tracking-caps text-pine md:block">
+          <span className="hidden font-en text-2 leading-3 font-medium tracking-caps text-pine md:block">
             PETER PAN FOUNDATION
           </span>
         </span>

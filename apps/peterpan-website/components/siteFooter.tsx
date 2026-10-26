@@ -1,10 +1,16 @@
 import Link from "next/link";
 
 import type { SiteContact } from "@repo/db/siteContact";
+import Icon from "@repo/ui/icon";
 
 import Logo from "@components/logo";
 import { displayOrPreparing } from "@lib/format";
-import { FOOTER_LINKS } from "@lib/nav";
+
+/**
+ * constants
+ */
+/** 공익법인 의무 게시. 공익위반 사항을 제보할 수 있는 관리·감독 기관 연결 */
+const PUBLIC_INTEREST_REPORT_URL = "https://www.clean.go.kr";
 
 /**
  * types
@@ -14,7 +20,7 @@ type Props = {
 };
 
 /**
- * 하단 재단 정보와 링크
+ * 하단 재단 법정 표기와 개인정보처리방침. 메뉴는 상단에만 둔다
  * @param contact 관리자 기본정보에서 저장한 연락처
  */
 const SiteFooter = ({ contact }: Props) => {
@@ -22,62 +28,57 @@ const SiteFooter = ({ contact }: Props) => {
   const rows = [
     { label: "재단명", value: "재단법인 피터팬 자폐인복지재단" },
     { label: "대표", value: contact.representative },
-    { label: "주소", value: contact.address },
-    { label: "연락처", value: displayOrPreparing(contact.phone) },
-    { label: "이메일", value: displayOrPreparing(contact.email) },
     {
       label: "고유번호",
       value: displayOrPreparing(contact.registrationNumber),
     },
+    { label: "주소", value: contact.address },
+    { label: "연락처", value: displayOrPreparing(contact.phone) },
+    { label: "이메일", value: displayOrPreparing(contact.email) },
   ];
   // render
   return (
     <footer className="bg-pine-deep text-paper">
-      <div className="page-wide grid gap-10 py-14 md:grid-cols-[1.2fr_1fr]">
-        <div>
-          <div className="flex items-center gap-3">
-            <span className="grid size-16 place-items-center rounded-xlarge bg-white">
-              <Logo variant="symbol" />
-            </span>
-            <div>
-              <p className="text-6 leading-7 font-semibold">피터팬 재단</p>
-              <p className="font-en text-3 leading-4 font-medium tracking-caps text-beige">
-                PETER PAN FOUNDATION
-              </p>
-            </div>
+      <div className="page-wide flex flex-col gap-6 py-10 md:flex-row md:items-start md:justify-between">
+        <div className="flex items-center gap-3">
+          <span className="grid size-12 place-items-center rounded-large bg-white">
+            <Logo variant="symbol" />
+          </span>
+          <div>
+            <p className="text-5 leading-6 font-semibold">피터팬 재단</p>
+            <p className="font-en text-3 leading-4 font-medium tracking-caps text-beige">
+              PETER PAN FOUNDATION
+            </p>
           </div>
-          <p className="mt-5 text-4 leading-5 text-gold">
-            자폐인의 오늘, 더 넓은 내일로
-          </p>
-          <p className="mt-3 max-w-md text-4 leading-9 text-beige">
-            재단법인 피터팬 자폐인복지재단은 성인 중증 자폐성장애인이 혼자가
-            되어도 혼자가 아닌 삶을 이어 가도록 생활주거공동체를 준비합니다.
-          </p>
         </div>
-        <dl className="grid grid-cols-[5.5rem_1fr] gap-x-3 gap-y-2 text-4 leading-5 text-beige">
+        <dl className="flex flex-col gap-1.5 text-4 leading-5 text-beige md:max-w-160 md:flex-row md:flex-wrap md:gap-x-5">
           {rows.map(row => (
-            <div key={row.label} className="contents">
-              <dt>{row.label}</dt>
+            <div key={row.label} className="flex gap-2">
+              <dt className="shrink-0">{row.label}</dt>
               <dd className="text-paper">{row.value}</dd>
             </div>
           ))}
         </dl>
       </div>
       <div className="border-t border-white/10">
-        <div className="page-wide flex flex-col gap-4 py-5 text-4 leading-5 text-beige md:flex-row md:items-center md:justify-between">
-          <nav
-            className="flex flex-wrap gap-x-4 gap-y-2"
-            aria-label="하단 메뉴">
-            {FOOTER_LINKS.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="hover:text-paper">
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-          <p>© 2026 피터팬 재단</p>
+        <div className="page-wide flex flex-col gap-2 py-5 text-4 leading-5 text-beige md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <Link
+              href="/privacy"
+              className="font-semibold text-gold hover:text-paper">
+              개인정보처리방침
+            </Link>
+            <a
+              href={PUBLIC_INTEREST_REPORT_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 hover:text-paper">
+              공익위반 신고
+              <Icon name="external-link" size={14} />
+              <span className="sr-only">(국민권익위원회, 새 창)</span>
+            </a>
+          </div>
+          <p>© 2026 재단법인 피터팬 자폐인복지재단. All rights reserved.</p>
         </div>
       </div>
     </footer>

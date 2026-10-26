@@ -201,6 +201,9 @@ const readProfileInput = (user: User): ProfileInput => {
   };
 };
 
+/**
+ * 처음 가입하면 소셜 계정의 이름·사진·이메일로 profiles 행을 만든다. 이미 있으면 회원이 고친 값을 지키고 비어 있는 칸만 채운다
+ */
 const saveProfile = async (input: ProfileInput) => {
   const db = getDb();
   const byId = await db
@@ -223,17 +226,24 @@ const saveProfile = async (input: ProfileInput) => {
           .limit(1)
       )[0];
   const current = byId[0] ?? linked;
+  if (!current) {
+    await db.insert(profiles).values({
+      id: input.userId,
+      email: input.email,
+      name: input.name,
+      avatarUrl: input.avatarUrl,
+      provider: input.provider,
+      providerUserId: input.providerUserId,
+    });
+    return;
+  }
   const nextProfile = {
-    email: input.email ?? current?.email ?? null,
-    name: input.name,
-    avatarUrl: input.avatarUrl,
+    email: current.email ?? input.email,
+    name: current.name || input.name,
+    avatarUrl: current.avatarUrl ?? input.avatarUrl,
     provider: input.provider,
     providerUserId: input.providerUserId,
   };
-  if (!current) {
-    await db.insert(profiles).values({ id: input.userId, ...nextProfile });
-    return;
-  }
   await db
     .update(profiles)
     .set(

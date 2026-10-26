@@ -42,12 +42,12 @@ const COLUMNS: AdminColumn<Inquiry>[] = [
   },
   {
     key: "kind",
-    label: "참여 방법",
+    label: "후원 방식",
     className: "whitespace-nowrap",
     render: inquiry => (
       <Chip
         variant="tint"
-        color={inquiry.kind === "founding" ? "gold" : "gray"}
+        color={inquiry.kind === "pledge" ? "gold" : "gray"}
         size="small"
         text={donationKindLabel(inquiry.kind)}
       />
@@ -55,7 +55,7 @@ const COLUMNS: AdminColumn<Inquiry>[] = [
   },
   {
     key: "amount",
-    label: "희망 금액",
+    label: "보낸 금액",
     className: "whitespace-nowrap text-gray-600",
     render: inquiry => inquiry.amount || "—",
   },
@@ -97,7 +97,7 @@ const readInquiries = (params: ReadInquiriesParams) => {
 };
 
 /**
- * screen — 후원 문의. 기부하기 화면에서 남긴 참여 의사
+ * screen — 후원 문의. 후원하기 화면에서 남긴 후원 알림
  */
 const InquiriesScreen = () => {
   // hooks
@@ -126,7 +126,7 @@ const InquiriesScreen = () => {
     <div className="flex flex-col gap-5">
       <AdminPageHeader
         title="후원 문의"
-        description="웹사이트 기부하기에서 남긴 참여 의사입니다. 안내를 마친 문의는 파기해 주세요."
+        description="웹사이트 후원하기에서 남긴 후원 알림입니다. 입금 확인과 기록을 마친 문의는 파기해 주세요."
       />
       {list.error ? (
         <Text variant="caption-1" color={adminTextErrorColor}>
@@ -222,14 +222,18 @@ const InquiryDetailSection = ({
           <dd className="break-all">{inquiry.email}</dd>
           <dt className="text-gray-500">전화</dt>
           <dd>{inquiry.phone || "—"}</dd>
-          <dt className="text-gray-500">참여 방법</dt>
+          <dt className="text-gray-500">후원 방식</dt>
           <dd>{donationKindLabel(inquiry.kind)}</dd>
-          <dt className="text-gray-500">희망 금액</dt>
+          <dt className="text-gray-500">보낸 금액</dt>
           <dd>{inquiry.amount || "—"}</dd>
+          <dt className="text-gray-500">입금자명</dt>
+          <dd>{inquiry.depositorName || inquiry.name}</dd>
+          <dt className="text-gray-500">이름 벽</dt>
+          <dd>{inquiry.wallName || "올리지 않음"}</dd>
         </dl>
         <div className="flex flex-col gap-2">
           <Text as="span" variant="label-3">
-            하고 싶은 말
+            남기는 말
           </Text>
           <Text variant="body-3" className="whitespace-pre-wrap">
             {inquiry.message || "남긴 말이 없어요."}

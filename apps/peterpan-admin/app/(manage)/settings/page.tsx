@@ -31,7 +31,7 @@ const FIELDS: { key: keyof SiteContact; label: string; placeholder: string }[] =
   ];
 
 /**
- * screen — 기본정보. 웹사이트 하단에 보이는 재단 연락처
+ * screen — 기본 정보. 웹사이트 하단에 보이는 재단 연락처
  */
 const SettingsScreen = () => {
   // hooks
@@ -78,7 +78,7 @@ const SettingsScreen = () => {
           setError(
             loadError instanceof Error
               ? loadError.message
-              : "기본정보를 불러오지 못했어요.",
+              : "기본 정보를 불러오지 못했어요.",
           );
         }
       });
@@ -90,7 +90,7 @@ const SettingsScreen = () => {
   return (
     <div className="flex max-w-160 flex-col gap-5">
       <AdminPageHeader
-        title="기본정보"
+        title="기본 정보"
         description="웹사이트 하단에 보이는 재단 연락처입니다. 비워 두면 “준비 중”으로 보여요."
       />
       {error ? (

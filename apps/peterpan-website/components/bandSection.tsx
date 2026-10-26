@@ -10,6 +10,7 @@ import BrandText from "@components/brandText";
 type Tone = "plain" | "paper";
 
 type Props = {
+  id?: string;
   overline: string;
   title: string;
   description?: string;
@@ -19,6 +20,7 @@ type Props = {
 
 /**
  * 가로 띠 구역. 영문 소제목·제목·설명 아래에 본문을 page-article 칼럼으로 놓는다
+ * @param id 앵커 이름
  * @param overline 제목 위 영문 소제목
  * @param title 구역 제목
  * @param description 제목 아래 한두 줄 설명
@@ -26,6 +28,7 @@ type Props = {
  * @param children 본문
  */
 const BandSection = ({
+  id,
   overline,
   title,
   description,
@@ -35,6 +38,7 @@ const BandSection = ({
   // render
   return (
     <section
+      id={id}
       className={cn(
         "border-b border-beige last:border-b-0",
         tone === "paper" && "bg-paper",

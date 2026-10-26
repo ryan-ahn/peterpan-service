@@ -7,13 +7,16 @@ import DisclosureList from "@components/disclosureList";
 import { formatDate } from "@lib/format";
 import { listDisclosureRows, listYears } from "@lib/posts";
 
-export const metadata: Metadata = { title: "기부금 공시" };
+export const metadata: Metadata = {
+  title: "기부금 공시",
+  description: "피터팬 재단의 기부금 모금과 활용 실적 공시.",
+};
 
 /**
  * constants
  */
 const NTS_URL =
-  "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2456&cntntsId=7782";
+  "https://hometax.go.kr/websquare/websquare.html?w2xPath=/ui/pp/index_pp.xml&tmIdx=44&tm2lIdx=4405000000&tm3lIdx=4405020000";
 
 /**
  * types
@@ -37,8 +40,9 @@ const DonationsDisclosureScreen = async ({ searchParams }: Props) => {
   // render
   return (
     <DisclosureList
+      overline="Donation disclosure"
       title="기부금 공시"
-      lead="기부금 모금액과 활용실적을 연도별 파일로 공개합니다. 국세청 공익법인 공시와도 연결합니다."
+      lead="기부금 모금액과 활용실적을 연도별 파일로 공개합니다."
       years={years}
       currentYear={selectedYear}
       basePath="/disclosure/donations"

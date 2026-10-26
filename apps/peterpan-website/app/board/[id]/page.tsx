@@ -10,7 +10,7 @@ import cn from "@repo/ui/lib/cn";
 
 import BrandText from "@components/brandText";
 import { getBoardPost, listBoardComments, readBoardLikes } from "@lib/board";
-import { formatDate } from "@lib/format";
+import { formatDate, summarize } from "@lib/format";
 
 import {
   addBoardComment,
@@ -46,7 +46,20 @@ export const generateMetadata = async ({
 }: Props): Promise<Metadata> => {
   const { id } = await params;
   const post = await getBoardPost(id).catch(() => null);
-  return { title: post?.title ?? "게시판" };
+  if (!post) {
+    return { title: "게시판" };
+  }
+  const description = summarize(post.body) || "피터팬 재단 게시판 글";
+  return {
+    title: post.title,
+    description,
+    openGraph: {
+      type: "article",
+      title: post.title,
+      description,
+      publishedTime: post.createdAt.toISOString(),
+    },
+  };
 };
 
 /**
@@ -78,7 +91,7 @@ const BoardDetailScreen = async ({ params }: Props) => {
     .filter(Boolean);
   // render
   return (
-    <article className="page-reading py-16">
+    <article className="page-article py-14 lg:py-16">
       <Link href="/board" className="text-4 leading-5 text-pine">
         목록으로
       </Link>
