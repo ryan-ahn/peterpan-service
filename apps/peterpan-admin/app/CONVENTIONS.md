@@ -6,20 +6,20 @@
 
 ## 라우트
 
-| 경로                                                     | 화면                                                                  |
-| -------------------------------------------------------- | --------------------------------------------------------------------- |
-| `/`                                                      | 운영자 로그인 (카카오·구글). 운영자면 `/members`로 보냄               |
-| `/members`                                               | 회원 관리 (조회·삭제)                                                 |
-| `/inquiries`                                             | 후원 문의 (웹사이트 기부하기에서 남긴 참여 의사)                      |
-| `/news`                                                  | 소식 관리 (공지 `notices`, 활동 `posts` news·activity, 언론보도 승인) |
-| `/posts`                                                 | 게시물 관리 (웹사이트 게시판 회원 글. 숨김·삭제·댓글 삭제)            |
-| `/disclosures`                                           | 공시 관리 (경영공시, 기부금 공시)                                     |
-| `/organization`                                          | 조직도 관리 (그룹·인원을 끌어 놓아 구조를 짜고 저장)                  |
-| `/bylaws`                                                | 정관 관리 (판마다 올리고 웹사이트 노출 1건 선택)                      |
-| `/settings`                                              | 기본 정보 (웹사이트 하단 연락처)                                      |
-| `/permissions`                                           | 권한 관리 (오너 전용. 관리자 지정·해제)                               |
-| `/auth/{kakao,google}`, `/auth/callback`, `/auth/logout` | OAuth 라우트 핸들러. 실패하면 `/?error=`                              |
-| `/api/cron/press`                                        | 언론보도 수집 크론 (Vercel Cron 매일 09시, `CRON_SECRET` 확인)        |
+| 경로                                                     | 화면                                                                   |
+| -------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `/`                                                      | 운영자 로그인 (카카오·구글). 운영자면 `/members`로 보냄                |
+| `/members`                                               | 회원 관리 (조회·삭제)                                                  |
+| `/inquiries`                                             | 후원 문의 (웹사이트 기부하기에서 남긴 참여 의사)                       |
+| `/news`                                                  | 소식 관리 (공지 `notices`, 활동 `posts` news·activity, 언론 보도 승인) |
+| `/posts`                                                 | 게시물 관리 (웹사이트 게시판 회원 글. 숨김·삭제·댓글 삭제)             |
+| `/disclosures`                                           | 공시 관리 (경영 공시, 기부금 공시)                                     |
+| `/organization`                                          | 조직도 관리 (그룹·인원을 끌어 놓아 구조를 짜고 저장)                   |
+| `/bylaws`                                                | 정관 관리 (판마다 올리고 웹사이트 노출 1건 선택)                       |
+| `/settings`                                              | 기본 정보 (웹사이트 하단 연락처)                                       |
+| `/permissions`                                           | 권한 관리 (오너 전용. 관리자 지정·해제)                                |
+| `/auth/{kakao,google}`, `/auth/callback`, `/auth/logout` | OAuth 라우트 핸들러. 실패하면 `/?error=`                               |
+| `/api/cron/press`                                        | 언론 보도 수집 크론 (Vercel Cron 매일 09시, `CRON_SECRET` 확인)        |
 
 - 관리 화면은 `app/(manage)/` 라우트 그룹에 둔다. 그룹 `layout.tsx`가 `requireAdmin()`으로 운영자를 확인하고 `AdminFrame`으로 감싼다.
 - 메뉴는 `components/adminShell.tsx`의 `NAV_LINKS` 한 곳에만 두고, 라우트 표 순서와 같게 둔다. 화면을 추가하면 여기에 링크를 더한다.
@@ -45,8 +45,8 @@
 - 목록·저장·삭제는 `@lib/adminData`의 서버 액션(`"use server"`)만 부른다. 모든 액션은 첫 줄에서 `assertAdmin()`으로 권한을 다시 확인한다.
 - 서버 컴포넌트·레이아웃의 권한 확인은 `@lib/adminSession`의 `requireAdmin()`(운영진이 아니면 `/`로 보냄). 오너 전용 화면은 `requireOwner()`, 오너 전용 액션은 첫 줄에서 `assertOwner()`.
 - 회원 게시물은 `board_posts`(댓글 `board_comments`, 좋아요 `board_likes`). 어드민은 숨김(`published`)·삭제만 하고 글을 고치지 않는다.
-- 소식의 공지는 `notices`, 활동과 공시는 `posts` 테이블이다. 웹사이트 재단소식은 공지와 활동을 합쳐 보여 준다. `posts` 작성·수정 드로어는 `components/postEditor.tsx` 하나를 소식·공시 화면이 같이 쓴다.
-- 언론보도는 직접 쓰지 않는다. `@lib/pressCollector`가 NAVER API HUB 뉴스 검색(네이버 클라우드 플랫폼 Application 키 `NAVER_SEARCH_CLIENT_ID`·`NAVER_SEARCH_CLIENT_SECRET`)로 키워드 기사를 `press_candidates`에 모으고, 운영자가 승인하면 `posts`(news·press, `externalUrl` 원문 링크)를 만든다. 숨기면 글을 지우고 상태만 남겨 다시 올라오지 않게 한다. 기사 본문은 저장하지 않는다.
+- 소식의 공지는 `notices`, 활동과 공시는 `posts` 테이블이다. 웹사이트 재단 소식은 공지와 활동을 합쳐 보여 준다. `posts` 작성·수정 드로어는 `components/postEditor.tsx` 하나를 소식·공시 화면이 같이 쓴다.
+- 언론 보도는 직접 쓰지 않는다. `@lib/pressCollector`가 NAVER API HUB 뉴스 검색(네이버 클라우드 플랫폼 Application 키 `NAVER_SEARCH_CLIENT_ID`·`NAVER_SEARCH_CLIENT_SECRET`)로 키워드 기사를 `press_candidates`에 모으고, 운영자가 승인하면 `posts`(news·press, `externalUrl` 원문 링크)를 만든다. 숨기면 글을 지우고 상태만 남겨 다시 올라오지 않게 한다. 기사 본문은 저장하지 않는다.
 - 첨부가 있는 저장은 `FormData`로 `savePost`에 넘긴다. 파일당 20MB, 이미지는 `media`, 나머지는 `documents` 버킷. 서버 액션 본문 한도는 `next.config.ts`의 `serverActions.bodySizeLimit`.
 - 목록 화면의 검색·필터·쪽 상태는 `@lib/useAdminList`. 쪽 크기는 `@constants/adminUi`의 `ADMIN_PAGE_SIZE`.
 - 날짜 표기는 `@lib/formatDate`의 `formatAdminDate`. 게시판·분류 이름은 `@repo/db/boards`.

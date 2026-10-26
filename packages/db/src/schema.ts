@@ -64,7 +64,7 @@ export const adminMembers = pgTable("admin_members", {
 });
 
 /**
- * 재단소식(활동·언론보도), 경영공시, 기부금 공시. 공지는 notices에 따로 둔다.
+ * 재단 소식(활동·언론 보도), 경영 공시, 기부금 공시. 공지는 notices에 따로 둔다.
  */
 export const posts = pgTable("posts", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -87,7 +87,7 @@ export const posts = pgTable("posts", {
 });
 
 /**
- * 공지사항. 웹사이트 재단소식 게시판에 공지 분류로 함께 보인다.
+ * 공지사항. 웹사이트 재단 소식 게시판에 공지 분류로 함께 보인다.
  */
 export const notices = pgTable("notices", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -106,7 +106,8 @@ export const notices = pgTable("notices", {
 
 /**
  * 회원 게시판. 로그인한 회원이 쓰고, 글쓴이와 어드민이 고치거나 지운다.
- * author_name은 쓸 때의 이름이다. 회원이 탈퇴하면 author_id만 비운다.
+ * author_name은 글쓴이 닉네임이다. 마이페이지에서 닉네임을 바꾸면 글·댓글 모두 함께 바뀐다.
+ * 회원이 탈퇴하면 author_id만 비우고 마지막 닉네임은 남긴다.
  */
 export const boardPosts = pgTable("board_posts", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -168,7 +169,7 @@ export const boardLikes = pgTable(
 );
 
 /**
- * 언론보도 수집 대기열. 네이버 뉴스 검색으로 매일 모으고, 운영자가 승인하면 posts(news·press)에 글을 만든다.
+ * 언론 보도 수집 대기열. 네이버 뉴스 검색으로 매일 모으고, 운영자가 승인하면 posts(news·press)에 글을 만든다.
  * 기사 본문은 저장하지 않고 제목·요약·원문 링크만 둔다.
  */
 export const pressCandidates = pgTable("press_candidates", {

@@ -49,7 +49,7 @@ const CreedScreen = () => (
  */
 const StatementSection = () => (
   <section className="border-b border-beige">
-    <div className="page-article grid gap-8 py-14 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.75fr)] lg:items-start lg:gap-16 lg:py-16">
+    <div className="page-article grid gap-8 py-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.75fr)] lg:items-start lg:gap-16 lg:py-12">
       <div>
         <h2 className="text-8 leading-12 font-semibold text-pine">
           {CREED_STATEMENT}
@@ -67,7 +67,7 @@ const StatementSection = () => (
 
 const PrincipleSection = () => (
   <section className="bg-paper">
-    <div className="page-article py-14 lg:py-16">
+    <div className="page-article py-10 lg:py-12">
       <BrandText variant="overline" color="pine">
         In the mark
       </BrandText>

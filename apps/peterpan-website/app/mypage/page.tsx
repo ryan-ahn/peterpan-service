@@ -19,6 +19,7 @@ import {
 } from "@app/mypage/actions";
 import AvatarPicker from "@components/avatarPicker";
 import BrandText from "@components/brandText";
+import FlashToast from "@components/flashToast";
 import PageIntro from "@components/pageIntro";
 import { getMyProfile, listMyBoardPosts, listMyInquiries } from "@lib/account";
 import { formatDate } from "@lib/format";
@@ -75,7 +76,7 @@ type ProfileSectionProps = {
 
 type SettingsSectionProps = {
   profile: Profile;
-  isSaved: boolean;
+  savedAt: string | null;
   error: string | null;
 };
 
@@ -147,7 +148,7 @@ const MyPageScreen = async ({ searchParams }: Props) => {
     params.error === "confirm" || params.error === "owner";
   // render
   return (
-    <section className="page-article flex flex-col gap-8 py-16">
+    <section className="page-article flex flex-col gap-8 py-12">
       <PageIntro eyebrow="내 계정" title="마이페이지" />
       <ProfileSection profile={profile} isAdmin={user.role !== null} />
       <nav aria-label="마이페이지 메뉴" className="flex flex-wrap gap-2">
@@ -162,7 +163,7 @@ const MyPageScreen = async ({ searchParams }: Props) => {
       </nav>
       <SettingsSection
         profile={profile}
-        isSaved={params.saved === "1"}
+        savedAt={params.saved ?? null}
         error={isWithdrawError ? null : error}
       />
       <InquirySection inquiries={inquiries} />
@@ -230,14 +231,12 @@ const ProfileSection = ({ profile, isAdmin }: ProfileSectionProps) => (
   </div>
 );
 
-const SettingsSection = ({ profile, isSaved, error }: SettingsSectionProps) => (
+const SettingsSection = ({ profile, savedAt, error }: SettingsSectionProps) => (
   <Block
     id="settings"
     title="개인정보 설정"
     description="닉네임은 게시판과 상단 메뉴에 보입니다. 휴대전화와 생년월일은 후원 안내에만 쓰고 공개하지 않습니다.">
     <form action={updateMyProfile} className="grid gap-4 md:grid-cols-2">
-      {isSaved ? <Notice tone="pine">저장했습니다.</Notice> : null}
-      {error ? <Notice tone="gold">{error}</Notice> : null}
       <Field
         label="닉네임"
         name="name"
@@ -265,7 +264,18 @@ const SettingsSection = ({ profile, isSaved, error }: SettingsSectionProps) => (
         type="date"
         defaultValue={profile.birthDate ?? ""}
       />
-      <div className="flex justify-end md:col-span-2">
+      <div className="flex items-center justify-end gap-4 md:col-span-2">
+        {error ? (
+          <p
+            role="alert"
+            className="flex items-center gap-1.5 text-4 leading-5 text-gold-deep">
+            <Icon name="alert-circle" size={16} />
+            {error}
+          </p>
+        ) : null}
+        {savedAt ? (
+          <FlashToast key={savedAt} text="저장했습니다." param="saved" />
+        ) : null}
         <Button
           variant="solid"
           color="pine"

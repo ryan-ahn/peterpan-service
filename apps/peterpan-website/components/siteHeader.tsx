@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Link from "next/link";
 
@@ -33,8 +33,12 @@ type UserBadgeProps = {
  * @param user 로그인한 사용자. 있으면 사진·닉네임이 마이페이지 링크, 없으면 로그인 링크
  */
 const SiteHeader = ({ user }: Props) => {
+  // refs
+  const navRef = useRef<HTMLElement>(null);
   // states
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [dismissedHref, setDismissedHref] = useState<string | null>(null);
+  const [isScrollHidden, setIsScrollHidden] = useState(false);
   // handlers
   const handleMenuToggle = () => {
     setIsMenuOpen(current => !current);
@@ -42,29 +46,65 @@ const SiteHeader = ({ user }: Props) => {
   const handleMenuClose = () => {
     setIsMenuOpen(false);
   };
+  const handleDropdownDismiss = (href: string) => {
+    setDismissedHref(href);
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+  };
+  const handleDropdownReset = () => {
+    setDismissedHref(null);
+    setIsScrollHidden(false);
+  };
+  // effects
+  useEffect(() => {
+    const handleWindowScroll = () => {
+      const activeElement = document.activeElement;
+      if (
+        activeElement instanceof HTMLElement &&
+        navRef.current?.contains(activeElement)
+      ) {
+        activeElement.blur();
+      }
+      setIsScrollHidden(true);
+    };
+    window.addEventListener("scroll", handleWindowScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleWindowScroll);
+    };
+  }, []);
   // render
   return (
     <header className="sticky top-0 z-40 border-b border-beige bg-white/95 backdrop-blur">
       <div className="page-wide flex h-20 items-center justify-between gap-6">
         <Logo />
         <nav
+          ref={navRef}
           className="hidden items-center gap-7 lg:flex"
           aria-label="주요 메뉴">
           {NAV.map(item => (
-            <div key={item.href} className="group relative">
+            <div
+              key={item.href}
+              className="group relative"
+              onMouseEnter={handleDropdownReset}
+              onMouseLeave={handleDropdownReset}
+              onFocus={handleDropdownReset}>
               <Link
                 href={item.href}
                 className="text-4.5 leading-6 font-medium text-ink transition hover:text-pine">
                 {item.label}
               </Link>
-              {item.children ? (
-                <div className="invisible absolute top-full left-1/2 z-20 w-52 -translate-x-1/2 pt-3 opacity-0 transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
-                  <div className="rounded-xlarge border border-beige bg-white p-2 shadow-large">
+              {item.children &&
+              !isScrollHidden &&
+              dismissedHref !== item.href ? (
+                <div className="invisible absolute top-full left-1/2 z-20 w-max min-w-32 -translate-x-1/2 pt-3 opacity-0 transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+                  <div className="rounded-xlarge border border-beige bg-white p-1.5 shadow-large">
                     {item.children.map(child => (
                       <Link
                         key={child.href}
                         href={child.href}
-                        className="block rounded-large px-3 py-2 text-center text-4 leading-5 text-ink/80 hover:bg-paper hover:text-pine">
+                        className="block rounded-large px-4 py-2 text-center text-4 leading-5 whitespace-nowrap text-ink/80 hover:bg-paper hover:text-pine"
+                        onClick={() => handleDropdownDismiss(item.href)}>
                         {child.label}
                       </Link>
                     ))}

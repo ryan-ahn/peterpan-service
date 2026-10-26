@@ -37,7 +37,7 @@ export const NAV: NavItem[] = [
     label: "정보공개",
     href: "/disclosure",
     children: [
-      { label: "경영공시", href: "/disclosure/management" },
+      { label: "경영 공시", href: "/disclosure/management" },
       { label: "기부금 공시", href: "/disclosure/donations" },
     ],
   },

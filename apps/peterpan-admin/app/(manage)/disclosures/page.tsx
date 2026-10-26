@@ -108,7 +108,7 @@ const readDisclosures = (params: ReadDisclosuresParams) => {
 };
 
 /**
- * screen — 공시 관리. 경영공시, 기부금 공시
+ * screen — 공시 관리. 경영 공시, 기부금 공시
  */
 const DisclosuresScreen = () => {
   // hooks
@@ -151,7 +151,7 @@ const DisclosuresScreen = () => {
     <div className="flex flex-col gap-5">
       <AdminPageHeader
         title="공시 관리"
-        description="경영공시와 기부금 공시를 올립니다. 공시 자료는 첨부파일로 웹사이트에 열려요."
+        description="경영 공시와 기부금 공시를 올립니다. 공시 자료는 첨부파일로 웹사이트에 열려요."
         actions={
           <Button
             variant="solid"

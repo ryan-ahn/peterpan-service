@@ -64,7 +64,7 @@ npm run dev
 
 ## 데이터
 
-재단소식(공지·활동·언론보도), 경영공시, 기부금 공시, 후원 문의, 하단 연락처는 Supabase Postgres에 있다. 공지는 `notices`, 나머지 글은 `posts` 테이블이다. 첨부는 `documents`, 이미지는 `media` 공개 버킷이다. 정관은 어드민 `/bylaws`에서 판마다 `documents` 버킷에 올리고, `bylaws` 테이블에서 노출 1건을 고른다. 조직도는 어드민 `/organization`에서 짜고 `site_settings`의 `organization_chart`에 JSON으로 저장한다.
+재단 소식(공지·활동·언론 보도), 경영 공시, 기부금 공시, 후원 문의, 하단 연락처는 Supabase Postgres에 있다. 공지는 `notices`, 나머지 글은 `posts` 테이블이다. 첨부는 `documents`, 이미지는 `media` 공개 버킷이다. 정관은 어드민 `/bylaws`에서 판마다 `documents` 버킷에 올리고, `bylaws` 테이블에서 노출 1건을 고른다. 조직도는 어드민 `/organization`에서 짜고 `site_settings`의 `organization_chart`에 JSON으로 저장한다.
 
 홈과 마을 사진 일부는 실제 마을 촬영본이 생기기 전의 예시다.
 

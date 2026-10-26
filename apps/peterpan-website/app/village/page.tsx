@@ -63,7 +63,7 @@ const BackgroundSection = () => (
 
 const PromiseSection = () => (
   <section className="bg-pine text-paper">
-    <div className="page-article py-14 text-center lg:py-18">
+    <div className="page-article py-10 text-center lg:py-14">
       <div className="mx-auto w-10 border-t-2 border-gold" />
       <p className="mt-6 text-7 leading-11 font-semibold text-paper md:text-9 md:leading-13">
         {VILLAGE_PROMISE.title}

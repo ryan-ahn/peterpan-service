@@ -6,8 +6,8 @@
  * constants
  */
 export const BOARDS = [
-  { id: "news", label: "재단소식" },
-  { id: "management", label: "경영공시" },
+  { id: "news", label: "재단 소식" },
+  { id: "management", label: "경영 공시" },
   { id: "donation", label: "기부금 공시" },
 ] as const;
 

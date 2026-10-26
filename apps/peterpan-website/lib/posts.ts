@@ -6,7 +6,7 @@ import { type BoardId, publicStorageUrl } from "@repo/db/boards";
 
 /**
  * 공개 게시글 조회. 웹사이트는 공개(published) 글만 읽는다.
- * 재단소식은 posts(활동·언론보도)와 notices(공지)를 합쳐 보여 준다.
+ * 재단 소식은 posts(활동·언론 보도)와 notices(공지)를 합쳐 보여 준다.
  */
 
 /**
@@ -127,7 +127,7 @@ export const listLatestNews = async (limit: number) =>
   listNewsRows({ category: "all", query: "", limit, offset: 0 });
 
 /**
- * 재단소식 본문. 활동·언론보도를 먼저 찾고, 없으면 공지에서 찾는다
+ * 재단 소식 본문. 활동·언론 보도를 먼저 찾고, 없으면 공지에서 찾는다
  */
 export const getNewsBySlug = async (slug: string) => {
   const db = getDb();

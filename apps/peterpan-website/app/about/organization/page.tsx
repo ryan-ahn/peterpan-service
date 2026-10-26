@@ -60,7 +60,7 @@ const OrganizationScreen = async () => {
         lead="재단 임원과 조직원들의 직책 및 소속입니다."
       />
       <section className="bg-paper">
-        <div className="page-wide py-14 lg:py-16">
+        <div className="page-wide py-10 lg:py-12">
           {chart.groups.length === 0 ? (
             <BrandText variant="body" color="muted" className="text-center">
               준비 중입니다.

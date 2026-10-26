@@ -9,6 +9,7 @@ import { getSessionProfile, signOut } from "@repo/auth/session";
 import { createServerSupabase } from "@repo/auth/supabase";
 import {
   adminMembers,
+  boardComments,
   boardPosts,
   donationInquiries,
   getDb,
@@ -59,12 +60,22 @@ export const updateMyProfile = async (formData: FormData) => {
   if (birthDate && !isBirthDate(birthDate)) {
     redirect(`${MYPAGE_PATH}?error=birthDate#settings`);
   }
-  await getDb()
-    .update(profiles)
-    .set({ name, phone, birthDate: birthDate || null, updatedAt: new Date() })
-    .where(eq(profiles.id, user.id));
+  await getDb().transaction(async tx => {
+    await tx
+      .update(profiles)
+      .set({ name, phone, birthDate: birthDate || null, updatedAt: new Date() })
+      .where(eq(profiles.id, user.id));
+    await tx
+      .update(boardPosts)
+      .set({ authorName: name })
+      .where(eq(boardPosts.authorId, user.id));
+    await tx
+      .update(boardComments)
+      .set({ authorName: name })
+      .where(eq(boardComments.authorId, user.id));
+  });
   revalidatePath("/", "layout");
-  redirect(`${MYPAGE_PATH}?saved=1#settings`);
+  redirect(`${MYPAGE_PATH}?saved=${Date.now()}#settings`);
 };
 
 export const updateMyAvatar = async (

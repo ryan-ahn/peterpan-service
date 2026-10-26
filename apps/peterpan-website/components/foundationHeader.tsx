@@ -19,7 +19,7 @@ const FoundationHeader = ({ overline, title, lead }: Props) => {
   // render
   return (
     <header className="border-b border-beige">
-      <div className="page-article py-16 lg:py-20">
+      <div className="page-article py-12 lg:py-14">
         <BrandText variant="overline" color="pine">
           {overline}
         </BrandText>

@@ -108,7 +108,7 @@ export type PressCandidate = {
 };
 
 /**
- * 소식 관리 목록 행. 공지는 notices, 활동은 posts(news·activity), 언론보도는 press_candidates에서 온다
+ * 소식 관리 목록 행. 공지는 notices, 활동은 posts(news·activity), 언론 보도는 press_candidates에서 온다
  */
 export type NewsItem = {
   id: string;
@@ -589,7 +589,7 @@ export const listNewsItems = async (
 };
 
 /**
- * 언론보도 승인. posts에 언론보도 글(원문 링크)을 만들고 공개한다
+ * 언론 보도 승인. posts에 언론 보도 글(원문 링크)을 만들고 공개한다
  */
 export const approvePress = async (params: IdParams) => {
   const { id } = params;
@@ -630,7 +630,7 @@ export const approvePress = async (params: IdParams) => {
 };
 
 /**
- * 언론보도 숨김. 게시 중이면 웹사이트 글을 지운다. 다시 수집돼도 대기열에 올라오지 않는다
+ * 언론 보도 숨김. 게시 중이면 웹사이트 글을 지운다. 다시 수집돼도 대기열에 올라오지 않는다
  */
 export const hidePress = async (params: IdParams) => {
   const { id } = params;
@@ -659,7 +659,7 @@ export const collectPressNow = async (): Promise<CollectPressResult> => {
 };
 
 /**
- * actions — 게시물 (재단소식 활동, 경영공시, 기부금 공시)
+ * actions — 게시물 (재단 소식 활동, 경영 공시, 기부금 공시)
  */
 export const listPosts = async (
   params: ListPostsParams,
@@ -698,7 +698,7 @@ export const listPosts = async (
 };
 
 /**
- * actions — 공지사항. notices 테이블. 웹사이트 재단소식에 공지 분류로 함께 보인다
+ * actions — 공지사항. notices 테이블. 웹사이트 재단 소식에 공지 분류로 함께 보인다
  */
 export const saveNotice = async (params: SaveNoticeParams): Promise<Notice> => {
   const { id, isPinned, isPublished } = params;

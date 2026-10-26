@@ -43,7 +43,7 @@ const BandSection = ({
         "border-b border-beige last:border-b-0",
         tone === "paper" && "bg-paper",
       )}>
-      <div className="page-article py-14 lg:py-16">
+      <div className="page-article py-10 lg:py-12">
         <BrandText variant="overline" color="pine">
           {overline}
         </BrandText>

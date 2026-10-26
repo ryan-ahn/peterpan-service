@@ -12,9 +12,9 @@
 | `/about`, `/about/{greeting,brand,organization,bylaws}`  | 설립 배경과 목적·대표 인사말·상징과 가치·조직도·정관       |
 | `/about/vision`                                          | 이념 (메뉴·링크 밖. 주소로만 접근)                         |
 | `/village`, `/village/{spaces,operation}`                | 피터팬 마을 소개·공간·운영                                 |
-| `/news`, `/news/[slug]`                                  | 재단소식 목록(공지·활동·언론보도)·본문                     |
+| `/news`, `/news/[slug]`                                  | 재단 소식 목록(공지·활동·언론 보도)·본문                   |
 | `/board`, `/board/[id]`, `/board/write`                  | 회원 게시판 목록·본문·글쓰기(`?id=` 고치기)                |
-| `/disclosure`, `/disclosure/{management,donations}`      | 경영공시·기부금 공시                                       |
+| `/disclosure`, `/disclosure/{management,donations}`      | 경영 공시·기부금 공시                                      |
 | `/donate`                                                | 후원 안내·참여 의사 남기기 (`actions.ts`)                  |
 | `/login`                                                 | 카카오·구글 로그인. 로그인했으면 `/mypage`로 보낸다        |
 | `/mypage`                                                | 프로필·개인정보 설정·내 문의·내 게시글·탈퇴 (`actions.ts`) |
@@ -33,7 +33,7 @@
 
 - `page.tsx` 안의 진입 컴포넌트 이름은 `*Screen`. 본문은 `*Section`.
 - 서버 컴포넌트가 기본이다. 데이터가 필요하면 screen을 `async`로 두고 `@lib/posts`의 함수를 기다린다.
-- 메뉴 화면(재단소개·마을소개·소통·정보공개·후원하기)의 첫머리는 `FoundationHeader`(영문 overline·제목·금색 선·lead, 아래 선)이고 본문은 `page-article` 칼럼에 `py-14 lg:py-16`으로 놓는다. 글 본문·글쓰기도 `page-article`. 그 밖의 화면(로그인·마이페이지·처리방침)은 `PageIntro`(eyebrow·title·lead). 마을소개·후원하기 본문은 `BandSection` 띠 구역, 공시 목록은 `DisclosureList`.
+- 메뉴 화면(재단소개·마을소개·소통·정보공개·후원하기)의 첫머리는 `FoundationHeader`(영문 overline·제목·금색 선·lead, 아래 선)이고 본문은 `page-article` 칼럼에 `py-10 lg:py-12`으로 놓는다. 글 본문·글쓰기도 `page-article`. 그 밖의 화면(로그인·마이페이지·처리방침)은 `PageIntro`(eyebrow·title·lead). 마을소개·후원하기 본문은 `BandSection` 띠 구역, 공시 목록은 `DisclosureList`.
 - 후원은 1구좌 단위 없이 공식 후원 계좌로 받는다. 계좌 정보는 `app/donate/page.tsx`의 `DONATION_ACCOUNT`에 적고, 비어 있으면 "공개 준비 중"으로 보인다. 양식은 보낸 후원을 알리는 후원 알림(`donation_inquiries`)이다. 지금은 계좌이체 일시 후원만 받고(`DONATION_FORM_KINDS`), 정기 후원·카드 결제는 재단 설립과 PG 심사 뒤 결제 연동과 함께 연다.
 - 메뉴·캐러셀처럼 브라우저 상태가 필요한 UI만 `components/`에 `"use client"`로 둔다.
 - 폼 제출은 그 라우트의 `actions.ts` 서버 액션. 입력값은 `@repo/db/boards`의 `is*` 가드로 거른다.
@@ -53,24 +53,25 @@
 
 ## 컴포넌트
 
-| 위치                               | 내용                                                                    |
-| ---------------------------------- | ----------------------------------------------------------------------- |
-| `@repo/ui`                         | Button, Chip, Icon, Text 등 공용 원자                                   |
-| `components/brandText.tsx`         | `Text` 위에 브랜드 크기·색을 얹은 본문 글자                             |
-| `components/pageIntro.tsx`         | 화면 첫머리 eyebrow·제목·리드                                           |
-| `components/foundationHeader.tsx`  | 재단소개·마을소개·소통·정보공개 공통 머리 (page-article)                |
-| `components/foundationHeading.tsx` | 재단소개 탭 본문의 구역 제목·한 줄 설명                                 |
-| `components/bandSection.tsx`       | 마을소개 가로 띠 구역 (영문 소제목·제목)                                |
-| `components/infoCard.tsx`          | 마을소개 흰 카드 (분류·제목·설명)                                       |
-| `components/numberedList.tsx`      | 01·02 번호 제목·설명 목록                                               |
-| `components/villageAerial.tsx`     | 치유 마을 조감도 (자리 이름·설명 창, client). 홈 첫 화면·조감과 공간    |
-| `components/siteHeader.tsx`        | 상단 메뉴·모바일 메뉴·후원하기. 로그인하면 사진·닉네임(마이페이지 링크) |
-| `components/avatarPicker.tsx`      | 마이페이지 프로필 사진. 눌러서 골라 바로 올림 (client)                  |
-| `components/siteFooter.tsx`        | 하단 재단 정보·개인정보처리방침 링크                                    |
-| `components/logo.tsx`              | 로고 링크 (`horizontal`·`symbol`)                                       |
-| `components/logoEmblem.tsx`        | 로고 네 모양 선 아이콘 (이념·상징과 가치)                               |
-| `components/workCarousel.tsx`      | 홈 하는 일 캐러셀                                                       |
-| `components/disclosureList.tsx`    | 연도별 공시 목록                                                        |
+| 위치                               | 내용                                                                      |
+| ---------------------------------- | ------------------------------------------------------------------------- |
+| `@repo/ui`                         | Button, Chip, Icon, Text 등 공용 원자                                     |
+| `components/brandText.tsx`         | `Text` 위에 브랜드 크기·색을 얹은 본문 글자                               |
+| `components/pageIntro.tsx`         | 화면 첫머리 eyebrow·제목·리드                                             |
+| `components/foundationHeader.tsx`  | 재단소개·마을소개·소통·정보공개 공통 머리 (page-article)                  |
+| `components/foundationHeading.tsx` | 재단소개 탭 본문의 구역 제목·한 줄 설명                                   |
+| `components/bandSection.tsx`       | 마을소개 가로 띠 구역 (영문 소제목·제목)                                  |
+| `components/infoCard.tsx`          | 마을소개 흰 카드 (분류·제목·설명)                                         |
+| `components/numberedList.tsx`      | 01·02 번호 제목·설명 목록                                                 |
+| `components/villageAerial.tsx`     | 치유 마을 조감도 (자리 이름·설명 창, client). 홈 첫 화면·조감과 공간      |
+| `components/siteHeader.tsx`        | 상단 메뉴·모바일 메뉴·후원하기. 로그인하면 사진·닉네임(마이페이지 링크)   |
+| `components/avatarPicker.tsx`      | 마이페이지 프로필 사진. 눌러서 골라 바로 올림 (client)                    |
+| `components/flashToast.tsx`        | 서버 액션이 쿼리로 넘긴 결과를 토스트로 한 번 띄우고 쿼리를 지움 (client) |
+| `components/siteFooter.tsx`        | 하단 재단 정보·개인정보처리방침 링크                                      |
+| `components/logo.tsx`              | 로고 링크 (`horizontal`·`symbol`)                                         |
+| `components/logoEmblem.tsx`        | 로고 네 모양 선 아이콘 (이념·상징과 가치)                                 |
+| `components/workCarousel.tsx`      | 홈 하는 일 캐러셀                                                         |
+| `components/disclosureList.tsx`    | 연도별 공시 목록                                                          |
 
 - 글자는 `BrandText`의 `variant`로 고른다. `display`·`title`·`section`·`heading`·`cardTitle`·`lead`·`body`·`bodyCompact`·`small`·`smallCompact`·`caption`·`overline`·`pen`(손글씨).
 - 글자 색은 `color`로 고른다. `ink`·`inkSoft`·`muted`·`pine`·`pineDeep`·`gold`·`goldDeep`·`sage`·`beige`·`paper`·`white`·`whiteSoft`.

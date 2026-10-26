@@ -98,7 +98,7 @@ const BrandScreen = () => (
       title="상징과 가치"
       lead="피터팬 재단이 지향하는 가치와 그것이 담긴 상징과 디자인입니다."
     />
-    <div className="page-article flex flex-col divide-y divide-beige py-14 lg:py-16">
+    <div className="page-article flex flex-col divide-y divide-beige py-10 lg:py-12">
       <IdentitySection />
       <LogoSection />
       <ColorSection />

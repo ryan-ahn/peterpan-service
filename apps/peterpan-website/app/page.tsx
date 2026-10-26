@@ -133,11 +133,11 @@ const NewsSection = ({ news }: NewsSectionProps) => (
               News
             </BrandText>
             <BrandText as="h2" variant="heading" color="pine" className="mt-2">
-              재단소식
+              재단 소식
             </BrandText>
           </div>
           <Link href="/news" className="text-4 leading-5 text-pine">
-            전체 보기
+            소식 전체 보기
           </Link>
         </div>
         <div className="flex flex-col">
@@ -184,7 +184,7 @@ const NewsSection = ({ news }: NewsSectionProps) => (
               color: "white",
               size: "small",
             })}>
-            경영공시
+            경영 공시
           </Link>
           <Link
             href="/disclosure/donations"

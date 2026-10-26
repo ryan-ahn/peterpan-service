@@ -269,7 +269,7 @@ export const VILLAGE_ROADMAP = [
 ] as const;
 
 export const VILLAGE_NOTE =
-  "규모와 일정은 2026년 10월 설립추진위원회의 사업 제안입니다. 부지 확정과 인허가 이전의 계획이며, 확정되는 내용은 재단소식과 경영공시에 갱신합니다.";
+  "규모와 일정은 2026년 10월 설립추진위원회의 사업 제안입니다. 부지 확정과 인허가 이전의 계획이며, 확정되는 내용은 재단 소식과 경영 공시에 갱신합니다.";
 
 export const VILLAGE_ZONES = [
   {
@@ -612,28 +612,28 @@ export const WORKS = [
     index: "01",
     title: "생활주거공동체 조성",
     body: "성인 중증 자폐성장애인을 위한 안정적인 주거 공간을 조성합니다.",
-    image: "/images/work-housing.jpg",
+    image: "/images/work-housing-illust.jpg",
     href: "/village/spaces",
   },
   {
     index: "02",
     title: "맞춤형 돌봄과 자립지원",
     body: "개인별 특성을 반영한 돌봄, 재활, 사회적응 프로그램을 운영합니다.",
-    image: "/images/work-care.jpg",
+    image: "/images/work-care-illust.jpg",
     href: "/village/operation",
   },
   {
     index: "03",
     title: "치유농업과 지역 연계",
     body: "자연 속에서 일하고, 배우고, 교류하는 기회를 제공합니다.",
-    image: "/images/work-farm.jpg",
+    image: "/images/work-farm-illust.jpg",
     href: "/village",
   },
   {
     index: "04",
     title: "가족의 삶도 함께",
     body: "부모와 가족의 돌봄 부담을 덜고, 지속 가능한 지원체계를 만듭니다.",
-    image: "/images/work-family.jpg",
+    image: "/images/work-family-illust.jpg",
     href: "/about",
   },
 ] as const;

@@ -273,7 +273,7 @@ const PrivacyScreen = () => {
   };
   // render
   return (
-    <article className="page-reading flex flex-col gap-10 py-16">
+    <article className="page-reading flex flex-col gap-10 py-12">
       <div className="flex flex-col gap-6">
         <PageIntro title="개인정보처리방침" />
         <BrandText variant="body">

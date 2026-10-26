@@ -218,7 +218,7 @@ const readNews = (params: ReadNewsParams) => {
 };
 
 /**
- * screen — 소식 관리. 공지와 활동을 탭으로 나눠 쓰고, 수집한 언론보도를 승인한다
+ * screen — 소식 관리. 공지와 활동을 탭으로 나눠 쓰고, 수집한 언론 보도를 승인한다
  */
 const NewsScreen = () => {
   // hooks
@@ -300,7 +300,7 @@ const NewsScreen = () => {
         title="소식 관리"
         description={
           isPressTab
-            ? "네이버 뉴스에서 매일 모은 기사예요. 승인한 기사만 웹사이트 언론보도에 원문 링크로 올라가요."
+            ? "네이버 뉴스에서 매일 모은 기사예요. 승인한 기사만 웹사이트 언론 보도에 원문 링크로 올라가요."
             : "웹사이트 소식에 올라갈 공지와 활동을 씁니다. 상단 고정한 글이 맨 위에 보여요."
         }
         actions={
@@ -394,7 +394,7 @@ const NewsScreen = () => {
 };
 
 /**
- * section — 수집한 언론보도 검토. 승인하면 웹사이트에 게시하고, 숨기면 내린다
+ * section — 수집한 언론 보도 검토. 승인하면 웹사이트에 게시하고, 숨기면 내린다
  */
 const PressReviewSection = ({
   press,
@@ -415,7 +415,7 @@ const PressReviewSection = ({
     setError(null);
     try {
       await approvePress({ id: press.id });
-      toast.show({ text: "언론보도에 게시했어요.", variant: "success" });
+      toast.show({ text: "언론 보도에 게시했어요.", variant: "success" });
       onChanged();
     } catch (approveError) {
       setError(

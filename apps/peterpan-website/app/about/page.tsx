@@ -52,7 +52,7 @@ const AboutScreen = () => (
  */
 const PreambleSection = () => (
   <section className="border-b border-beige">
-    <div className="page-article py-14 lg:py-16">
+    <div className="page-article py-10 lg:py-12">
       <BrandText variant="overline" color="pine">
         Why now
       </BrandText>
@@ -68,7 +68,7 @@ const PreambleSection = () => (
 
 const ReasonSection = () => (
   <section className="border-b border-beige bg-paper">
-    <div className="page-article py-14 lg:py-16">
+    <div className="page-article py-10 lg:py-12">
       <BrandText variant="overline" color="pine">
         Why this foundation
       </BrandText>
@@ -107,7 +107,7 @@ const ReasonSection = () => (
 
 const QuoteSection = () => (
   <section className="bg-pine text-paper">
-    <div className="page-article py-14 text-center lg:py-18">
+    <div className="page-article py-10 text-center lg:py-14">
       <div className="mx-auto w-10 border-t-2 border-gold" />
       <p className="mt-6 text-7 leading-11 font-semibold text-beige md:text-9 md:leading-13">
         {FOUNDING_QUOTE.before}
@@ -123,7 +123,7 @@ const QuoteSection = () => (
 
 const WorksSection = () => (
   <section className="border-b border-beige">
-    <div className="page-article py-14 lg:py-16">
+    <div className="page-article py-10 lg:py-12">
       <BrandText variant="overline" color="pine">
         What we will do
       </BrandText>
@@ -156,7 +156,7 @@ const WorksSection = () => (
 
 const ProgressSection = () => (
   <section className="border-b border-beige bg-paper">
-    <div className="page-article py-14 lg:py-16">
+    <div className="page-article py-10 lg:py-12">
       <BrandText variant="overline" color="pine">
         What is in place
       </BrandText>
@@ -190,7 +190,7 @@ const ProgressSection = () => (
 
 const AimSection = () => (
   <section>
-    <div className="page-article flex flex-col gap-5 py-14 lg:py-16">
+    <div className="page-article flex flex-col gap-5 py-10 lg:py-12">
       <BrandText variant="overline" color="pine">
         Our commitment
       </BrandText>

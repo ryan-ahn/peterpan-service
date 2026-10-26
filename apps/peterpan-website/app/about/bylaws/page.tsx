@@ -86,7 +86,7 @@ const BylawsScreen = async () => {
         }
       />
       {bylaw ? (
-        <div className="page-article flex flex-col divide-y divide-beige py-14 lg:py-16">
+        <div className="page-article flex flex-col divide-y divide-beige py-10 lg:py-12">
           {outline ? <SummarySection bylaw={bylaw} outline={outline} /> : null}
           {outline ? <OutlineSection outline={outline} /> : null}
           <DownloadSection bylaw={bylaw} />

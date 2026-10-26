@@ -5,6 +5,7 @@ import { Montserrat, Nanum_Pen_Script } from "next/font/google";
 
 import { getSessionProfile } from "@repo/auth/session";
 import { getSiteContact } from "@repo/db/siteContact";
+import ToastProvider from "@repo/ui/components/toast";
 
 import SiteFooter from "@components/siteFooter";
 import SiteHeader from "@components/siteHeader";
@@ -99,8 +100,13 @@ export default async function RootLayout({
       suppressHydrationWarning>
       <head>
         <link
+          rel="preconnect"
+          href="https://cdn.jsdelivr.net"
+          crossOrigin="anonymous"
+        />
+        <link
           rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
         />
       </head>
       <body className="flex min-h-dvh flex-col">
@@ -109,13 +115,15 @@ export default async function RootLayout({
           className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-white focus:px-3 focus:py-2">
           본문으로
         </a>
-        <SiteHeader
-          user={user ? { name: user.name, avatarUrl: user.avatarUrl } : null}
-        />
-        <main id="content" className="flex-1 pb-8 lg:pb-10">
-          {children}
-        </main>
-        <SiteFooter contact={contact} />
+        <ToastProvider>
+          <SiteHeader
+            user={user ? { name: user.name, avatarUrl: user.avatarUrl } : null}
+          />
+          <main id="content" className="flex-1 pb-8 lg:pb-10">
+            {children}
+          </main>
+          <SiteFooter contact={contact} />
+        </ToastProvider>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

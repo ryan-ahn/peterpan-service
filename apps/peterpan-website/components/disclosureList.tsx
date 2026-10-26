@@ -36,11 +36,11 @@ type YearLinkProps = {
 };
 
 /**
- * 경영공시·기부금 공시 목록. 연도로 거르고 파일을 새 탭으로 연다
+ * 경영 공시·기부금 공시 목록. 연도로 거르고 파일을 새 탭으로 연다
  * @param overline 제목 위 영문 분류
  * @param title 제목
  * @param lead 설명
- * @param years 자료가 있는 연도
+ * @param years 자료가 있는 연도. 두 해 이상일 때만 연도 탭을 보인다
  * @param currentYear 선택한 연도. 없으면 전체
  * @param basePath 목록 주소
  * @param empty 자료가 없을 때 문구
@@ -62,21 +62,23 @@ const DisclosureList = ({
   return (
     <article>
       <FoundationHeader overline={overline} title={title} lead={lead} />
-      <div className="page-article py-14 lg:py-16">
-        <nav
-          aria-label="연도"
-          className="flex flex-wrap gap-2 text-4 leading-5">
-          <YearLink href={basePath} label="전체" isActive={!currentYear} />
-          {years.map(year => (
-            <YearLink
-              key={year}
-              href={`${basePath}?year=${year}`}
-              label={String(year)}
-              isActive={currentYear === year}
-            />
-          ))}
-        </nav>
-        <div className="mt-6 flex flex-col gap-3">
+      <div className="page-article py-10 lg:py-12">
+        {years.length > 1 ? (
+          <nav
+            aria-label="연도"
+            className="mb-6 flex flex-wrap gap-2 text-4 leading-5">
+            <YearLink href={basePath} label="전체" isActive={!currentYear} />
+            {years.map(year => (
+              <YearLink
+                key={year}
+                href={`${basePath}?year=${year}`}
+                label={String(year)}
+                isActive={currentYear === year}
+              />
+            ))}
+          </nav>
+        ) : null}
+        <div className="flex flex-col gap-3">
           {rows.length === 0 ? (
             <BrandText
               variant="bodyCompact"

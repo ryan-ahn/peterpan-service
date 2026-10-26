@@ -91,7 +91,7 @@ const BoardDetailScreen = async ({ params }: Props) => {
     .filter(Boolean);
   // render
   return (
-    <article className="page-article py-14 lg:py-16">
+    <article className="page-article py-10 lg:py-12">
       <Link href="/board" className="text-4 leading-5 text-pine">
         목록으로
       </Link>

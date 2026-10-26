@@ -56,7 +56,7 @@ const NewsDetailScreen = async ({ params }: Props) => {
   const isPress = post.category === "press";
   // render
   return (
-    <article className="page-article py-14 lg:py-16">
+    <article className="page-article py-10 lg:py-12">
       <Link href="/news" className="text-4 leading-5 text-pine">
         목록으로
       </Link>

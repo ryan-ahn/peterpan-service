@@ -195,8 +195,7 @@ const WallSection = () => (
       })}
     </div>
     <BrandText variant="bodyCompact" color="muted" className="mt-6">
-      후원 알림에 이름 벽에 올릴 이름을 적어 주세요. 비워 두시면 올리지
-      않습니다. 출연과 후원금의 쓰임은{" "}
+      후원 알림에 이름 벽에 올릴 이름을 적어 주세요. 출연과 후원금의 쓰임은{" "}
       <Link href="/disclosure/donations" className="text-pine underline">
         기부금 공시
       </Link>
@@ -283,7 +282,6 @@ const NoticeSection = ({ isSent, profile }: NoticeSectionProps) => (
             label="이름 벽에 올릴 이름"
             name="wallName"
             placeholder="예: 홍길동, 피터팬즈 가족"
-            hint="비워 두시면 이름 벽에 올리지 않습니다."
           />
         </div>
         <label className="flex flex-col gap-2 text-4 leading-5 md:col-span-2">

@@ -66,7 +66,7 @@ const BoardScreen = async ({ searchParams }: Props) => {
         title="함께 나누는 이야기"
         lead="회원 누구나 글을 남길 수 있습니다. 서로를 배려하는 말로 마음을 나눠 주세요."
       />
-      <div className="page-article py-14 lg:py-16">
+      <div className="page-article py-10 lg:py-12">
         <div className="flex flex-col gap-3 md:flex-row md:items-center">
           <form className="flex flex-1 gap-2" action="/board">
             <input

@@ -11,8 +11,8 @@ import { formatDate } from "@lib/format";
 import { listNews } from "@lib/posts";
 
 export const metadata: Metadata = {
-  title: "재단소식",
-  description: "피터팬 재단의 공지, 활동 소식, 언론보도를 모아 봅니다.",
+  title: "재단 소식",
+  description: "피터팬 재단의 공지, 활동 소식, 언론 보도를 모아 봅니다.",
 };
 
 /**
@@ -63,10 +63,10 @@ const NewsScreen = async ({ searchParams }: Props) => {
     <article>
       <FoundationHeader
         overline="News"
-        title="재단소식"
-        lead="공지, 활동, 언론보도를 한 목록에서 봅니다."
+        title="재단 소식"
+        lead="공지, 활동, 언론 보도를 한 목록에서 봅니다."
       />
-      <div className="page-article py-14 lg:py-16">
+      <div className="page-article py-10 lg:py-12">
         <div className="flex flex-wrap gap-2">
           {TABS.map(tab => (
             <Link

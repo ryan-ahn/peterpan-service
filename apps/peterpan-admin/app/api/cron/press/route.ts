@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { collectPress } from "@lib/pressCollector";
 
 /**
- * Vercel Cron이 매일 부르는 언론보도 수집. `Authorization: Bearer ${CRON_SECRET}`만 받는다
+ * Vercel Cron이 매일 부르는 언론 보도 수집. `Authorization: Bearer ${CRON_SECRET}`만 받는다
  */
 export const GET = async (request: Request) => {
   const secret = process.env.CRON_SECRET;
