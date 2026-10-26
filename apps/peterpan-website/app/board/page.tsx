@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -8,7 +10,9 @@ import cn from "@repo/ui/lib/cn";
 
 import BrandText from "@components/brandText";
 import FoundationHeader from "@components/foundationHeader";
-import { listBoardPosts } from "@lib/board";
+import PagerSkeleton from "@components/pagerSkeleton";
+import SkeletonText from "@components/skeletonText";
+import { BOARD_PAGE_SIZE, listBoardPosts } from "@lib/board";
 import { formatDate } from "@lib/format";
 
 export const metadata: Metadata = {
@@ -16,6 +20,16 @@ export const metadata: Metadata = {
   description:
     "피터팬 재단 게시판. 후원자와 가족, 이웃이 소식과 마음을 나누는 공간입니다.",
 };
+
+/**
+ * constants
+ */
+const WRITE_BUTTON_STYLE = buttonStyle({
+  variant: "solid",
+  color: "pine",
+  size: "medium",
+  isRound: true,
+});
 
 /**
  * types
@@ -27,7 +41,8 @@ type Props = {
 type BoardResult = Awaited<ReturnType<typeof listBoardPosts>>;
 
 type ListSectionProps = {
-  result: BoardResult | null;
+  query: string;
+  page: number;
 };
 
 type PagerSectionProps = {
@@ -41,23 +56,14 @@ type FormatRowNumberParams = {
 };
 
 /**
- * screen — 회원 게시판. 검색, 글쓰기, 목록, 쪽 번호
+ * screen — 회원 게시판. 검색, 글쓰기, 목록, 쪽 번호. 글쓰기 버튼과 목록만 스켈레톤 뒤에서 따로 들어온다
  */
 const BoardScreen = async ({ searchParams }: Props) => {
   // variables
   const params = await searchParams;
-  const page = Number(params.page ?? "1");
+  const pageNumber = Number(params.page ?? "1");
+  const page = Number.isFinite(pageNumber) ? pageNumber : 1;
   const query = params.q ?? "";
-  const [user, result] = await Promise.all([
-    getSessionProfile(),
-    listBoardPosts({
-      query,
-      page: Number.isFinite(page) ? page : 1,
-    }).catch(() => null),
-  ]);
-  const writeHref = user
-    ? "/board/write"
-    : `/login?next=${encodeURIComponent("/board/write")}`;
   // render
   return (
     <article>
@@ -83,22 +89,13 @@ const BoardScreen = async ({ searchParams }: Props) => {
               isRound
             />
           </form>
-          <Link
-            href={writeHref}
-            className={buttonStyle({
-              variant: "solid",
-              color: "pine",
-              size: "medium",
-              isRound: true,
-            })}>
-            <Icon name="edit" size={18} />
-            {user ? "글쓰기" : "로그인하고 글쓰기"}
-          </Link>
+          <Suspense fallback={<WriteLinkSkeleton />}>
+            <WriteLink />
+          </Suspense>
         </div>
-        <ListSection result={result} />
-        {result && result.pageCount > 1 ? (
-          <PagerSection result={result} query={query} />
-        ) : null}
+        <Suspense key={`${query}-${page}`} fallback={<ListSkeleton />}>
+          <ListSection query={query} page={page} />
+        </Suspense>
       </div>
     </article>
   );
@@ -107,7 +104,9 @@ const BoardScreen = async ({ searchParams }: Props) => {
 /**
  * section
  */
-const ListSection = ({ result }: ListSectionProps) => {
+const ListSection = async ({ query, page }: ListSectionProps) => {
+  // variables
+  const result = await listBoardPosts({ query, page }).catch(() => null);
   // render
   if (!result) {
     return (
@@ -127,50 +126,49 @@ const ListSection = ({ result }: ListSectionProps) => {
     );
   }
   return (
-    <div className="mt-8 overflow-hidden rounded-2xlarge border border-beige bg-white">
-      <div className="hidden grid-cols-[5rem_1fr_8rem_5rem_7rem] gap-3 border-b border-beige px-6 py-3 text-4 leading-5 text-muted md:grid">
-        <span>번호</span>
-        <span>제목</span>
-        <span>글쓴이</span>
-        <span>좋아요</span>
-        <span>작성일</span>
-      </div>
-      {result.posts.map((post, index) => (
-        <Link
-          key={post.id}
-          href={`/board/${post.id}`}
-          className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-1 border-b border-beige px-6 py-4 last:border-b-0 hover:bg-paper/60 md:grid-cols-[5rem_1fr_8rem_5rem_7rem] md:items-center">
-          <span className="hidden text-4 leading-5 text-muted md:block">
-            {formatRowNumber({ result, index })}
-          </span>
-          <span className="col-span-2 font-medium break-all md:col-span-1">
-            {post.title}
-            {post.commentCount > 0 ? (
-              <span className="ml-1.5 text-4 leading-5 font-semibold text-gold-deep">
-                [{post.commentCount}]
+    <>
+      <div className="mt-8 overflow-hidden rounded-2xlarge border border-beige bg-white">
+        <ListHead />
+        {result.posts.map((post, index) => (
+          <Link
+            key={post.id}
+            href={`/board/${post.id}`}
+            className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-1 border-b border-beige px-6 py-4 last:border-b-0 hover:bg-paper/60 md:grid-cols-[5rem_1fr_8rem_5rem_7rem] md:items-center">
+            <span className="hidden text-4 leading-5 text-muted md:block">
+              {formatRowNumber({ result, index })}
+            </span>
+            <span className="col-span-2 truncate font-medium md:col-span-1">
+              {post.title}
+              {post.commentCount > 0 ? (
+                <span className="ml-1.5 text-4 leading-5 font-semibold text-gold-deep">
+                  [{post.commentCount}]
+                </span>
+              ) : null}
+            </span>
+            <span className="truncate text-4 leading-5 text-ink/80">
+              {post.authorName || "회원"}
+              <span className="ml-2 text-muted md:hidden">
+                {formatDate(post.createdAt)}
               </span>
-            ) : null}
-          </span>
-          <span className="truncate text-4 leading-5 text-ink/80">
-            {post.authorName || "회원"}
-            <span className="ml-2 text-muted md:hidden">
+            </span>
+            <span
+              className={cn(
+                "text-4 leading-5",
+                post.likeCount > 0 ? "text-pine" : "text-muted",
+              )}
+              aria-label={`좋아요 ${post.likeCount}`}>
+              {post.likeCount}
+            </span>
+            <span className="hidden text-4 leading-5 text-muted md:block">
               {formatDate(post.createdAt)}
             </span>
-          </span>
-          <span
-            className={cn(
-              "text-4 leading-5",
-              post.likeCount > 0 ? "text-pine" : "text-muted",
-            )}
-            aria-label={`좋아요 ${post.likeCount}`}>
-            {post.likeCount}
-          </span>
-          <span className="hidden text-4 leading-5 text-muted md:block">
-            {formatDate(post.createdAt)}
-          </span>
-        </Link>
-      ))}
-    </div>
+          </Link>
+        ))}
+      </div>
+      {result.pageCount > 1 ? (
+        <PagerSection result={result} query={query} />
+      ) : null}
+    </>
   );
 };
 
@@ -192,6 +190,82 @@ const PagerSection = ({ result, query }: PagerSectionProps) => (
       ),
     )}
   </div>
+);
+
+/**
+ * inner components
+ */
+const WriteLink = async () => {
+  // variables
+  const user = await getSessionProfile();
+  const writeHref = user
+    ? "/board/write"
+    : `/login?next=${encodeURIComponent("/board/write")}`;
+  // render
+  return (
+    <Link href={writeHref} className={WRITE_BUTTON_STYLE}>
+      <Icon name="edit" size={18} />
+      {user ? "글쓰기" : "로그인하고 글쓰기"}
+    </Link>
+  );
+};
+
+/**
+ * 로그아웃 상태 글쓰기 버튼과 같은 크기로 자리를 칠한다
+ */
+const WriteLinkSkeleton = () => (
+  <span
+    className={cn(
+      WRITE_BUTTON_STYLE,
+      "animate-pulse border-transparent bg-beige text-transparent",
+    )}
+    aria-hidden="true">
+    <Icon name="edit" size={18} />
+    로그인하고 글쓰기
+  </span>
+);
+
+const ListHead = () => (
+  <div className="hidden grid-cols-[5rem_1fr_8rem_5rem_7rem] gap-3 border-b border-beige px-6 py-3 text-4 leading-5 text-muted md:grid">
+    <span>번호</span>
+    <span>제목</span>
+    <span>글쓴이</span>
+    <span>좋아요</span>
+    <span>작성일</span>
+  </div>
+);
+
+/**
+ * `ListSection`과 같은 표에 글자 자리만 칠한다
+ */
+const ListSkeleton = () => (
+  <>
+    <div className="mt-8 overflow-hidden rounded-2xlarge border border-beige bg-white">
+      <ListHead />
+      {Array.from({ length: BOARD_PAGE_SIZE }, (_, index) => (
+        <div
+          key={index}
+          className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-1 border-b border-beige px-6 py-4 last:border-b-0 md:grid-cols-[5rem_1fr_8rem_5rem_7rem] md:items-center">
+          <span className="hidden text-4 leading-5 md:block">
+            <SkeletonText>00</SkeletonText>
+          </span>
+          <span className="col-span-2 truncate font-medium md:col-span-1">
+            <SkeletonText>게시글 제목이 이 자리에 들어갑니다</SkeletonText>
+          </span>
+          <span className="truncate text-4 leading-5">
+            <SkeletonText>회원 이름</SkeletonText>
+          </span>
+          <span className="text-4 leading-5">
+            <SkeletonText>0</SkeletonText>
+          </span>
+          <span className="hidden text-4 leading-5 md:block">
+            <SkeletonText>2026.10.27</SkeletonText>
+          </span>
+        </div>
+      ))}
+    </div>
+    <PagerSkeleton />
+  </>
 );
 
 /**

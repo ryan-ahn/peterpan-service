@@ -18,14 +18,15 @@ const AERIAL = {
   height: 886,
 };
 
+/** 핀 끝 점이 놓일 자리(이미지 기준 %) */
 const SPOT_POSITION: Record<SpotId, Point> = {
-  community: { x: 56, y: 27 },
-  homes: { x: 34, y: 45 },
-  courtyard: { x: 49, y: 55 },
-  garden: { x: 70, y: 57 },
-  coop: { x: 14, y: 48 },
-  pitch: { x: 79, y: 38 },
-  path: { x: 41, y: 84 },
+  community: { x: 56, y: 36 },
+  homes: { x: 35, y: 46 },
+  courtyard: { x: 49, y: 53 },
+  garden: { x: 70, y: 51 },
+  coop: { x: 14, y: 55 },
+  pitch: { x: 78, y: 44 },
+  path: { x: 48, y: 82 },
 };
 
 /**
@@ -102,14 +103,42 @@ const VillageAerial = () => {
               type="button"
               aria-expanded={isSelected}
               className={cn(
-                "absolute z-10 -translate-x-1/2 -translate-y-1/2 rounded-full border px-2 py-0.5 text-3 leading-4 font-semibold whitespace-nowrap shadow-medium transition-transform duration-200 hover:z-20 hover:scale-125 focus-visible:scale-125 md:px-3 md:py-1.5 md:text-4 md:leading-5",
-                isSelected
-                  ? "z-20 scale-125 border-pine bg-pine text-paper"
-                  : "border-beige bg-white/90 text-pine",
+                "group/pin absolute flex -translate-x-1/2 -translate-y-[calc(100%-0.375rem)] flex-col items-center",
+                isSelected ? "z-20" : "z-10 hover:z-20 focus-visible:z-20",
               )}
               style={{ left: `${position.x}%`, top: `${position.y}%` }}
               onClick={() => handleSpotClick(spot.id)}>
-              {spot.name}
+              <span
+                className={cn(
+                  "origin-bottom rounded-medium border px-2 py-0.5 text-3 leading-4 font-semibold whitespace-nowrap shadow-medium transition duration-200 group-hover/pin:-translate-y-0.5 group-focus-visible/pin:-translate-y-0.5 md:px-2.5 md:py-1 md:text-4 md:leading-5",
+                  isSelected
+                    ? "border-pine bg-pine text-paper"
+                    : "border-beige bg-paper-light/95 text-pine group-hover/pin:border-pine",
+                )}>
+                {spot.name}
+              </span>
+              <span
+                className={cn(
+                  "h-2 w-0.5 md:h-3",
+                  isSelected ? "bg-pine" : "bg-pine/60",
+                )}
+                aria-hidden="true"
+              />
+              <span className="relative grid size-3 place-items-center">
+                {isSelected ? (
+                  <span
+                    className="absolute inset-0 animate-ping rounded-full bg-gold"
+                    aria-hidden="true"
+                  />
+                ) : null}
+                <span
+                  className={cn(
+                    "relative size-3 rounded-full border-2 border-white shadow-small",
+                    isSelected ? "bg-gold" : "bg-pine",
+                  )}
+                  aria-hidden="true"
+                />
+              </span>
             </button>
           );
         })}
@@ -181,9 +210,11 @@ const cardPosition = (params: Point) => {
   const { x, y } = params;
   return {
     ...(x < 50
-      ? { left: `${Math.max(x - 8, 0)}%` }
-      : { right: `${Math.max(92 - x, 0)}%` }),
-    ...(y < 50 ? { top: `${y + 6}%` } : { bottom: `${106 - y}%` }),
+      ? { left: `max(0px, calc(${x}% - 2.5rem))` }
+      : { right: `max(0px, calc(${100 - x}% - 2.5rem))` }),
+    ...(y < 50
+      ? { top: `calc(${y}% + 1.25rem)` }
+      : { bottom: `calc(${100 - y}% + 4rem)` }),
   };
 };
 

@@ -7,7 +7,6 @@ import { getSessionProfile } from "@repo/auth/session";
 import { getSiteContact } from "@repo/db/siteContact";
 import ToastProvider from "@repo/ui/components/toast";
 
-import BrandSkeleton from "@components/brandSkeleton";
 import SiteFooter from "@components/siteFooter";
 import SiteHeader from "@components/siteHeader";
 import {
@@ -96,7 +95,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           본문으로
         </a>
         <ToastProvider>
-          <Suspense fallback={<SiteHeaderSkeleton />}>
+          <Suspense fallback={<SiteHeader user={null} />}>
             <SessionHeader />
           </Suspense>
           <main id="content" className="flex-1 pb-8 lg:pb-10">
@@ -116,7 +115,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
  */
 
 /**
- * 세션을 읽어 헤더를 그린다. 본문은 이 읽기를 기다리지 않고 각 화면 폭 그대로 먼저 나간다
+ * 세션을 읽어 헤더를 그린다. 읽는 동안은 로그아웃 상태 헤더를 같은 크기로 먼저 보이고, 본문은 이 읽기를 기다리지 않는다
  */
 const SessionHeader = async () => {
   // variables
@@ -161,22 +160,3 @@ const ContactFooter = async () => {
     </>
   );
 };
-
-/**
- * inner components
- */
-
-/**
- * `SessionHeader`가 세션을 읽는 동안 헤더 줄 자리를 잡는다
- */
-const SiteHeaderSkeleton = () => (
-  <div className="border-b border-beige bg-white">
-    <div className="page-wide flex h-20 items-center justify-between gap-6">
-      <div className="flex items-center gap-2.5">
-        <BrandSkeleton className="h-12 w-11 rounded-medium" />
-        <BrandSkeleton className="h-5 w-24" />
-      </div>
-      <BrandSkeleton isRound className="size-11" />
-    </div>
-  </div>
-);

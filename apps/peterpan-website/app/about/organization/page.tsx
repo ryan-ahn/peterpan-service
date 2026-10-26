@@ -48,10 +48,12 @@ type GroupCardProps = {
 };
 
 /**
- * screen — 조직도. 어드민에서 짠 그룹·인원 구조를 그린다
+ * screen — 조직도. 어드민에서 짠 그룹·인원 구조를 그린다. 모양을 미리 알 수 없어 스켈레톤 없이 다 읽은 뒤 한 번에 보인다
  */
 const OrganizationScreen = async () => {
+  // variables
   const chart = await getOrganizationChart();
+  // render
   return (
     <article>
       <FoundationHeader
@@ -61,23 +63,34 @@ const OrganizationScreen = async () => {
       />
       <section className="bg-paper">
         <div className="page-wide py-10 lg:py-12">
-          {chart.groups.length === 0 ? (
-            <BrandText variant="body" color="muted" className="text-center">
-              준비 중입니다.
-            </BrandText>
-          ) : (
-            <>
-              <div className="hidden md:block">
-                <ChartLayout groups={chart.groups} />
-              </div>
-              <div className="md:hidden">
-                <StackedList groups={chart.groups} parentId={null} />
-              </div>
-            </>
-          )}
+          <ChartSection groups={chart.groups} />
         </div>
       </section>
     </article>
+  );
+};
+
+/**
+ * section
+ */
+const ChartSection = ({ groups }: ChartLayoutProps) => {
+  // render
+  if (groups.length === 0) {
+    return (
+      <BrandText variant="body" color="muted" className="text-center">
+        준비 중입니다.
+      </BrandText>
+    );
+  }
+  return (
+    <>
+      <div className="hidden md:block">
+        <ChartLayout groups={groups} />
+      </div>
+      <div className="md:hidden">
+        <StackedList groups={groups} parentId={null} />
+      </div>
+    </>
   );
 };
 

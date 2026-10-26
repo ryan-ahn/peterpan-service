@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -8,6 +10,7 @@ import Button from "@repo/ui/components/button";
 
 import BrandText from "@components/brandText";
 import PageIntro from "@components/pageIntro";
+import SkeletonText from "@components/skeletonText";
 import { getBoardPost } from "@lib/board";
 
 import { saveBoardPost } from "../actions";
@@ -24,13 +27,43 @@ type Props = {
   searchParams: Promise<{ id?: string; error?: string }>;
 };
 
+type WriteSectionProps = {
+  id: string;
+  hasError: boolean;
+};
+
+type WriteFormProps = {
+  id: string;
+  post: { title: string; body: string } | null;
+  userName: string | null;
+  hasError: boolean;
+};
+
 /**
- * screen — 게시판 글쓰기. id가 있으면 본인 글 고치기
+ * screen — 게시판 글쓰기. id가 있으면 본인 글 고치기. 세션과 글을 읽는 동안 같은 틀을 먼저 보인다
  */
 const BoardWriteScreen = async ({ searchParams }: Props) => {
   // variables
   const params = await searchParams;
   const id = params.id ?? "";
+  const hasError = Boolean(params.error);
+  // render
+  return (
+    <Suspense
+      key={id}
+      fallback={
+        <WriteForm id={id} post={null} userName={null} hasError={hasError} />
+      }>
+      <WriteSection id={id} hasError={hasError} />
+    </Suspense>
+  );
+};
+
+/**
+ * section
+ */
+const WriteSection = async ({ id, hasError }: WriteSectionProps) => {
+  // variables
   const user = await getSessionProfile();
   if (!user) {
     const next = id ? `/board/write?id=${id}` : "/board/write";
@@ -40,26 +73,49 @@ const BoardWriteScreen = async ({ searchParams }: Props) => {
   if (id && (!post || post.authorId !== user.id)) {
     notFound();
   }
-  const isEditing = Boolean(post);
+  // render
+  return (
+    <WriteForm id={id} post={post} userName={user.name} hasError={hasError} />
+  );
+};
+
+/**
+ * inner components
+ */
+
+/**
+ * 글쓰기 틀. `userName`이 없으면 읽는 중으로 보고 이름 자리를 칠하고 입력을 막는다
+ */
+const WriteForm = ({ id, post, userName, hasError }: WriteFormProps) => {
+  // variables
+  const isEditing = Boolean(id);
+  const isLoading = userName === null;
   // render
   return (
     <section className="page-article py-10 lg:py-12">
       <Link
-        href={post ? `/board/${post.id}` : "/board"}
+        href={isEditing ? `/board/${id}` : "/board"}
         className="text-4 leading-5 text-pine">
-        {post ? "글로 돌아가기" : "목록으로"}
+        {isEditing ? "글로 돌아가기" : "목록으로"}
       </Link>
       <div className="mt-6">
         <PageIntro
           eyebrow="게시판"
           title={isEditing ? "글 고치기" : "글쓰기"}
-          lead={`${user.name} 님의 이름으로 올라갑니다.`}
+          lead={
+            isLoading ? (
+              <SkeletonText>회원 님의 이름으로 올라갑니다.</SkeletonText>
+            ) : (
+              `${userName} 님의 이름으로 올라갑니다.`
+            )
+          }
         />
       </div>
       <form
         action={saveBoardPost}
+        inert={isLoading}
         className="mt-8 flex flex-col gap-5 rounded-2xlarge border border-beige bg-white px-5 py-6 md:px-8 md:py-8">
-        <input type="hidden" name="id" value={post?.id ?? ""} />
+        <input type="hidden" name="id" value={id} />
         <label className="flex flex-col gap-2">
           <span className="text-4 leading-5 font-semibold text-pine">제목</span>
           <input
@@ -83,7 +139,7 @@ const BoardWriteScreen = async ({ searchParams }: Props) => {
             className="resize-y rounded-large border border-beige bg-white px-4 py-3 leading-7 outline-none focus:border-pine"
           />
         </label>
-        {params.error ? (
+        {hasError ? (
           <BrandText variant="smallCompact" color="goldDeep">
             제목과 내용을 모두 입력해 주세요. 제목은 {BOARD_POST_LIMIT.title}
             자, 내용은 {BOARD_POST_LIMIT.body.toLocaleString()}자까지 쓸 수

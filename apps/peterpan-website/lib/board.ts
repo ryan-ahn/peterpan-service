@@ -9,7 +9,7 @@ import { boardComments, boardLikes, boardPosts, getDb } from "@repo/db";
 /**
  * constants
  */
-const PAGE_SIZE = 15;
+export const BOARD_PAGE_SIZE = 15;
 
 /**
  * types
@@ -54,8 +54,8 @@ export const listBoardPosts = async (params: ListBoardPostsParams) => {
       .from(boardPosts)
       .where(where)
       .orderBy(desc(boardPosts.createdAt))
-      .limit(PAGE_SIZE)
-      .offset((page - 1) * PAGE_SIZE),
+      .limit(BOARD_PAGE_SIZE)
+      .offset((page - 1) * BOARD_PAGE_SIZE),
     db
       .select({ count: sql<number>`count(*)::int` })
       .from(boardPosts)
@@ -65,9 +65,9 @@ export const listBoardPosts = async (params: ListBoardPostsParams) => {
   return {
     posts: rows,
     page,
-    pageSize: PAGE_SIZE,
+    pageSize: BOARD_PAGE_SIZE,
     total,
-    pageCount: Math.max(1, Math.ceil(total / PAGE_SIZE)),
+    pageCount: Math.max(1, Math.ceil(total / BOARD_PAGE_SIZE)),
   };
 };
 

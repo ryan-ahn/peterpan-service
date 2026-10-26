@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { type ReactNode, Suspense } from "react";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -21,6 +21,7 @@ import AvatarPicker from "@components/avatarPicker";
 import BrandText from "@components/brandText";
 import FlashToast from "@components/flashToast";
 import PageIntro from "@components/pageIntro";
+import SkeletonText from "@components/skeletonText";
 import { getMyProfile, listMyBoardPosts, listMyInquiries } from "@lib/account";
 import { formatDate } from "@lib/format";
 
@@ -53,6 +54,15 @@ const TABS = [
   { id: "posts", label: "내 게시글" },
 ] as const;
 
+const LIST_SKELETON_COUNT = 3;
+
+const EMPTY_PROFILE = {
+  name: "",
+  email: null,
+  phone: "",
+  birthDate: null,
+};
+
 const FIELD_CLASS =
   "h-12 rounded-xlarge border border-beige bg-white px-4 outline-none focus:border-pine read-only:bg-paper read-only:text-muted";
 
@@ -80,18 +90,27 @@ type ProfileSectionProps = {
   isAdmin: boolean;
 };
 
+type AccountSectionProps = {
+  params: Awaited<Props["searchParams"]>;
+  activeTab: TabId;
+};
+
+type AccountSkeletonProps = {
+  activeTab: TabId;
+};
+
 type SettingsSectionProps = {
-  profile: Profile;
+  profile: Pick<Profile, "name" | "email" | "phone" | "birthDate">;
   savedAt: string | null;
   error: string | null;
 };
 
 type InquirySectionProps = {
-  inquiries: Inquiry[];
+  inquiries: Inquiry[] | null;
 };
 
 type PostSectionProps = {
-  posts: BoardPost[];
+  posts: BoardPost[] | null;
 };
 
 type WithdrawSectionProps = {
@@ -137,6 +156,25 @@ type DeleteButtonProps = {
 const MyPageScreen = async ({ searchParams }: Props) => {
   // variables
   const params = await searchParams;
+  const activeTab = readTab(params.tab);
+  // render
+  return (
+    <section className="page-article flex flex-col gap-8 py-12">
+      <PageIntro eyebrow="내 계정" title="마이페이지" />
+      <Suspense
+        key={activeTab}
+        fallback={<AccountSkeleton activeTab={activeTab} />}>
+        <AccountSection params={params} activeTab={activeTab} />
+      </Suspense>
+    </section>
+  );
+};
+
+/**
+ * section
+ */
+const AccountSection = async ({ params, activeTab }: AccountSectionProps) => {
+  // variables
   const user = await getSessionProfile();
   if (!user) {
     redirect(`/login?next=${encodeURIComponent("/mypage")}`);
@@ -152,11 +190,9 @@ const MyPageScreen = async ({ searchParams }: Props) => {
   const error = params.error ? (ERROR_MESSAGES[params.error] ?? null) : null;
   const isWithdrawError =
     params.error === "confirm" || params.error === "owner";
-  const activeTab = readTab(params.tab);
   // render
   return (
-    <section className="page-article flex flex-col gap-8 py-12">
-      <PageIntro eyebrow="내 계정" title="마이페이지" />
+    <>
       <ProfileSection profile={profile} isAdmin={user.role !== null} />
       <TabNav activeId={activeTab} />
       {activeTab === "settings" ? (
@@ -173,13 +209,10 @@ const MyPageScreen = async ({ searchParams }: Props) => {
         <InquirySection inquiries={inquiries} />
       ) : null}
       {activeTab === "posts" ? <PostSection posts={posts} /> : null}
-    </section>
+    </>
   );
 };
 
-/**
- * section
- */
 const TabNav = ({ activeId }: TabNavProps) => (
   <nav
     aria-label="마이페이지 메뉴"
@@ -322,7 +355,9 @@ const InquirySection = ({ inquiries }: InquirySectionProps) => (
     id="inquiries"
     title="내 문의 내역"
     description="로그인한 상태로 남긴 후원 알림입니다. 필요 없으면 직접 지울 수 있습니다.">
-    {inquiries.length === 0 ? (
+    {inquiries === null ? (
+      <ListSkeleton />
+    ) : inquiries.length === 0 ? (
       <Empty>
         남긴 문의가 없습니다.{" "}
         <Link href="/donate" className="text-pine underline">
@@ -372,7 +407,9 @@ const PostSection = ({ posts }: PostSectionProps) => (
     id="posts"
     title="내 게시글"
     description="게시판에 쓴 글을 고치거나 지웁니다.">
-    {posts.length === 0 ? (
+    {posts === null ? (
+      <ListSkeleton />
+    ) : posts.length === 0 ? (
       <Empty>
         쓴 글이 없습니다.{" "}
         <Link href="/board/write" className="text-pine underline">
@@ -448,6 +485,82 @@ const WithdrawSection = ({ error }: WithdrawSectionProps) => (
 /**
  * inner components
  */
+
+/**
+ * `AccountSection`과 같은 틀. 프로필 글자 자리는 칠하고, 탭과 입력 칸은 빈 채로 누를 수 없게 그린다
+ */
+const AccountSkeleton = ({ activeTab }: AccountSkeletonProps) => (
+  <>
+    <div
+      className="flex flex-col items-center gap-6 rounded-3xlarge border border-beige bg-white p-6 md:flex-row md:items-center md:p-8"
+      aria-hidden="true">
+      <div className="flex flex-col items-center gap-1">
+        <span className="block size-24 animate-pulse rounded-full bg-beige" />
+      </div>
+      <div className="flex flex-1 flex-col items-center gap-1 md:items-start">
+        <p className="text-8 leading-10 font-semibold">
+          <SkeletonText>회원 이름</SkeletonText>
+        </p>
+        <BrandText variant="smallCompact">
+          <SkeletonText>member@example.com</SkeletonText>
+        </BrandText>
+        <BrandText variant="caption" className="mt-1">
+          <SkeletonText>카카오 계정 · 2026.10.27 가입</SkeletonText>
+        </BrandText>
+      </div>
+      <div className="flex w-full flex-col gap-2 md:w-auto">
+        <span
+          className={buttonStyle({
+            variant: "line",
+            color: "paper",
+            size: "small",
+            isRound: true,
+            isFullWidth: true,
+            className:
+              "animate-pulse border-transparent bg-beige text-transparent",
+          })}>
+          <Icon name="log-out" size={14} />
+          로그아웃
+        </span>
+      </div>
+    </div>
+    <div inert className="contents">
+      <TabNav activeId={activeTab} />
+      {activeTab === "settings" ? (
+        <>
+          <SettingsSection
+            profile={EMPTY_PROFILE}
+            savedAt={null}
+            error={null}
+          />
+          <WithdrawSection error={null} />
+        </>
+      ) : null}
+      {activeTab === "inquiries" ? <InquirySection inquiries={null} /> : null}
+      {activeTab === "posts" ? <PostSection posts={null} /> : null}
+    </div>
+  </>
+);
+
+const ListSkeleton = () => (
+  <ul
+    className="overflow-hidden rounded-2xlarge border border-beige bg-white"
+    aria-hidden="true">
+    {Array.from({ length: LIST_SKELETON_COUNT }, (_, index) => (
+      <li
+        key={index}
+        className="flex flex-col gap-1 border-b border-beige px-5 py-4 last:border-b-0">
+        <span className="font-medium">
+          <SkeletonText>내역 제목이 이 자리에 들어갑니다</SkeletonText>
+        </span>
+        <span className="text-4 leading-5">
+          <SkeletonText>2026.10.27 · 댓글 0</SkeletonText>
+        </span>
+      </li>
+    ))}
+  </ul>
+);
+
 const Block = ({ id, title, description, children }: BlockProps) => (
   <div id={id} className="flex scroll-mt-28 flex-col gap-4">
     <div>

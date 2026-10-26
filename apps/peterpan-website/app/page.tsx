@@ -5,9 +5,11 @@ import Link from "next/link";
 import { categoryLabel } from "@repo/db/boards";
 import { buttonStyle } from "@repo/ui/components/button";
 import Icon from "@repo/ui/icon";
+import cn from "@repo/ui/lib/cn";
 
-import BrandSkeleton from "@components/brandSkeleton";
 import BrandText from "@components/brandText";
+import LogoEmblem from "@components/logoEmblem";
+import SkeletonText from "@components/skeletonText";
 import VillageAerial from "@components/villageAerial";
 import WorkCarousel from "@components/workCarousel";
 import { formatDate } from "@lib/format";
@@ -17,7 +19,20 @@ import { listLatestNews } from "@lib/posts";
 /**
  * constants
  */
-const NEWS_COUNT = 3;
+const NEWS_COUNT = 5;
+
+const DISCLOSURE_LINKS = [
+  {
+    href: "/disclosure/management",
+    label: "경영 공시",
+    description: "사업계획·결산서·감사보고서",
+  },
+  {
+    href: "/disclosure/donations",
+    label: "기부금 공시",
+    description: "기부금 모금액과 활용 실적",
+  },
+];
 
 /**
  * screen — 홈. 첫 화면, 가치, 하는 일, 소식과 정보공개. 소식 목록만 스켈레톤 뒤에서 따로 들어온다
@@ -50,8 +65,7 @@ const HeroSection = () => (
           홀로 남겨지지 않는 삶,
           <br />
           존엄이 지켜지는 안전한 삶,
-          <br />
-          그 삶을 함께 지키는 작은 마을
+          <br />그 삶을 함께 지키는 작은 마을
         </BrandText>
         <BrandText variant="body" color="muted" className="mt-6 max-w-md">
           피터팬 재단은 성인 중증 자폐성장애인이 가족의 돌봄 여건과 관계없이
@@ -93,25 +107,43 @@ const ValuesSection = () => (
       <BrandText as="h2" variant="section" color="pine" className="mt-2">
         재단이 지키는 가치
       </BrandText>
-      <div className="mt-8 grid gap-px overflow-hidden rounded-xlarge border border-beige bg-beige sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {VALUES.map(value => (
-          <div key={value.title} className="bg-white px-6 py-8">
-            <BrandText variant="overline" color="goldDeep">
+          <div
+            key={value.title}
+            className="group relative flex flex-col overflow-hidden rounded-xlarge border border-beige bg-white px-6 pt-7 pb-8 transition-[translate,border-color] duration-300 hover:-translate-y-1 hover:border-sage">
+            <span className="absolute inset-x-0 top-0 h-1 origin-left scale-x-0 bg-gold transition-transform duration-300 group-hover:scale-x-100" />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute top-3 right-5 font-en text-19 leading-none font-semibold text-beige/60">
               {value.index}
+            </span>
+            <span
+              className={cn(
+                "relative grid size-14 place-items-center rounded-full bg-paper",
+                value.emblem === "star" ? "text-gold-deep" : "text-pine",
+              )}>
+              <LogoEmblem name={value.emblem} className="size-8" />
+            </span>
+            <BrandText variant="caption" color="goldDeep" className="mt-6">
+              {value.keywords.join(" · ")}
             </BrandText>
-            <h3 className="mt-4 text-6 leading-8 font-semibold text-pine">
+            <h3 className="mt-1 text-6 leading-8 font-semibold text-pine">
               {value.title}
             </h3>
-            <BrandText variant="smallCompact" color="muted" className="mt-2">
+            <div className="mt-3 w-8 border-t-2 border-gold" />
+            <BrandText variant="smallCompact" color="muted" className="mt-3">
               {value.body}
             </BrandText>
             {"link" in value ? (
-              <Link
+              <a
                 href={value.link.href}
-                className="mt-3 inline-flex items-center gap-1 text-4 leading-5 font-medium text-pine hover:text-pine-deep">
+                target="_blank"
+                rel="noreferrer"
+                className="mt-4 inline-flex items-center gap-1 text-4 leading-5 font-medium text-pine hover:text-pine-deep">
                 {value.link.label}
-                <Icon name="chevron-right" size={16} />
-              </Link>
+                <Icon name="external-link" size={16} />
+              </a>
             ) : null}
           </div>
         ))}
@@ -141,39 +173,40 @@ const NewsSection = () => (
           <NewsList />
         </Suspense>
       </div>
-      <aside className="flex flex-col justify-between rounded-2xlarge bg-pine px-8 py-10 text-paper">
-        <div>
-          <BrandText variant="overline" color="gold">
-            Disclosure
-          </BrandText>
-          <BrandText as="h2" variant="heading" className="mt-3">
-            운영은 투명하게 공개하겠습니다.
-          </BrandText>
-          <BrandText variant="bodyCompact" color="beige" className="mt-4">
-            피터팬 재단은 사업계획과 재정 운영, 기부금의 모금 및 사용 내역을
-            투명하게 공개하겠습니다.
-          </BrandText>
-        </div>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Link
-            href="/disclosure/management"
-            className={buttonStyle({
-              variant: "solid",
-              color: "white",
-              size: "small",
-            })}>
-            경영 공시
-          </Link>
-          <Link
-            href="/disclosure/donations"
-            className={buttonStyle({
-              variant: "line",
-              color: "white",
-              size: "small",
-            })}>
-            기부금 공시
-          </Link>
-        </div>
+      <aside className="flex flex-col rounded-2xlarge bg-sage/15 px-7 py-8 md:px-8 md:py-9">
+        <BrandText variant="overline" color="pine">
+          Disclosure
+        </BrandText>
+        <BrandText as="h2" variant="heading" color="pine" className="mt-2">
+          운영은 투명하게 공개하겠습니다.
+        </BrandText>
+        <BrandText variant="bodyCompact" color="inkSoft" className="mt-3">
+          피터팬 재단은 사업계획과 재정 운영, 기부금의 모금 및 사용 내역을
+          투명하게 공개하겠습니다.
+        </BrandText>
+        <ul className="mt-6 flex flex-col gap-2">
+          {DISCLOSURE_LINKS.map(link => (
+            <li key={link.href}>
+              <Link
+                href={link.href}
+                className="group flex items-center gap-4 rounded-xlarge bg-white/85 px-5 py-4 transition-colors hover:bg-white">
+                <span className="min-w-0 flex-1">
+                  <span className="block font-semibold text-pine">
+                    {link.label}
+                  </span>
+                  <span className="block text-4 leading-5 text-muted">
+                    {link.description}
+                  </span>
+                </span>
+                <Icon
+                  name="chevron-right"
+                  size={18}
+                  className="shrink-0 text-pine transition-transform group-hover:translate-x-1"
+                />
+              </Link>
+            </li>
+          ))}
+        </ul>
       </aside>
     </div>
   </section>
@@ -201,8 +234,8 @@ const NewsList = async () => {
             <span className="text-4 leading-5 text-gold-deep">
               {categoryLabel(post.category)}
             </span>
-            <span className="font-medium text-ink">{post.title}</span>
-            <span className="text-4 leading-5 text-muted">
+            <span className="truncate font-medium text-ink">{post.title}</span>
+            <span className="text-4 leading-5 text-muted tabular-nums">
               {formatDate(post.createdAt)}
             </span>
           </Link>
@@ -217,10 +250,16 @@ const NewsListSkeleton = () => (
     {Array.from({ length: NEWS_COUNT }, (_, index) => (
       <div
         key={index}
-        className="flex flex-col gap-2 border-b border-beige py-5 md:flex-row md:items-center md:gap-6">
-        <BrandSkeleton className="h-5 w-16" />
-        <BrandSkeleton className="h-5 w-3/4 md:flex-1" />
-        <BrandSkeleton className="h-5 w-20" />
+        className="grid gap-1 border-b border-beige py-5 md:grid-cols-[6.5rem_1fr_auto] md:items-baseline md:gap-6">
+        <span className="text-4 leading-5">
+          <SkeletonText>언론보도</SkeletonText>
+        </span>
+        <span className="truncate font-medium">
+          <SkeletonText>재단 소식 제목이 이 자리에 들어갑니다</SkeletonText>
+        </span>
+        <span className="text-4 leading-5 tabular-nums">
+          <SkeletonText>2026.10.27</SkeletonText>
+        </span>
       </div>
     ))}
   </div>

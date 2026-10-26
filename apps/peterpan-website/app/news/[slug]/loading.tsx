@@ -5,7 +5,7 @@ import ArticleSkeleton from "@components/articleSkeleton";
  */
 const NewsDetailLoadingScreen = () => {
   // render
-  return <ArticleSkeleton />;
+  return <ArticleSkeleton variant="news" />;
 };
 
 export default NewsDetailLoadingScreen;

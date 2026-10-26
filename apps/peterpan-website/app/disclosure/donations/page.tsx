@@ -33,26 +33,28 @@ const DonationsDisclosureScreen = async ({ searchParams }: Props) => {
   const params = await searchParams;
   const year = params.year ? Number(params.year) : undefined;
   const selectedYear = Number.isFinite(year) ? year : undefined;
-  const [years, rows] = await Promise.all([
+  const data = Promise.all([
     listYears("donation").catch(() => []),
     listDisclosureRows({ board: "donation", year: selectedYear }),
-  ]);
+  ]).then(([years, rows]) => ({
+    years,
+    rows: rows.map(({ post, href }) => ({
+      id: post.id,
+      title: post.title,
+      date: formatDate(post.createdAt),
+      href,
+    })),
+  }));
   // render
   return (
     <DisclosureList
       overline="Donation disclosure"
       title="기부금 공시"
       lead="기부금 모금액과 활용실적을 회계연도가 마감되면 연도별 파일로 공개하겠습니다."
-      years={years}
       currentYear={selectedYear}
       basePath="/disclosure/donations"
       empty="등록된 기부금 공시 자료가 없습니다. 모금이 시작되고 회계가 마감되면 실적 파일을 올립니다."
-      rows={rows.map(({ post, href }) => ({
-        id: post.id,
-        title: post.title,
-        date: formatDate(post.createdAt),
-        href,
-      }))}
+      data={data}
       extra={
         <a
           href={NTS_URL}

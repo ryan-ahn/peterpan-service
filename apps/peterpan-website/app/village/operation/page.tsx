@@ -143,8 +143,8 @@ const ConsortiumSection = () => (
 const RequestSection = () => (
   <BandSection
     overline="Policy"
-    title="정부에 요청하는 것"
-    description="민간에서 먼저 운영해 본 모델이 제도적으로 확산될 수 있도록 세 가지를 제안합니다.">
+    title="지속 가능한 돌봄을 위한 제안"
+    description="민간에서 시작한 새로운 돌봄 모델이 지속 가능한 제도로 자리 잡을 수 있도록, 공공의 협력과 제도적 개선을 제안합니다.">
     <NumberedList items={POLICY_REQUESTS} />
   </BandSection>
 );

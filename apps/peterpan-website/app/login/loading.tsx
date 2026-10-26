@@ -1,21 +1,18 @@
-import BrandSkeleton from "@components/brandSkeleton";
+import PageIntro from "@components/pageIntro";
+import SocialLoginButtons from "@components/socialLoginButtons";
 
 /**
- * screen — 로그인 스켈레톤. 제목·안내, 소셜 로그인 버튼 두 개
+ * screen — 로그인 로딩. 세션을 읽는 동안 같은 화면을 누를 수 없게 먼저 보인다
  */
 const LoginLoadingScreen = () => {
   // render
   return (
-    <div className="page-auth flex min-h-dvh flex-col gap-6 py-20">
-      <div>
-        <BrandSkeleton className="h-10 w-28" />
-        <BrandSkeleton className="mt-4 h-5 w-64" />
+    <section className="page-auth flex flex-col gap-6 py-20">
+      <PageIntro title="로그인" lead="원하시는 로그인 방법을 선택해 주세요." />
+      <div inert>
+        <SocialLoginButtons nextPath="/" />
       </div>
-      <div className="flex flex-col gap-3">
-        <BrandSkeleton isRound className="h-14 w-full" />
-        <BrandSkeleton isRound className="h-14 w-full" />
-      </div>
-    </div>
+    </section>
   );
 };
 

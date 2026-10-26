@@ -34,7 +34,8 @@
 - 서버 컴포넌트가 기본이다. 데이터가 필요하면 screen을 `async`로 두고 `@lib/posts`의 함수를 기다린다.
 - 메뉴 화면(재단소개·마을소개·소통·정보공개·후원하기)의 첫머리는 `FoundationHeader`(영문 overline·제목·금색 선·lead, 아래 선)이고 본문은 `page-article` 칼럼에 `py-10 lg:py-12`으로 놓는다. 글 본문·글쓰기도 `page-article`. 그 밖의 화면(로그인·마이페이지·처리방침)은 `PageIntro`(eyebrow·title·lead). 마을소개·후원하기 본문은 `BandSection` 띠 구역, 공시 목록은 `DisclosureList`.
 - 후원은 1구좌 단위 없이 공식 후원 계좌로 받는다. 계좌 정보는 `app/donate/page.tsx`의 `DONATION_ACCOUNT`에 적고, 비어 있으면 "공개 준비 중"으로 보인다. 양식은 보낸 후원을 알리는 후원 알림(`donation_inquiries`)이다. 지금은 계좌이체 일시 후원만 받고(`DONATION_FORM_KINDS`), 정기 후원·카드 결제는 재단 설립과 PG 심사 뒤 결제 연동과 함께 연다.
-- 데이터를 기다리는 화면은 그 라우트에 `loading.tsx`를 두고 화면 모양을 닮은 스켈레톤(`BrandSkeleton`)을 보인다. 루트 `app/loading.tsx`는 홈 모양(`page-wide`)이다. 그래서 다른 화면은 모두 자기 `loading.tsx`를 둔다. 소개형 화면(재단소개·마을·개인정보처리방침)은 `PageSkeleton`을 쓴다. 화면 일부만 기다리면(홈 소식 목록) 그 부분만 `<Suspense>`로 감싼다.
+- 스켈레톤은 새로고침 때 실제 화면과 1px도 어긋나지 않게 만든다. 데이터와 상관없는 머리·탭·검색칸·제목은 실제로 그리고, 데이터를 기다리는 부분만 `<Suspense>`로 감싼다. fallback은 실제와 같은 마크업·클래스에 글자 자리만 `SkeletonText`(대신 글을 투명하게 두고 배경만 칠함)로 바꾼다. 줄 높이·기준선·줄바꿈이 실제 글과 같아진다. 버튼 자리는 `buttonStyle`에 `animate-pulse border-transparent bg-beige text-transparent`를 얹는다. 세션에 따라 달라지는 양식은 같은 양식을 `inert`로 먼저 보인다. 목록 스켈레톤 줄 수는 한 쪽 크기(`NEWS_PAGE_SIZE`·`BOARD_PAGE_SIZE`)다.
+- 데이터가 없는 화면에는 `loading.tsx`를 두지 않는다. 화면 전체가 하나의 글에 달린 경우(소식·게시판 글 본문, 로그인)만 `loading.tsx`를 둔다. 헤더는 세션을 읽는 동안 로그아웃 상태 `SiteHeader`를 그대로 보인다.
 - 메뉴·캐러셀처럼 브라우저 상태가 필요한 UI만 `components/`에 `"use client"`로 둔다.
 - 폼 제출은 그 라우트의 `actions.ts` 서버 액션. 입력값은 `@repo/db/boards`의 `is*` 가드로 거른다.
 
@@ -71,11 +72,8 @@
 | `components/logo.tsx`              | 로고 링크 (`horizontal`·`symbol`)                                           |
 | `components/logoEmblem.tsx`        | 로고 네 모양 선 아이콘 (상징과 미션)                                        |
 | `components/introSplash.tsx`       | 초록 스플래시. 로고 조각이 뜻대로 모이는 애니메이션 (client, 지금은 미사용) |
-| `components/brandSkeleton.tsx`     | `Skeleton` 위에 베이지 톤을 얹은 자리 블록                                  |
-| `components/headerSkeleton.tsx`    | `FoundationHeader` 자리 스켈레톤                                            |
-| `components/pageSkeleton.tsx`      | 소개형 화면 스켈레톤 (머리 + 본문 글·카드)                                  |
-| `components/rowListSkeleton.tsx`   | 소식·게시판 목록 표 스켈레톤                                                |
-| `components/articleSkeleton.tsx`   | 소식·게시판 글 본문 스켈레톤                                                |
+| `components/skeletonText.tsx`      | 글자 자리 스켈레톤. 투명한 대신 글에 배경만 칠한다                          |
+| `components/articleSkeleton.tsx`   | 소식·게시판 글 본문 스켈레톤 (`variant`)                                    |
 | `components/workCarousel.tsx`      | 홈 하는 일 캐러셀                                                           |
 | `components/disclosureList.tsx`    | 연도별 공시 목록                                                            |
 

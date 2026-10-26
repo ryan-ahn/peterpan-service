@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -7,8 +9,10 @@ import cn from "@repo/ui/lib/cn";
 
 import BrandText from "@components/brandText";
 import FoundationHeader from "@components/foundationHeader";
+import PagerSkeleton from "@components/pagerSkeleton";
+import SkeletonText from "@components/skeletonText";
 import { formatDate } from "@lib/format";
-import { listNews } from "@lib/posts";
+import { NEWS_PAGE_SIZE, listNews } from "@lib/posts";
 
 export const metadata: Metadata = {
   title: "재단 소식",
@@ -30,7 +34,9 @@ type Props = {
 type NewsResult = NonNullable<Awaited<ReturnType<typeof listNews>>>;
 
 type ListSectionProps = {
-  result: NewsResult | null;
+  category: string;
+  query: string;
+  page: number;
 };
 
 type PagerSectionProps = {
@@ -45,19 +51,15 @@ type FormatRowNumberParams = {
 };
 
 /**
- * screen — 소식 게시판. 분류 탭, 검색, 목록, 쪽 번호
+ * screen — 소식 게시판. 분류 탭, 검색, 목록, 쪽 번호. 목록만 스켈레톤 뒤에서 따로 들어온다
  */
 const NewsScreen = async ({ searchParams }: Props) => {
   // variables
   const params = await searchParams;
   const category = params.category ?? "all";
-  const page = Number(params.page ?? "1");
+  const pageNumber = Number(params.page ?? "1");
+  const page = Number.isFinite(pageNumber) ? pageNumber : 1;
   const query = params.q ?? "";
-  const result = await listNews({
-    category,
-    query,
-    page: Number.isFinite(page) ? page : 1,
-  }).catch(() => null);
   // render
   return (
     <article>
@@ -100,10 +102,11 @@ const NewsScreen = async ({ searchParams }: Props) => {
             isRound
           />
         </form>
-        <ListSection result={result} />
-        {result && result.pageCount > 1 ? (
-          <PagerSection result={result} category={category} query={query} />
-        ) : null}
+        <Suspense
+          key={`${category}-${query}-${page}`}
+          fallback={<ListSkeleton />}>
+          <ListSection category={category} query={query} page={page} />
+        </Suspense>
       </div>
     </article>
   );
@@ -112,7 +115,9 @@ const NewsScreen = async ({ searchParams }: Props) => {
 /**
  * section
  */
-const ListSection = ({ result }: ListSectionProps) => {
+const ListSection = async ({ category, query, page }: ListSectionProps) => {
+  // variables
+  const result = await listNews({ category, query, page }).catch(() => null);
   // render
   if (!result) {
     return (
@@ -132,38 +137,80 @@ const ListSection = ({ result }: ListSectionProps) => {
     );
   }
   return (
-    <div className="mt-8 overflow-hidden rounded-2xlarge border border-beige bg-white">
-      <div className="hidden grid-cols-[5rem_6rem_1fr_8rem] gap-3 border-b border-beige px-6 py-3 text-4 leading-5 text-muted md:grid">
-        <span>번호</span>
-        <span>분류</span>
-        <span>제목</span>
-        <span>작성일</span>
+    <>
+      <div className="mt-8 overflow-hidden rounded-2xlarge border border-beige bg-white">
+        <ListHead />
+        {result.posts.map((post, index) => (
+          <Link
+            key={post.id}
+            href={`/news/${post.slug}`}
+            className="grid gap-1 border-b border-beige px-6 py-4 last:border-b-0 md:grid-cols-[5rem_6rem_1fr_8rem] md:items-center">
+            <span className="text-4 leading-5 text-muted">
+              {formatRowNumber({ result, index })}
+            </span>
+            <span className="text-4 leading-5 text-pine">
+              {categoryLabel(post.category)}
+            </span>
+            <span className="truncate font-medium">
+              {post.pinned ? (
+                <span className="mr-2 text-gold-deep">고정</span>
+              ) : null}
+              {post.title}
+            </span>
+            <span className="text-4 leading-5 text-muted">
+              {formatDate(post.createdAt)}
+            </span>
+          </Link>
+        ))}
       </div>
-      {result.posts.map((post, index) => (
-        <Link
-          key={post.id}
-          href={`/news/${post.slug}`}
-          className="grid gap-1 border-b border-beige px-6 py-4 last:border-b-0 md:grid-cols-[5rem_6rem_1fr_8rem] md:items-center">
-          <span className="text-4 leading-5 text-muted">
-            {formatRowNumber({ result, index })}
-          </span>
-          <span className="text-4 leading-5 text-pine">
-            {categoryLabel(post.category)}
-          </span>
-          <span className="font-medium">
-            {post.pinned ? (
-              <span className="mr-2 text-gold-deep">고정</span>
-            ) : null}
-            {post.title}
-          </span>
-          <span className="text-4 leading-5 text-muted">
-            {formatDate(post.createdAt)}
-          </span>
-        </Link>
-      ))}
-    </div>
+      {result.pageCount > 1 ? (
+        <PagerSection result={result} category={category} query={query} />
+      ) : null}
+    </>
   );
 };
+
+/**
+ * inner components
+ */
+const ListHead = () => (
+  <div className="hidden grid-cols-[5rem_6rem_1fr_8rem] gap-3 border-b border-beige px-6 py-3 text-4 leading-5 text-muted md:grid">
+    <span>번호</span>
+    <span>분류</span>
+    <span>제목</span>
+    <span>작성일</span>
+  </div>
+);
+
+/**
+ * `ListSection`과 같은 표에 글자 자리만 칠한다
+ */
+const ListSkeleton = () => (
+  <>
+    <div className="mt-8 overflow-hidden rounded-2xlarge border border-beige bg-white">
+      <ListHead />
+      {Array.from({ length: NEWS_PAGE_SIZE }, (_, index) => (
+        <div
+          key={index}
+          className="grid gap-1 border-b border-beige px-6 py-4 last:border-b-0 md:grid-cols-[5rem_6rem_1fr_8rem] md:items-center">
+          <span className="text-4 leading-5">
+            <SkeletonText>00</SkeletonText>
+          </span>
+          <span className="text-4 leading-5">
+            <SkeletonText>공지사항</SkeletonText>
+          </span>
+          <span className="truncate font-medium">
+            <SkeletonText>재단 소식 제목이 이 자리에 들어갑니다</SkeletonText>
+          </span>
+          <span className="text-4 leading-5">
+            <SkeletonText>2026.10.27</SkeletonText>
+          </span>
+        </div>
+      ))}
+    </div>
+    <PagerSkeleton />
+  </>
+);
 
 const PagerSection = ({ result, category, query }: PagerSectionProps) => (
   <div className="mt-6 flex justify-center gap-2">

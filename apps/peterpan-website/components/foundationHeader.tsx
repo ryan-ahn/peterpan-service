@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import BrandText from "@components/brandText";
 
 /**
@@ -6,7 +8,7 @@ import BrandText from "@components/brandText";
 type Props = {
   overline: string;
   title: string;
-  lead: string;
+  lead: ReactNode;
 };
 
 /**

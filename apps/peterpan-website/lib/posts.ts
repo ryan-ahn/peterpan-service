@@ -12,7 +12,7 @@ import { type BoardId, publicStorageUrl } from "@repo/db/boards";
 /**
  * constants
  */
-const PAGE_SIZE = 10;
+export const NEWS_PAGE_SIZE = 10;
 
 /**
  * types
@@ -72,8 +72,8 @@ export const listPosts = async (params: ListPostsParams) => {
     .from(posts)
     .where(where)
     .orderBy(desc(posts.pinned), desc(posts.createdAt))
-    .limit(PAGE_SIZE)
-    .offset((page - 1) * PAGE_SIZE);
+    .limit(NEWS_PAGE_SIZE)
+    .offset((page - 1) * NEWS_PAGE_SIZE);
   const countRows = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(posts)
@@ -82,9 +82,9 @@ export const listPosts = async (params: ListPostsParams) => {
   return {
     posts: rows,
     page,
-    pageSize: PAGE_SIZE,
+    pageSize: NEWS_PAGE_SIZE,
     total,
-    pageCount: Math.max(1, Math.ceil(total / PAGE_SIZE)),
+    pageCount: Math.max(1, Math.ceil(total / NEWS_PAGE_SIZE)),
   };
 };
 
@@ -97,8 +97,8 @@ export const listNews = async (params: ListNewsParams) => {
     listNewsRows({
       category,
       query,
-      limit: PAGE_SIZE,
-      offset: (page - 1) * PAGE_SIZE,
+      limit: NEWS_PAGE_SIZE,
+      offset: (page - 1) * NEWS_PAGE_SIZE,
     }),
     postWhere
       ? db
@@ -117,9 +117,9 @@ export const listNews = async (params: ListNewsParams) => {
   return {
     posts: rows,
     page,
-    pageSize: PAGE_SIZE,
+    pageSize: NEWS_PAGE_SIZE,
     total,
-    pageCount: Math.max(1, Math.ceil(total / PAGE_SIZE)),
+    pageCount: Math.max(1, Math.ceil(total / NEWS_PAGE_SIZE)),
   };
 };
 

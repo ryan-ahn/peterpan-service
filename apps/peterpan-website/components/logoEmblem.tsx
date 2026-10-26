@@ -1,10 +1,10 @@
-import type { CREED_PRINCIPLES } from "@lib/foundation";
+import type { VALUES } from "@lib/foundation";
 
 /**
  * types
  */
 type Props = {
-  name: (typeof CREED_PRINCIPLES)[number]["name"];
+  name: (typeof VALUES)[number]["emblem"];
   className?: string;
 };
 

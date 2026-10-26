@@ -10,11 +10,7 @@ import BrandText from "@components/brandText";
 import FoundationHeader from "@components/foundationHeader";
 import FoundationHeading from "@components/foundationHeading";
 import LogoEmblem from "@components/logoEmblem";
-import {
-  CREED_HORIZON,
-  CREED_PRINCIPLES,
-  CREED_STATEMENT,
-} from "@lib/foundation";
+import { CREED_HORIZON, CREED_STATEMENT, VALUES } from "@lib/foundation";
 
 export const metadata: Metadata = {
   title: "상징과 미션",
@@ -33,13 +29,7 @@ const SYMBOL = {
   height: 1034,
 };
 
-const KEYWORDS = ["존엄", "자립", "포용", "연결", "성장", "희망"] as const;
-
-const DIRECTIONS = [
-  "안정적인 주거",
-  "지속적인 돌봄",
-  "지역사회와의 연결",
-] as const;
+const KEYWORDS = VALUES.flatMap(value => value.keywords);
 
 const COLORS = [
   {
@@ -102,7 +92,7 @@ const BrandScreen = () => (
     <FoundationHeader
       overline="Symbol & Values"
       title="상징과 미션"
-      lead="피터팬 재단이 지향하는 가치와 그것이 담긴 상징과 디자인입니다."
+      lead="피터팬 재단이 지향하는 가치와 그 가치를 담은 상징과 디자인입니다."
     />
     <div className="page-article flex flex-col divide-y divide-beige py-10 lg:py-12">
       <IdentitySection />
@@ -136,9 +126,9 @@ const IdentitySection = () => (
         </dd>
       </div>
       <div className="flex flex-col gap-1 py-4 md:flex-row md:gap-4">
-        <dt className="w-20 shrink-0 text-4 leading-7 text-muted">핵심 방향</dt>
+        <dt className="w-20 shrink-0 text-4 leading-7 text-muted">핵심 가치</dt>
         <dd className="text-4 leading-7 font-medium text-ink">
-          {DIRECTIONS.join(" · ")}
+          {VALUES.map(value => value.title).join(" · ")}
         </dd>
       </div>
       <div className="flex flex-col gap-2 py-4 md:flex-row md:gap-4">
@@ -211,24 +201,25 @@ const LogoSection = () => (
       </LogoCard>
     </div>
     <ul className="grid gap-px overflow-hidden rounded-xlarge border border-beige bg-beige md:grid-cols-2">
-      {CREED_PRINCIPLES.map(principle => (
-        <li
-          key={principle.name}
-          className="flex items-center gap-4 bg-white px-5 py-4">
+      {VALUES.map(value => (
+        <li key={value.emblem} className="flex gap-4 bg-white px-5 py-5">
           <span
             className={cn(
               "grid size-12 shrink-0 place-items-center rounded-full bg-paper",
-              principle.name === "star" ? "text-gold-deep" : "text-pine",
+              value.emblem === "star" ? "text-gold-deep" : "text-pine",
             )}>
-            <LogoEmblem name={principle.name} className="size-6" />
+            <LogoEmblem name={value.emblem} className="size-6" />
           </span>
           <div>
             <BrandText variant="caption" color="goldDeep">
-              {principle.words}
+              {value.keywords.join(" · ")}
             </BrandText>
             <p className="mt-1 text-5 leading-7 font-semibold text-pine">
-              {principle.title}
+              {value.title}
             </p>
+            <BrandText variant="smallCompact" color="muted" className="mt-1">
+              {value.body}
+            </BrandText>
           </div>
         </li>
       ))}

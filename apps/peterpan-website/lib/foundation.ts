@@ -107,13 +107,6 @@ export const CREED_STATEMENT =
 
 export const CREED_HORIZON = "모두의 존엄한 삶이 이어지는 사회";
 
-export const CREED_PRINCIPLES = [
-  { name: "people", words: "존중 · 포용", title: "함께하는 사람들" },
-  { name: "curve", words: "연결", title: "이어지는 삶" },
-  { name: "rise", words: "자립 · 성장", title: "스스로 서는 힘" },
-  { name: "star", words: "희망", title: "남겨 둔 약속" },
-] as const;
-
 export const VILLAGE_LEAD =
   "피터팬 네버랜드는 성인 최중증 발달장애인이 안전한 집에서 생활하며, 365일 필요한 돌봄과 지원을 받을 수 있도록 계획한 생활공동체입니다. 자연 속 주거공간과 맞춤형 돌봄, 치유농업을 연결하고 시민과 기업, 지역사회가 함께 지속 가능한 마을을 만들어 갑니다.";
 
@@ -147,7 +140,7 @@ export const VILLAGE_CHALLENGES = [
 
 export const VILLAGE_PROMISE = {
   title: "주말에 보호자가 돌보기 어려워도, 공백 없는 지원",
-  body: "기업은 집을 짓는 데 힘을 보태고, 국가는 지속 가능한 365일 지원 제도를, 재단은 전문성과 공익적 기준에 맞는 운영을 맡는 구조를 제안합니다.",
+  body: "기업은 집을 짓는 데 힘을 보태고, 국가는 지속 가능한 365일 지원 제도를, 재단은 전문성과 공익적 기준에 맞는 운영을 맡는 구조를 만듭니다.",
 } as const;
 
 export const VILLAGE_TARGETS = [
@@ -523,15 +516,15 @@ export const CONSORTIUM_ROLES = [
 
 export const POLICY_REQUESTS = [
   {
-    title: "공공용지 임대 제공",
+    title: "안정적인 주거 기반 마련",
     body: "재단과 기업 컨소시엄이 마을을 지어 기부채납하고, 사회적 주택으로 영구 임대 전환합니다.",
   },
   {
-    title: "유연하게 결합하는 지원 제도",
+    title: "개인의 필요에 맞춘 통합지원",
     body: "개인 활동지원과 통합돌봄, 주거생활서비스를 개인별 필요에 따라 묶을 수 있게 설계합니다.",
   },
   {
-    title: "계속지원이 필요한 사람을 위한 개선",
+    title: "돌봄이 끊어지지 않는 제도",
     body: "부모 사망, 가족 돌봄 불가, 전이 서비스 부재로 지원이 끊기지 않게 합니다.",
   },
 ] as const;
@@ -559,23 +552,31 @@ export const VALUES = [
   {
     index: "01",
     title: "안전한 보금자리",
+    emblem: "people",
+    keywords: ["안전", "포용"],
     body: "부모가 곁에 없어도 평생 안정적으로 살아갈 수 있는 주거와 돌봄의 공간.",
   },
   {
     index: "02",
     title: "존엄과 성장",
+    emblem: "rise",
+    keywords: ["존엄", "성장"],
     body: "각자의 특성과 속도를 존중하며, 스스로의 삶을 이어 갈 수 있도록 돕습니다.",
   },
   {
     index: "03",
     title: "지속적인 돌봄",
+    emblem: "curve",
+    keywords: ["돌봄", "연결"],
     body: "시간이 흘러도, 가족의 상황이 달라져도 끊어지지 않는 따뜻한 돌봄.",
   },
   {
     index: "04",
     title: "희망과 약속",
+    emblem: "star",
+    keywords: ["희망", "약속"],
     body: "전경철 님이 남긴 뜻과 모두의 마음을 이어 가겠습니다.",
-    link: { href: "/village#story", label: "전경철 님의 이야기" },
+    link: { href: "https://brunch.co.kr/@kkokdu", label: "전경철 님의 이야기" },
   },
 ] as const;
 
@@ -584,28 +585,28 @@ export const WORKS = [
     index: "01",
     title: "생활주거공동체 조성",
     body: "성인 중증 자폐성장애인을 위한 안정적인 주거 공간을 조성합니다.",
-    image: "/images/work-housing-illust.jpg",
+    image: "/images/work-housing.jpg",
     href: "/village/spaces",
   },
   {
     index: "02",
     title: "맞춤형 돌봄과 자립지원",
     body: "개인별 특성을 반영한 돌봄, 재활, 사회적응 프로그램을 운영합니다.",
-    image: "/images/work-care-illust.jpg",
+    image: "/images/work-care.jpg",
     href: "/village/operation",
   },
   {
     index: "03",
     title: "치유농업과 지역 연계",
     body: "자연 속에서 일하고, 배우고, 교류하는 기회를 제공합니다.",
-    image: "/images/work-farm-illust.jpg",
+    image: "/images/work-farm.jpg",
     href: "/village",
   },
   {
     index: "04",
     title: "가족의 삶도 함께",
     body: "부모와 가족의 돌봄 부담을 덜고, 지속 가능한 지원체계를 만듭니다.",
-    image: "/images/work-family-illust.jpg",
+    image: "/images/work-family.jpg",
     href: "/about",
   },
 ] as const;

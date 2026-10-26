@@ -5,7 +5,7 @@ import ArticleSkeleton from "@components/articleSkeleton";
  */
 const BoardDetailLoadingScreen = () => {
   // render
-  return <ArticleSkeleton />;
+  return <ArticleSkeleton variant="board" />;
 };
 
 export default BoardDetailLoadingScreen;
