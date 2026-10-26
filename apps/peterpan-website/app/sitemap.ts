@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
 
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray, max } from "drizzle-orm";
 
-import { boardPosts, getDb, notices, posts } from "@repo/db";
+import { boardPosts, bylaws, getDb, notices, posts } from "@repo/db";
 
 import { SITE_URL } from "@lib/site";
 
@@ -32,6 +32,11 @@ const STATIC_ROUTES: StaticRoute[] = [
   { path: "/donate", priority: 0.9, changeFrequency: "monthly" },
   { path: "/privacy", priority: 0.3, changeFrequency: "yearly" },
 ];
+
+const DISCLOSURE_PATHS: Record<string, string> = {
+  management: "/disclosure/management",
+  donation: "/disclosure/donations",
+};
 
 /**
  * types
@@ -68,7 +73,11 @@ const readNewsPaths = async (): Promise<DatedPath[]> => {
       .orderBy(desc(notices.updatedAt))
       .limit(DYNAMIC_LIMIT),
   ]);
-  return [...postRows, ...noticeRows].map(row => ({
+  const postSlugs = new Set(postRows.map(row => row.slug));
+  return [
+    ...postRows,
+    ...noticeRows.filter(row => !postSlugs.has(row.slug)),
+  ].map(row => ({
     path: `/news/${encodeURIComponent(row.slug)}`,
     updatedAt: row.updatedAt,
   }));
@@ -87,17 +96,57 @@ const readBoardPaths = async (): Promise<DatedPath[]> => {
   }));
 };
 
+const readDisclosureUpdates = async (): Promise<DatedPath[]> => {
+  const rows = await getDb()
+    .select({ board: posts.board, updatedAt: max(posts.updatedAt) })
+    .from(posts)
+    .where(
+      and(
+        inArray(posts.board, Object.keys(DISCLOSURE_PATHS)),
+        eq(posts.published, true),
+      ),
+    )
+    .groupBy(posts.board);
+  return rows.flatMap(row => {
+    const path = DISCLOSURE_PATHS[row.board];
+    return path && row.updatedAt ? [{ path, updatedAt: row.updatedAt }] : [];
+  });
+};
+
+const readBylawUpdates = async (): Promise<DatedPath[]> => {
+  const rows = await getDb()
+    .select({ createdAt: bylaws.createdAt })
+    .from(bylaws)
+    .where(eq(bylaws.published, true))
+    .limit(1);
+  return rows.map(row => ({ path: "/about/bylaws", updatedAt: row.createdAt }));
+};
+
 /**
- * screen — sitemap.xml. 고정 화면과 공개된 소식·게시판 글
+ * screen — sitemap.xml. 고정 화면과 공개된 소식·게시판 글. 목록 화면은 담긴 글의 최근 수정일을 lastModified로 쓴다
  */
 const sitemap = async (): Promise<MetadataRoute.Sitemap> => {
-  const [newsPaths, boardPaths] = await Promise.all([
-    readNewsPaths().catch(() => []),
-    readBoardPaths().catch(() => []),
+  const [newsPaths, boardPaths, disclosureUpdates, bylawUpdates] =
+    await Promise.all([
+      readNewsPaths().catch(() => []),
+      readBoardPaths().catch(() => []),
+      readDisclosureUpdates().catch(() => []),
+      readBylawUpdates().catch(() => []),
+    ]);
+  const newsUpdatedAt = readLatest(newsPaths);
+  const lastModified = new Map<string, Date | undefined>([
+    ["", newsUpdatedAt],
+    ["/news", newsUpdatedAt],
+    ["/board", readLatest(boardPaths)],
+    ["/disclosure", readLatest(disclosureUpdates)],
+    ...[...disclosureUpdates, ...bylawUpdates].map(
+      item => [item.path, item.updatedAt] as const,
+    ),
   ]);
   return [
     ...STATIC_ROUTES.map(route => ({
       url: `${SITE_URL}${route.path}`,
+      lastModified: lastModified.get(route.path),
       changeFrequency: route.changeFrequency,
       priority: route.priority,
     })),
@@ -115,5 +164,15 @@ const sitemap = async (): Promise<MetadataRoute.Sitemap> => {
     })),
   ];
 };
+
+/**
+ * utils
+ */
+const readLatest = (items: DatedPath[]) =>
+  items.reduce<Date | undefined>(
+    (latest, item) =>
+      !latest || item.updatedAt > latest ? item.updatedAt : latest,
+    undefined,
+  );
 
 export default sitemap;

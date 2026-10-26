@@ -109,6 +109,7 @@ export const finishOAuth = async (params: FinishOAuthParams) => {
     await saveProfile(readProfileInput(data.user));
     return applyCookies(NextResponse.redirect(`${origin}${nextPath}`), pending);
   } catch (error) {
+    console.error("[finishOAuth]", error);
     return redirectWithError({
       origin,
       loginPath,
