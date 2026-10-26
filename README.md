@@ -50,6 +50,8 @@ npm run dev
 
 어드민은 `admin_members` 테이블의 오너·매니저만 들어간다. 오너는 한 명으로 고정이고 `0002_admin_members.sql`이 지정한다. 매니저는 오너가 어드민 권한 관리(`/permissions`)에서 지정·해제한다. 새 매니저는 먼저 한 번 로그인해 회원으로 잡혀야 지정할 수 있다.
 
+어드민은 탭마다 10분이 지나면 자동으로 로그아웃한다. 남은 1분부터 메뉴에서, 30초부터 화면 위 알림에서 10분을 다시 연장할 수 있다. 시간은 `sessionStorage`에 두므로 새로고침해도 이어지고, 새 탭은 새로 센다. 로직은 `apps/peterpan-admin/components/adminShell.tsx`에 있다.
+
 카카오 REST API 키·클라이언트 시크릿, 구글 클라이언트 ID·시크릿은 Supabase의 Authentication → Providers에 넣는다. 카카오·구글 콘솔에 등록하는 리다이렉트는 Supabase 콜백 하나다.
 
 - `https://<프로젝트-ref>.supabase.co/auth/v1/callback`

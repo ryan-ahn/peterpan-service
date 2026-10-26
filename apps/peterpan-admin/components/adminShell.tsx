@@ -1,11 +1,18 @@
 "use client";
 
-import { type ReactNode, useState } from "react";
+import {
+  type ReactNode,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { colors } from "@repo/tailwind-config/theme";
 import Avatar from "@repo/ui/components/avatar";
 import Button from "@repo/ui/components/button";
 import Input from "@repo/ui/components/input";
@@ -63,6 +70,17 @@ const ROLE_LABEL: Record<AdminSelf["role"], string> = {
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
+const SESSION_LIMIT_MS = 10 * 60 * 1000;
+
+const SESSION_EXTEND_AT_SECONDS = 60;
+
+const SESSION_WARN_AT_SECONDS = 30;
+
+const SESSION_DEADLINE_KEY = "peterpan-admin-session-until";
+
+const SESSION_EXPIRED_MESSAGE =
+  "로그인 후 10분이 지나 자동으로 로그아웃됐어요. 다시 로그인해 주세요.";
+
 /**
  * types
  */
@@ -79,6 +97,109 @@ type Props = {
   children: ReactNode;
 };
 
+type SessionWarningToastProps = {
+  seconds: number;
+  onExtend: () => void;
+};
+
+/**
+ * pre-root runtime
+ */
+const deadlineListeners = new Set<() => void>();
+
+const readDeadline = () => {
+  const stored = Number(sessionStorage.getItem(SESSION_DEADLINE_KEY));
+  return stored > 0 ? stored : null;
+};
+
+const readServerDeadline = () => null;
+
+const notifyDeadline = () => {
+  deadlineListeners.forEach(listener => listener());
+};
+
+const startDeadline = () => {
+  sessionStorage.setItem(
+    SESSION_DEADLINE_KEY,
+    String(Date.now() + SESSION_LIMIT_MS),
+  );
+  notifyDeadline();
+};
+
+const clearDeadline = () => {
+  sessionStorage.removeItem(SESSION_DEADLINE_KEY);
+  notifyDeadline();
+};
+
+const subscribeDeadline = (listener: () => void) => {
+  deadlineListeners.add(listener);
+  queueMicrotask(() => {
+    if (readDeadline() !== null) return;
+    startDeadline();
+  });
+  return () => {
+    deadlineListeners.delete(listener);
+  };
+};
+
+const expireSession = async () => {
+  clearDeadline();
+  await fetch("/auth/logout", { method: "POST", redirect: "manual" });
+  window.location.replace(
+    `/?error=${encodeURIComponent(SESSION_EXPIRED_MESSAGE)}`,
+  );
+};
+
+/**
+ * hooks
+ */
+/**
+ * 로그인 유지 시간. 탭마다 10분을 세고, 끝나면 세션을 지우고 로그인 화면으로 보낸다
+ */
+const useSessionDeadline = () => {
+  // hooks
+  const deadline = useSyncExternalStore(
+    subscribeDeadline,
+    readDeadline,
+    readServerDeadline,
+  );
+  // refs
+  const isExpiringRef = useRef(false);
+  // states
+  const [now, setNow] = useState(() => Date.now());
+  // variables
+  const remainingSeconds =
+    deadline === null ? null : Math.max(0, Math.ceil((deadline - now) / 1000));
+  // functions
+  const extendSession = () => {
+    startDeadline();
+    setNow(Date.now());
+  };
+  // effects
+  useEffect(() => {
+    if (deadline === null) return;
+    const tick = () => {
+      const current = Date.now();
+      if (current < deadline) {
+        setNow(current);
+        return;
+      }
+      if (isExpiringRef.current) return;
+      isExpiringRef.current = true;
+      void expireSession();
+    };
+    const timeoutId = window.setTimeout(tick, 0);
+    const intervalId = window.setInterval(tick, 1000);
+    document.addEventListener("visibilitychange", tick);
+    return () => {
+      window.clearTimeout(timeoutId);
+      window.clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", tick);
+    };
+  }, [deadline]);
+  return { remainingSeconds, extendSession };
+};
+
 /**
  * 어드민 크롬. 왼쪽 메뉴, 위쪽 검색 바, 본문 스크롤 영역
  * @param self 로그인한 운영자
@@ -88,9 +209,25 @@ type Props = {
 const AdminShell = ({ self, headerSearch, children }: Props) => {
   // hooks
   const pathname = usePathname();
+  const { remainingSeconds, extendSession } = useSessionDeadline();
   // states
   const [isNavOpen, setIsNavOpen] = useState(false);
+  // variables
+  const isExtendVisible =
+    remainingSeconds !== null &&
+    remainingSeconds > 0 &&
+    remainingSeconds <= SESSION_EXTEND_AT_SECONDS;
+  const isWarningVisible =
+    remainingSeconds !== null &&
+    remainingSeconds > 0 &&
+    remainingSeconds <= SESSION_WARN_AT_SECONDS;
   // handlers
+  const handleSessionExtend = () => {
+    extendSession();
+  };
+  const handleLogoutSubmit = () => {
+    clearDeadline();
+  };
   const handleNavToggle = () => {
     setIsNavOpen(current => !current);
   };
@@ -100,6 +237,12 @@ const AdminShell = ({ self, headerSearch, children }: Props) => {
   // render
   return (
     <div className="flex h-dvh overflow-hidden bg-gray-100">
+      {isWarningVisible && remainingSeconds !== null ? (
+        <SessionWarningToast
+          seconds={remainingSeconds}
+          onExtend={handleSessionExtend}
+        />
+      ) : null}
       {isNavOpen ? (
         <button
           className="fixed inset-0 z-30 bg-black/30 lg:hidden"
@@ -138,6 +281,22 @@ const AdminShell = ({ self, headerSearch, children }: Props) => {
                 numberOfLines={1}>
                 {self.email ?? "이메일 없음"}
               </Text>
+              {remainingSeconds !== null ? (
+                <div className="flex items-center justify-between gap-2">
+                  <Text variant="caption-2" color={adminTextLabelColor}>
+                    {formatRemaining(remainingSeconds)}
+                  </Text>
+                  {isExtendVisible ? (
+                    <Button
+                      variant="tint"
+                      color="primary"
+                      size="xsmall"
+                      text="연장"
+                      onClick={handleSessionExtend}
+                    />
+                  ) : null}
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
@@ -186,7 +345,10 @@ const AdminShell = ({ self, headerSearch, children }: Props) => {
             isFullWidth
             leftChildren={<Icon name="external-link" size={16} />}
           />
-          <form action="/auth/logout" method="post">
+          <form
+            action="/auth/logout"
+            method="post"
+            onSubmit={handleLogoutSubmit}>
             <Button
               variant="line"
               color="gray"
@@ -240,6 +402,45 @@ const AdminShell = ({ self, headerSearch, children }: Props) => {
       </div>
     </div>
   );
+};
+
+/**
+ * inner components
+ */
+/**
+ * 자동 로그아웃 직전 화면 위에 뜨는 알림
+ * @param seconds 남은 초
+ * @param onExtend 연장 버튼을 눌렀을 때
+ */
+const SessionWarningToast = ({ seconds, onExtend }: SessionWarningToastProps) => (
+  <div className="pointer-events-none fixed inset-x-0 top-4 z-60 flex justify-center px-4">
+    <div
+      className="pointer-events-auto flex w-full max-w-120 animate-pop-in items-center justify-between gap-4 rounded-full bg-gray-900 py-3 pr-3 pl-6 shadow-large"
+      role="status"
+      aria-live="assertive">
+      <Text variant="label-3" color={colors.white}>
+        {seconds}초 후 자동으로 로그아웃돼요
+      </Text>
+      <Button
+        variant="solid"
+        color="primary"
+        size="small"
+        isRound
+        text="연장"
+        onClick={onExtend}
+      />
+    </div>
+  </div>
+);
+
+/**
+ * utils
+ */
+const formatRemaining = (totalSeconds: number) => {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  if (minutes <= 0) return `남은 시간 ${seconds}초`;
+  return `남은 시간 ${minutes}분 ${seconds}초`;
 };
 
 export default AdminShell;
