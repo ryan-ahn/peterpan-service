@@ -177,11 +177,11 @@ const NewsSection = ({ news }: NewsSectionProps) => (
             Disclosure
           </BrandText>
           <BrandText as="h2" variant="heading" className="mt-3">
-            운영은 열려 있어야 합니다.
+            운영은 투명하게 공개합니다.
           </BrandText>
           <BrandText variant="bodyCompact" color="beige" className="mt-4">
-            사업계획, 결산, 감사보고서와 기부금 모금·활용 실적은 연도별로 이
-            자리에 올립니다. 자료가 준비되는 대로 파일을 공개합니다.
+            사업계획, 결산, 감사보고서와 기부금 모금·활용 실적은 연도별로
+            공개하고 있습니다.
           </BrandText>
         </div>
         <div className="mt-6 flex flex-wrap gap-3">

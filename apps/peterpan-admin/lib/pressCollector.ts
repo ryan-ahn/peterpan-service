@@ -11,13 +11,20 @@ import { getDb, pressCandidates } from "@repo/db";
  */
 const SEARCH_URL = "https://naverapihub.apigw.ntruss.com/search/v1/news";
 
+/** 큰따옴표로 묶은 검색어는 문구가 그대로 들어간 기사만 찾는다 */
 const PRESS_KEYWORDS = [
-  "피터팬 자폐인복지재단",
-  "피터팬재단 자폐",
-  "피터팬 네버랜드 자폐",
+  '"피터팬 자폐인복지재단"',
+  '"피터팬재단"',
+  '"피터팬의 네버랜드"',
+  '"피터팬 아빠"',
+  '"피터팬 아버지"',
+  '"전경철 작가"',
+  '"안녕 피터팬"',
+  '"안녕, 엄니"',
+  "네버랜드 자폐 마을",
 ];
 
-const DISPLAY_COUNT = 50;
+const DISPLAY_COUNT = 20;
 
 const PUBLISHERS: [string, string][] = [
   ["yna.co.kr", "연합뉴스"],
@@ -125,7 +132,7 @@ const searchNews = async (
 ): Promise<NaverNewsItem[]> => {
   const { keyword, clientId, clientSecret } = params;
   const url = new URL(SEARCH_URL);
-  url.searchParams.set("query", `"${keyword}"`);
+  url.searchParams.set("query", keyword);
   url.searchParams.set("display", String(DISPLAY_COUNT));
   url.searchParams.set("sort", "date");
   url.searchParams.set("format", "json");
