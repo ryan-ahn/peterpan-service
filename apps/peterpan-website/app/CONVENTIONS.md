@@ -10,7 +10,6 @@
 | -------------------------------------------------------- | ---------------------------------------------------------- |
 | `/`                                                      | 홈 (비전·가치·하는 일·최근 소식)                           |
 | `/about`, `/about/{greeting,brand,organization,bylaws}`  | 설립 배경과 목적·대표 인사말·상징과 가치·조직도·정관       |
-| `/about/vision`                                          | 이념 (메뉴·링크 밖. 주소로만 접근)                         |
 | `/village`, `/village/{spaces,operation}`                | 피터팬 마을 소개·공간·운영                                 |
 | `/news`, `/news/[slug]`                                  | 재단 소식 목록(공지·활동·언론 보도)·본문                   |
 | `/board`, `/board/[id]`, `/board/write`                  | 회원 게시판 목록·본문·글쓰기(`?id=` 고치기)                |
@@ -45,7 +44,7 @@
 - 회원 정보는 `profiles` 테이블이 기준이다. 이름·사진·이메일은 처음 가입할 때만 소셜 계정에서 채우고(`@repo/auth/oauth`), 이후 로그인은 덮어쓰지 않는다. 마이페이지 조회는 `@lib/account`, 쓰기는 `app/mypage/actions.ts`. 프로필 사진은 `avatars` 버킷(`AVATAR_UPLOAD`, 2MB)에 회원 세션으로 `{userId}/` 경로에 올린다(스토리지 정책이 자기 폴더만 허용).
 - 로그인한 회원이 남긴 후원 문의는 `donation_inquiries.user_id`로 이어져 마이페이지에 보인다.
 - 게시물 조회는 `@lib/posts` (공개된 글만). 회원 게시판(`board_posts`·`board_comments`·`board_likes`)은 `@lib/board`, 글·댓글·좋아요 쓰기는 `app/board/actions.ts`. 날짜·빈 값 표기는 `@lib/format`.
-- 재단 고정 문구(설립취지서·이념·마을·가치·하는 일)는 `@lib/foundation`.
+- 재단 고정 문구(설립취지서·미션·마을·가치·하는 일)는 `@lib/foundation`.
 - 조직도는 `@repo/db/organization`(site_settings JSON), 정관은 `bylaws` 테이블의 노출 1건. 둘 다 어드민에서 관리한다.
 - 원격 이미지는 `next.config.ts`의 `images.remotePatterns`에 호스트를 추가한 뒤 `next/image`로 쓴다. 로컬 이미지는 `@assets`.
 
@@ -69,7 +68,7 @@
 | `components/flashToast.tsx`        | 서버 액션이 쿼리로 넘긴 결과를 토스트로 한 번 띄우고 쿼리를 지움 (client) |
 | `components/siteFooter.tsx`        | 하단 재단 정보·개인정보처리방침 링크                                      |
 | `components/logo.tsx`              | 로고 링크 (`horizontal`·`symbol`)                                         |
-| `components/logoEmblem.tsx`        | 로고 네 모양 선 아이콘 (이념·상징과 가치)                                 |
+| `components/logoEmblem.tsx`        | 로고 네 모양 선 아이콘 (상징과 가치)                                      |
 | `components/workCarousel.tsx`      | 홈 하는 일 캐러셀                                                         |
 | `components/disclosureList.tsx`    | 연도별 공시 목록                                                          |
 

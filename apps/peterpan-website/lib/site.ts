@@ -10,7 +10,7 @@ export const SITE_NAME = "피터팬 재단";
 export const SITE_LEGAL_NAME = "재단법인 피터팬 자폐인복지재단";
 
 export const SITE_DESCRIPTION =
-  "자폐인의 오늘, 더 넓은 내일로. 성인 중증 자폐성장애인이 부모가 떠난 뒤에도 존엄하게 살아갈 생활주거공동체 '피터팬의 네버랜드'를 준비하는 재단법인 피터팬 자폐인복지재단입니다.";
+  "성인 중증 자폐성장애인이 존엄하게 살아갈 생활주거공동체 '피터팬의 네버랜드'를 준비하는 재단법인 피터팬 자폐인복지재단입니다.";
 
 export const SITE_KEYWORDS = [
   "피터팬 재단",
