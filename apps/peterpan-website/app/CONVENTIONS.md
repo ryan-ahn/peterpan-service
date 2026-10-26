@@ -66,6 +66,6 @@
 
 - 공용 토큰은 `@repo/tailwind-config`. 바탕 `bg-paper`, 본문 `text-ink`, 강조 `pine`·`gold`.
 - 화면 폭은 `globals.css`의 `page-*` 유틸리티로 잡는다. `page-wide` 1180, `page-form` 1100, `page-list` 980, `page-article` 860, `page-reading` 820, `page-narrow` 640, `page-auth` 480. 양옆 16px 여백은 유틸리티에 들어 있다.
-- 히어로 사진의 가장자리 흐림은 `hero-mask`. 계산이 긴 장식만 `globals.css`에 둔다.
+- 계산이 긴 장식만 `globals.css`에 둔다.
 - 손글씨는 `layout.tsx`의 `next/font` Nanum Pen Script를 `--font-nanum-pen`으로 연결해 `font-pen`으로 쓴다. 본문은 Pretendard(`font-sans`).
 - 모바일이 기본이다. 커질 때만 `md:` `lg:` `xl:`.

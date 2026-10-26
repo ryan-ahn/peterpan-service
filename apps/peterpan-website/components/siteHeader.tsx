@@ -33,8 +33,8 @@ const SiteHeader = ({ userName }: Props) => {
   };
   // render
   return (
-    <header className="sticky top-0 z-40 border-b border-beige/80 bg-paper/95 backdrop-blur">
-      <div className="page-wide flex h-18 items-center justify-between gap-4">
+    <header className="sticky top-0 z-40 border-b border-beige bg-white/95 backdrop-blur">
+      <div className="page-wide flex h-20 items-center justify-between gap-6">
         <Logo />
         <nav
           className="hidden items-center gap-7 lg:flex"
@@ -43,7 +43,7 @@ const SiteHeader = ({ userName }: Props) => {
             <div key={item.href} className="group relative">
               <Link
                 href={item.href}
-                className="text-4.5 leading-6 text-ink/80 transition hover:text-pine">
+                className="text-4.5 leading-6 font-medium text-ink transition hover:text-pine">
                 {item.label}
               </Link>
               {item.children ? (
@@ -75,9 +75,7 @@ const SiteHeader = ({ userName }: Props) => {
               variant: "solid",
               color: "pine",
               size: "small",
-              isRound: true,
             })}>
-            <Icon name="heart" size={16} />
             후원하기
           </Link>
           <button

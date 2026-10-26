@@ -39,7 +39,8 @@ const brandText = tv({
       small: "text-4 leading-9 font-normal",
       smallCompact: "text-4 leading-7 font-normal",
       caption: "text-4 leading-5 font-normal",
-      overline: "text-3 leading-4 font-semibold tracking-caps-wide",
+      overline:
+        "font-en text-3 leading-4 font-semibold tracking-caps-wide uppercase",
       pen: "font-pen text-11 leading-14 font-normal tracking-normal md:text-12 md:leading-16",
     },
     color: {

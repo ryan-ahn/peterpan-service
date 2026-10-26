@@ -36,15 +36,20 @@ const SiteFooter = ({ contact }: Props) => {
       <div className="page-wide grid gap-10 py-14 md:grid-cols-[1.2fr_1fr]">
         <div>
           <div className="flex items-center gap-3">
-            <Logo variant="symbol" />
+            <span className="grid size-16 place-items-center rounded-xlarge bg-white">
+              <Logo variant="symbol" />
+            </span>
             <div>
               <p className="text-6 leading-7 font-semibold">피터팬 재단</p>
-              <p className="text-3 leading-4 tracking-caps text-beige">
+              <p className="font-en text-3 leading-4 font-medium tracking-caps text-beige">
                 PETER PAN FOUNDATION
               </p>
             </div>
           </div>
-          <p className="mt-5 max-w-md text-4 leading-9 text-beige">
+          <p className="mt-5 text-4 leading-5 text-gold">
+            자폐인의 오늘, 더 넓은 내일로
+          </p>
+          <p className="mt-3 max-w-md text-4 leading-9 text-beige">
             재단법인 피터팬 자폐인복지재단은 성인 중증 자폐성장애인이 혼자가
             되어도 혼자가 아닌 삶을 이어 가도록 생활주거공동체를 준비합니다.
           </p>

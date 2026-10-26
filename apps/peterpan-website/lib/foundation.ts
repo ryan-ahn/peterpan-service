@@ -380,24 +380,24 @@ export const OPERATION_SECTIONS: ArticleSection[] = [
 
 export const VALUES = [
   {
+    index: "01",
     title: "안전한 보금자리",
     body: "부모가 곁에 없어도 평생 안정하게 살아갈 수 있는 주거와 돌봄의 공간.",
-    icon: "home",
   },
   {
+    index: "02",
     title: "존엄과 성장",
     body: "각자의 특성과 속도로 살아갈 권리. 장애 여부와 관계없이.",
-    icon: "sprout",
   },
   {
+    index: "03",
     title: "지속적인 돌봄",
     body: "시간이 흘러도 변함없이 한 사람의 삶을 지켜 주는 따뜻한 돌봄.",
-    icon: "tree",
   },
   {
+    index: "04",
     title: "희망과 약속",
     body: "전경철 님이 남긴 뜻을 이어 가겠습니다.",
-    icon: "star",
   },
 ] as const;
 

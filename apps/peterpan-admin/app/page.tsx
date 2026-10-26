@@ -1,8 +1,8 @@
+import Image from "next/image";
 import { redirect } from "next/navigation";
 
 import { getSessionProfile } from "@repo/auth/session";
 import Button from "@repo/ui/components/button";
-import Icon from "@repo/ui/icon";
 import cn from "@repo/ui/lib/cn";
 import Text from "@repo/ui/text";
 
@@ -43,9 +43,14 @@ const LoginScreen = async ({ searchParams }: Props) => {
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-110 flex-col justify-center gap-8 px-4 py-8 md:px-6 md:py-12">
       <div className="flex flex-col items-center gap-3 text-center">
-        <span className="grid size-12 place-items-center rounded-full bg-paper text-gold-deep">
-          <Icon name="star" size={22} />
-        </span>
+        <Image
+          src="/brand/logo-symbol.png"
+          alt=""
+          width={313}
+          height={354}
+          priority
+          className="h-16 w-auto"
+        />
         <div className="flex flex-col gap-1">
           <Text as="h1" variant="heading-2" color={adminTextHeadingColor}>
             피터팬 재단 어드민

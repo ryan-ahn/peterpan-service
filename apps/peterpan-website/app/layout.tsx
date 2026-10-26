@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import type { Metadata } from "next";
-import { Nanum_Pen_Script } from "next/font/google";
+import { Montserrat, Nanum_Pen_Script } from "next/font/google";
 
 import { getSessionProfile } from "@repo/auth/session";
 import { getSiteContact } from "@repo/db/siteContact";
@@ -17,6 +17,12 @@ const nanumPen = Nanum_Pen_Script({
   variable: "--font-nanum-pen",
 });
 
+const montserrat = Montserrat({
+  weight: ["500", "600"],
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+});
+
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
@@ -25,7 +31,7 @@ export const metadata: Metadata = {
     template: "%s · 피터팬 재단",
   },
   description:
-    "성인 중증 자폐성장애인이 혼자가 되어도 혼자가 아닌 삶을 이어 가도록, 생활주거공동체를 준비하는 재단법인 피터팬 자폐인복지재단.",
+    "자폐인의 오늘, 더 넓은 내일로. 성인 중증 자폐성장애인이 존엄하게 살아갈 생활주거공동체를 준비하는 재단법인 피터팬 자폐인복지재단.",
 };
 
 export default async function RootLayout({
@@ -38,7 +44,7 @@ export default async function RootLayout({
     getSiteContact(),
   ]);
   return (
-    <html lang="ko" className={nanumPen.variable}>
+    <html lang="ko" className={`${nanumPen.variable} ${montserrat.variable}`}>
       <head>
         <link
           rel="stylesheet"

@@ -3,7 +3,6 @@ import Link from "next/link";
 
 import { categoryLabel } from "@repo/db/boards";
 import { buttonStyle } from "@repo/ui/components/button";
-import cn from "@repo/ui/lib/cn";
 
 import BrandText from "@components/brandText";
 import WorkCarousel from "@components/workCarousel";
@@ -23,10 +22,6 @@ type NewsItem = Awaited<ReturnType<typeof listLatestNews>>[number];
 
 type NewsSectionProps = {
   news: NewsItem[];
-};
-
-type ValueIconProps = {
-  name: (typeof VALUES)[number]["icon"];
 };
 
 /**
@@ -50,16 +45,17 @@ const HomeScreen = async () => {
  * section
  */
 const HeroSection = () => (
-  <section className="relative overflow-hidden">
-    <div className="mx-auto grid min-h-170 w-full max-w-350 items-center lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-      <div className="relative z-10 px-6 py-16 md:px-12 lg:px-16">
-        <p className="text-4 leading-5 text-muted md:text-5 md:leading-7">
-          성인 중증 자폐성장애인이 존엄하고 안전한 삶을 이어갈 수 있는 사회
-        </p>
+  <section className="border-b border-beige">
+    <div className="page-wide grid items-center gap-10 py-14 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-16 lg:py-20">
+      <div>
+        <BrandText variant="overline" color="pine">
+          Peter Pan Foundation
+        </BrandText>
+        <div className="mt-4 w-10 border-t-2 border-gold" />
         <BrandText as="h1" variant="display" color="pine" className="mt-5">
-          혼자가 되어도,
+          자폐인의 오늘,
           <br />
-          <span className="text-gold-deep">혼자가 아닌 삶.</span>
+          더 넓은 내일로
         </BrandText>
         <BrandText variant="body" color="muted" className="mt-6 max-w-md">
           피터팬 재단은 성인 중증 자폐성장애인이 부모의 생애주기 변화와 관계없이
@@ -69,83 +65,86 @@ const HeroSection = () => (
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             href="/about"
-            className={buttonStyle({
-              variant: "solid",
-              color: "pine",
-              isRound: true,
-            })}>
-            재단 소개 보기 →
+            className={buttonStyle({ variant: "solid", color: "pine" })}>
+            재단 소개
           </Link>
           <Link
             href="/donate"
-            className={cn(
-              buttonStyle({ variant: "line", color: "pine", isRound: true }),
-              "bg-white/70",
-            )}>
-            후원하기 ♡
+            className={buttonStyle({ variant: "line", color: "pine" })}>
+            후원하기
           </Link>
         </div>
       </div>
-      <div className="relative min-h-105 hero-mask lg:min-h-180">
+      <div className="relative min-h-120 overflow-hidden rounded-2xlarge lg:min-h-140">
         <Image
           src="/images/hero.jpg"
           alt="나무 사이에 자리한 낮은 집들"
           fill
           priority
           className="object-cover"
-          sizes="(min-width: 1024px) 60vw, 100vw"
+          sizes="(min-width: 1024px) 50vw, 100vw"
         />
-        <BrandText
-          variant="pen"
-          color="pine"
-          className="absolute top-16 right-8 max-w-48 text-right md:right-16">
-          각자의 속도로,
-          <br />
-          서로 연결되어 살아가는
-          <br />
-          따뜻한 마을을 만들어갑니다.
-        </BrandText>
+        <div className="absolute inset-x-0 bottom-0 bg-pine-deep/92 px-6 py-5">
+          <BrandText variant="caption" color="gold">
+            재단의 약속
+          </BrandText>
+          <BrandText variant="cardTitle" color="paper" className="mt-1">
+            혼자가 되어도, 혼자가 아닌 삶.
+          </BrandText>
+        </div>
       </div>
     </div>
   </section>
 );
 
 const ValuesSection = () => (
-  <section className="border-y border-beige/80 bg-paper">
-    <div className="page-wide grid gap-8 py-14 sm:grid-cols-2 lg:grid-cols-4">
-      {VALUES.map(value => (
-        <div
-          key={value.title}
-          className="flex flex-col items-center text-center">
-          <ValueIcon name={value.icon} />
-          <h2 className="mt-4 font-semibold text-pine">{value.title}</h2>
-          <BrandText variant="smallCompact" color="muted" className="mt-2">
-            {value.body}
-          </BrandText>
-        </div>
-      ))}
+  <section className="bg-paper">
+    <div className="page-wide py-16 lg:py-20">
+      <BrandText variant="overline" color="pine">
+        What we stand for
+      </BrandText>
+      <BrandText as="h2" variant="section" color="pine" className="mt-2">
+        재단이 지키는 가치
+      </BrandText>
+      <div className="mt-8 grid gap-px overflow-hidden rounded-xlarge border border-beige bg-beige sm:grid-cols-2 lg:grid-cols-4">
+        {VALUES.map(value => (
+          <div key={value.title} className="bg-white px-6 py-8">
+            <BrandText variant="overline" color="goldDeep">
+              {value.index}
+            </BrandText>
+            <h3 className="mt-4 text-6 leading-8 font-semibold text-pine">
+              {value.title}
+            </h3>
+            <BrandText variant="smallCompact" color="muted" className="mt-2">
+              {value.body}
+            </BrandText>
+          </div>
+        ))}
+      </div>
     </div>
   </section>
 );
 
 const NewsSection = ({ news }: NewsSectionProps) => (
-  <section className="bg-paper py-16">
-    <div className="page-wide grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+  <section className="border-t border-beige bg-paper py-16 lg:py-20">
+    <div className="page-wide grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-16">
       <div>
-        <div className="flex items-end justify-between gap-4">
-          <BrandText as="h2" variant="heading" color="pine">
-            재단소식
-          </BrandText>
+        <div className="flex items-end justify-between gap-4 border-b border-beige pb-4">
+          <div>
+            <BrandText variant="overline" color="pine">
+              News
+            </BrandText>
+            <BrandText as="h2" variant="heading" color="pine" className="mt-2">
+              재단소식
+            </BrandText>
+          </div>
           <Link href="/news" className="text-4 leading-5 text-pine">
             전체 보기
           </Link>
         </div>
-        <div className="mt-5 flex flex-col">
+        <div className="flex flex-col">
           {news.length === 0 ? (
-            <BrandText
-              variant="bodyCompact"
-              color="muted"
-              className="rounded-2xlarge bg-white px-5 py-8">
+            <BrandText variant="bodyCompact" color="muted" className="py-8">
               등록된 소식이 없습니다.
             </BrandText>
           ) : (
@@ -153,11 +152,11 @@ const NewsSection = ({ news }: NewsSectionProps) => (
               <Link
                 key={post.id}
                 href={`/news/${post.slug}`}
-                className="flex flex-col gap-1 border-b border-beige py-4 md:flex-row md:items-center md:justify-between">
+                className="grid gap-1 border-b border-beige py-5 md:grid-cols-[6.5rem_1fr_auto] md:items-baseline md:gap-6">
                 <span className="text-4 leading-5 text-gold-deep">
                   {categoryLabel(post.category)}
                 </span>
-                <span className="flex-1 font-medium md:px-6">{post.title}</span>
+                <span className="font-medium text-ink">{post.title}</span>
                 <span className="text-4 leading-5 text-muted">
                   {formatDate(post.createdAt)}
                 </span>
@@ -166,17 +165,19 @@ const NewsSection = ({ news }: NewsSectionProps) => (
           )}
         </div>
       </div>
-      <aside className="rounded-3xlarge bg-pine px-8 py-10 text-paper">
-        <BrandText variant="caption" color="gold">
-          정보공개
-        </BrandText>
-        <BrandText as="h2" variant="heading" className="mt-2">
-          운영은 열려 있어야 합니다.
-        </BrandText>
-        <BrandText variant="bodyCompact" color="beige" className="mt-4">
-          사업계획, 결산, 감사보고서와 기부금 모금·활용 실적은 연도별로 이
-          자리에 올립니다. 자료가 준비되는 대로 파일을 공개합니다.
-        </BrandText>
+      <aside className="flex flex-col justify-between rounded-2xlarge bg-pine px-8 py-10 text-paper">
+        <div>
+          <BrandText variant="overline" color="gold">
+            Disclosure
+          </BrandText>
+          <BrandText as="h2" variant="heading" className="mt-3">
+            운영은 열려 있어야 합니다.
+          </BrandText>
+          <BrandText variant="bodyCompact" color="beige" className="mt-4">
+            사업계획, 결산, 감사보고서와 기부금 모금·활용 실적은 연도별로 이
+            자리에 올립니다. 자료가 준비되는 대로 파일을 공개합니다.
+          </BrandText>
+        </div>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
             href="/disclosure/management"
@@ -184,7 +185,6 @@ const NewsSection = ({ news }: NewsSectionProps) => (
               variant: "solid",
               color: "white",
               size: "small",
-              isRound: true,
             })}>
             경영공시
           </Link>
@@ -194,7 +194,6 @@ const NewsSection = ({ news }: NewsSectionProps) => (
               variant: "line",
               color: "white",
               size: "small",
-              isRound: true,
             })}>
             기부금 공시
           </Link>
@@ -203,63 +202,5 @@ const NewsSection = ({ news }: NewsSectionProps) => (
     </div>
   </section>
 );
-
-/**
- * inner components
- */
-const ValueIcon = ({ name }: ValueIconProps) => {
-  // render
-  if (name === "home") {
-    return (
-      <svg viewBox="0 0 64 64" className="size-14" aria-hidden="true">
-        <path d="M10 30 L32 14 L54 30 V50 H10Z" className="fill-beige" />
-        <path d="M28 50 V36 H36 V50" className="fill-pine" />
-        <path
-          d="M8 32 L32 12 L56 32"
-          className="fill-none stroke-pine"
-          strokeWidth="3"
-        />
-      </svg>
-    );
-  }
-  if (name === "sprout") {
-    return (
-      <svg viewBox="0 0 64 64" className="size-14" aria-hidden="true">
-        <path d="M32 50 V28" className="stroke-pine" strokeWidth="3" />
-        <path
-          d="M32 34 C20 34 16 22 18 16 C30 18 34 28 32 34Z"
-          className="fill-sage"
-        />
-        <path
-          d="M32 30 C44 28 50 18 48 12 C36 16 32 24 32 30Z"
-          className="fill-pine"
-        />
-      </svg>
-    );
-  }
-  if (name === "tree") {
-    return (
-      <svg viewBox="0 0 64 64" className="size-14" aria-hidden="true">
-        <circle cx="32" cy="26" r="14" className="fill-pine" />
-        <rect
-          x="29"
-          y="36"
-          width="6"
-          height="16"
-          rx="2"
-          className="fill-bark"
-        />
-      </svg>
-    );
-  }
-  return (
-    <svg viewBox="0 0 64 64" className="size-14" aria-hidden="true">
-      <path
-        d="M32 8 L38 24 H56 L42 34 L47 52 L32 42 L17 52 L22 34 L8 24 H26Z"
-        className="fill-gold"
-      />
-    </svg>
-  );
-};
 
 export default HomeScreen;

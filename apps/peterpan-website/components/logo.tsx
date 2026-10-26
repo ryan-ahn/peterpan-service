@@ -19,26 +19,26 @@ const Logo = ({ variant = "horizontal" }: Props) => {
   return (
     <Link
       href="/"
-      className="inline-flex shrink-0 items-center"
-      aria-label="홈">
-      {variant === "symbol" ? (
-        <Image
-          src="/brand/logo-symbol.png"
-          alt=""
-          width={44}
-          height={44}
-          className="size-11 rounded-xlarge"
-        />
-      ) : (
-        <Image
-          src="/brand/logo-horizontal.png"
-          alt="피터팬 재단"
-          width={168}
-          height={138}
-          priority
-          className="h-16 w-auto"
-        />
-      )}
+      className="inline-flex shrink-0 items-center gap-2.5"
+      aria-label="피터팬 재단 홈">
+      <Image
+        src="/brand/logo-symbol.png"
+        alt=""
+        width={313}
+        height={354}
+        priority={variant === "horizontal"}
+        className={variant === "symbol" ? "h-11 w-auto" : "h-12 w-auto"}
+      />
+      {variant === "horizontal" ? (
+        <span className="flex flex-col">
+          <span className="text-4.5 leading-5 font-bold tracking-tight text-pine md:text-5 md:leading-6">
+            피터팬 재단
+          </span>
+          <span className="font-en hidden text-2 leading-3 font-medium tracking-caps text-pine md:block">
+            PETER PAN FOUNDATION
+          </span>
+        </span>
+      ) : null}
     </Link>
   );
 };

@@ -2,6 +2,7 @@
 
 import { type ReactNode, useState } from "react";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -80,9 +81,13 @@ const AdminShell = ({ self, headerSearch, children }: Props) => {
         )}>
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
-            <span className="grid size-8 place-items-center rounded-full bg-paper text-gold-deep">
-              <Icon name="star" size={16} />
-            </span>
+            <Image
+              src="/brand/logo-symbol.png"
+              alt=""
+              width={313}
+              height={354}
+              className="h-8 w-auto"
+            />
             <Text as="span" variant="heading-5" color={adminTextHeadingColor}>
               피터팬 재단
             </Text>

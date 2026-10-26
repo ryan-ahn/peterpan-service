@@ -48,8 +48,8 @@ const WorkCarousel = () => {
       <div className="page-wide">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div className="max-w-xl">
-            <BrandText variant="overline" color="sage">
-              OUR WORK
+            <BrandText variant="overline" color="pine">
+              Our work
             </BrandText>
             <BrandText as="h2" variant="section" color="pine" className="mt-2">
               우리가 만들어가는 변화
