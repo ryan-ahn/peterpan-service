@@ -1,15 +1,11 @@
-import Spinner from "@repo/ui/components/spinner";
+import AdminRouteSkeleton from "@components/adminRouteSkeleton";
 
 /**
- * screen — 관리 화면 이동 중 본문 자리에 바로 보이는 로딩 표시. 메뉴·헤더는 그대로 둔다
+ * screen — 관리 화면 이동 중 본문 자리 표시. 메뉴·헤더는 그대로 두고 목록형 스켈레톤을 쓴다
  */
 const LoadingScreen = () => {
   // render
-  return (
-    <div className="flex justify-center py-24 text-gray-400">
-      <Spinner size="large" />
-    </div>
-  );
+  return <AdminRouteSkeleton />;
 };
 
 export default LoadingScreen;

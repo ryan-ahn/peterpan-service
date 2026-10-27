@@ -242,16 +242,19 @@ const MetricSection = ({ dashboard, period }: SectionProps) => {
         label="총 회원"
         value={dashboard.members.total}
         note={`최근 ${formatPeriod(period)} +${formatCount(dashboard.members.current)}명`}
+        href="/members"
       />
       <MetricCard
         label={`신규 가입 (${formatPeriod(period)})`}
         value={dashboard.members.current}
         note={formatChange({ metric: dashboard.members, period })}
+        href="/members"
       />
       <MetricCard
         label={`회원 게시글 (${formatPeriod(period)})`}
         value={dashboard.posts.current}
         note={`댓글 ${formatCount(dashboard.comments.current)}개 · 전체 글 ${formatCount(dashboard.posts.total)}개`}
+        href="/posts"
       />
       <MetricCard
         label={`후원 (${formatPeriod(period)})`}
