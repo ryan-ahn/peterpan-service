@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  type MouseEvent,
+  type PointerEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -27,7 +33,8 @@ type WorkPanelProps = {
 
 /**
  * section — 홈 "우리가 만들어가는 변화". 네 패널 중 하나가 넓게 펼쳐지고, 일정 간격으로 다음 패널로 넘어간다.
- * 마우스를 올리거나 포커스하면 그 패널을 펼치고 멈춘다. 동작 줄이기 설정이면 자동으로 넘기지 않는다
+ * 마우스를 올리거나 포커스하면 그 패널을 펼치고 멈춘다. 동작 줄이기 설정이면 자동으로 넘기지 않는다.
+ * 터치는 호버가 없으므로 접힌 패널을 누르면 펼치기만 하고, 펼쳐진 패널을 눌러야 이동한다
  */
 const WorkCarousel = () => {
   // states
@@ -95,63 +102,80 @@ const WorkPanel = ({
   isActive,
   isPaused,
   onActivate,
-}: WorkPanelProps) => (
-  <li
-    className={cn(
-      "relative min-h-0 min-w-0 basis-0 overflow-hidden rounded-2xlarge border border-beige bg-paper-light transition-[flex-grow,border-color] duration-700 ease-out",
-      isActive ? "grow-4 border-sage" : "grow",
-    )}
-    onMouseEnter={onActivate}>
-    <Link
-      href={work.href}
-      className="relative block size-full"
-      aria-label={`${work.title} — ${work.body}`}
-      onFocus={onActivate}>
-      <Image
-        src={work.image}
-        alt=""
-        fill
-        className={cn(
-          "object-cover transition-transform duration-1000 ease-out",
-          isActive ? "scale-105" : "scale-100",
-        )}
-        sizes="(min-width: 768px) 50vw, 100vw"
-      />
-      <span
-        className={cn(
-          "absolute inset-0 bg-paper transition-opacity duration-700",
-          isActive ? "opacity-0" : "opacity-40",
-        )}
-      />
-      {isActive && !isPaused ? (
-        <span className="absolute inset-x-0 top-0 h-1 origin-left animate-work-progress bg-gold motion-reduce:hidden" />
-      ) : null}
-      <span
-        className={cn(
-          "absolute top-4 left-4 rounded-full bg-paper-light/90 px-3 py-1 font-en text-3 leading-4 font-semibold text-gold-deep transition-opacity duration-300",
-          isActive ? "opacity-0" : "opacity-100",
-        )}>
-        {work.index}
-      </span>
-      <div
-        className={cn(
-          "absolute inset-x-4 bottom-4 rounded-xlarge bg-paper-light/95 px-5 py-4 transition-[opacity,translate] md:max-w-md",
-          isActive
-            ? "translate-y-0 opacity-100 delay-300 duration-500"
-            : "pointer-events-none translate-y-3 opacity-0 duration-200",
-        )}>
-        <BrandText variant="caption" color="goldDeep">
+}: WorkPanelProps) => {
+  // refs
+  const isExpandOnlyRef = useRef(false);
+  // handlers
+  const handleLinkPointerDown = (event: PointerEvent<HTMLAnchorElement>) => {
+    isExpandOnlyRef.current = event.pointerType !== "mouse" && !isActive;
+  };
+  const handleLinkClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!isExpandOnlyRef.current) return;
+    isExpandOnlyRef.current = false;
+    event.preventDefault();
+    onActivate();
+  };
+  // render
+  return (
+    <li
+      className={cn(
+        "relative min-h-0 min-w-0 basis-0 overflow-hidden rounded-2xlarge border border-beige bg-paper-light transition-[flex-grow,border-color] duration-700 ease-out",
+        isActive ? "grow-4 border-sage" : "grow",
+      )}
+      onMouseEnter={onActivate}>
+      <Link
+        href={work.href}
+        className="relative block size-full"
+        aria-label={`${work.title} — ${work.body}`}
+        onFocus={onActivate}
+        onPointerDown={handleLinkPointerDown}
+        onClick={handleLinkClick}>
+        <Image
+          src={work.image}
+          alt=""
+          fill
+          className={cn(
+            "object-cover transition-transform duration-1000 ease-out",
+            isActive ? "scale-105" : "scale-100",
+          )}
+          sizes="(min-width: 768px) 50vw, 100vw"
+        />
+        <span
+          className={cn(
+            "absolute inset-0 bg-paper transition-opacity duration-700",
+            isActive ? "opacity-0" : "opacity-40",
+          )}
+        />
+        {isActive && !isPaused ? (
+          <span className="absolute inset-x-0 top-0 h-1 origin-left animate-work-progress bg-gold motion-reduce:hidden" />
+        ) : null}
+        <span
+          className={cn(
+            "absolute top-4 left-4 rounded-full bg-paper-light/90 px-3 py-1 font-en text-3 leading-4 font-semibold text-gold-deep transition-opacity duration-300",
+            isActive ? "opacity-0" : "opacity-100",
+          )}>
           {work.index}
-        </BrandText>
-        <BrandText as="h3" variant="cardTitle" color="pine" className="mt-1">
-          {work.title}
-        </BrandText>
-        <BrandText variant="smallCompact" color="muted" className="mt-1">
-          {work.body}
-        </BrandText>
-      </div>
-    </Link>
-  </li>
-);
+        </span>
+        <div
+          className={cn(
+            "absolute inset-x-4 bottom-4 rounded-xlarge bg-paper-light/95 px-5 py-4 transition-[opacity,translate] md:max-w-md",
+            isActive
+              ? "translate-y-0 opacity-100 delay-300 duration-500"
+              : "pointer-events-none translate-y-3 opacity-0 duration-200",
+          )}>
+          <BrandText variant="caption" color="goldDeep">
+            {work.index}
+          </BrandText>
+          <BrandText as="h3" variant="cardTitle" color="pine" className="mt-1">
+            {work.title}
+          </BrandText>
+          <BrandText variant="smallCompact" color="muted" className="mt-1">
+            {work.body}
+          </BrandText>
+        </div>
+      </Link>
+    </li>
+  );
+};
 
 export default WorkCarousel;
