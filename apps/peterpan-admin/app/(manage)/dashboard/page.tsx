@@ -41,6 +41,7 @@ import {
   type DashboardPeriod,
   readDashboard,
 } from "@lib/adminData";
+import { dedupeAsync } from "@lib/dedupeAsync";
 
 /**
  * constants
@@ -149,7 +150,7 @@ const DashboardScreen = () => {
   // effects
   useEffect(() => {
     let isCancelled = false;
-    readDashboard({ period })
+    dedupeAsync(`readDashboard:${period}`, () => readDashboard({ period }))
       .then(result => {
         if (!isCancelled) {
           setLoaded({ period, result, error: null });

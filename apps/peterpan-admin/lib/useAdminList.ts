@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { dedupeAsync } from "@lib/dedupeAsync";
+
 /**
  * types
  */
@@ -60,7 +62,8 @@ const useAdminList = <R, F extends string>(
   useEffect(() => {
     let isCancelled = false;
     const args = { search: query, page, filter };
-    load(args)
+    const key = `${load.name}:${reloadKey}:${JSON.stringify(args)}`;
+    dedupeAsync(key, () => load(args))
       .then(result => {
         if (!isCancelled) {
           setLoaded({ ...args, reloadKey, result, error: null });
