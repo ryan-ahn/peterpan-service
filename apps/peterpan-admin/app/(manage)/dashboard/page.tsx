@@ -253,7 +253,7 @@ const MetricSection = ({ dashboard, period }: SectionProps) => {
       <MetricCard
         label={`회원 게시글 (${formatPeriod(period)})`}
         value={dashboard.posts.current}
-        note={`댓글 ${formatCount(dashboard.comments.current)}개 · 전체 글 ${formatCount(dashboard.posts.total)}개`}
+        note={`글 ${formatCount(dashboard.posts.total)}개 · 댓글 ${formatCount(dashboard.comments.current)}개`}
         href="/posts"
       />
       <MetricCard
