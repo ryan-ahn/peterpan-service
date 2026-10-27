@@ -32,6 +32,15 @@ const DONATION_ACCOUNT = {
   holder: "재단법인 피터팬 설립추진위원회",
 };
 
+const PAYMENT_CHANNELS_NOTE =
+  "지금은 계좌이체로만 후원을 받고 있습니다. 재단법인 설립과 결제대행사(PG) 심사가 마무리되면 카드 결제와 매달 자동으로 이어지는 정기 후원을 열겠습니다. 조금만 기다려 주세요.";
+
+const ONCE_DONATION_DESCRIPTION =
+  "창립발기 약정 없이 처음 후원하시는 분을 위한 일시 후원입니다. 마음에 드는 금액을 보내 주시면 아래 양식으로 알려 주시고, 이름 벽과 후원 내역에 남깁니다. 지금은 약정 이행만 받고 있어 이 양식은 조만간 열 예정입니다.";
+
+const ONCE_DONATION_LOCKED_HINT =
+  "처음 후원 양식은 조만간 열 예정입니다. 지금은 위 안내에 따라 약정 이행을 진행해 주세요.";
+
 const PLEDGE_STEPS = [
   {
     step: "1",
@@ -168,7 +177,13 @@ const PledgeDepositSection = () => (
     overline="How to send"
     title="구좌 선택과 입금"
     description="창립발기 약정은 1구좌 10만 원입니다. 아래 순서대로 진행해 주세요.">
-    <ol className="grid gap-3 md:grid-cols-3">
+    <BrandText
+      variant="bodyCompact"
+      color="muted"
+      className="rounded-xlarge border border-beige bg-paper px-5 py-4">
+      {PAYMENT_CHANNELS_NOTE}
+    </BrandText>
+    <ol className="mt-6 grid gap-3 md:grid-cols-3">
       {PLEDGE_STEPS.map(item => (
         <li
           key={item.step}
@@ -290,11 +305,11 @@ const NoticeSection = ({ isSent }: NoticeSectionProps) => (
 );
 
 const OnceSection = () => (
-  <OnceDonationLocked>
+  <OnceDonationLocked hintText={ONCE_DONATION_LOCKED_HINT}>
     <BandSection
       overline="One-time gift"
       title="처음 후원하시는 분"
-      description="약정 없이 자유롭게 보내 주시는 후원입니다. 금액은 정해져 있지 않고, 지금은 계좌이체로만 받습니다.">
+      description={ONCE_DONATION_DESCRIPTION}>
       <NoticeForm isSent={false} profile={null} variant="once" isLocked />
     </BandSection>
   </OnceDonationLocked>
