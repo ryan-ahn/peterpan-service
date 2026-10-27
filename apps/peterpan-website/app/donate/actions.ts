@@ -5,7 +5,11 @@ import { redirect } from "next/navigation";
 
 import { getSessionProfile } from "@repo/auth/session";
 import { donationInquiries, getDb } from "@repo/db";
-import { isDonationFormKind } from "@repo/db/boards";
+import {
+  PLEDGE_SLOT_AMOUNT,
+  isDonationFormKind,
+  isPledgeSlotCount,
+} from "@repo/db/boards";
 
 /**
  * actions
@@ -18,13 +22,20 @@ export const submitDonationInquiry = async (formData: FormData) => {
   const email = String(formData.get("email") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const kind = String(formData.get("kind") ?? "");
-  const amount = String(formData.get("amount") ?? "").trim();
+  let amount = String(formData.get("amount") ?? "").trim();
   const depositorName = String(formData.get("depositorName") ?? "").trim();
   const wallName = String(formData.get("wallName") ?? "").trim();
   const message = String(formData.get("message") ?? "").trim();
   const hasConsent = Boolean(formData.get("consent"));
   if (!name || !email || !hasConsent || !isDonationFormKind(kind)) {
     redirect("/donate#notice");
+  }
+  if (kind === "pledge") {
+    const slotCount = Number(formData.get("slotCount"));
+    if (!isPledgeSlotCount(slotCount)) {
+      redirect("/donate#notice");
+    }
+    amount = `${(slotCount * PLEDGE_SLOT_AMOUNT).toLocaleString("ko-KR")}원 (${slotCount}구좌)`;
   }
   const user = await getSessionProfile();
   await getDb()

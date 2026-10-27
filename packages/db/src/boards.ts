@@ -33,6 +33,10 @@ export const AVATAR_UPLOAD = {
   types: ["image/jpeg", "image/png", "image/webp", "image/gif"],
 } as const;
 
+export const PLEDGE_SLOT_AMOUNT = 100_000;
+
+export const PLEDGE_SLOT_MAX = 50;
+
 export const DONATION_KINDS = [
   { id: "once", label: "일시 후원" },
   { id: "monthly", label: "정기 후원" },
@@ -42,10 +46,10 @@ export const DONATION_KINDS = [
 
 /**
  * 후원 양식에서 고를 수 있는 방식. 정기 후원은 재단 설립·PG 심사 뒤 결제 연동과 함께 연다.
- * 나머지는 지난 기록 표시에만 쓴다
+ * `founding`은 지난 기록 표시에만 쓴다
  */
 export const DONATION_FORM_KINDS = DONATION_KINDS.filter(
-  kind => kind.id === "once",
+  kind => kind.id === "once" || kind.id === "pledge",
 );
 
 /**
@@ -68,6 +72,9 @@ export const isNewsCategoryId = (value: string): value is NewsCategoryId =>
 
 export const isDonationFormKind = (value: string): value is DonationKindId =>
   DONATION_FORM_KINDS.some(kind => kind.id === value);
+
+export const isPledgeSlotCount = (value: number) =>
+  Number.isInteger(value) && value >= 1 && value <= PLEDGE_SLOT_MAX;
 
 export const boardLabel = (board: string) =>
   BOARDS.find(item => item.id === board)?.label ?? board;
