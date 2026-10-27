@@ -175,8 +175,40 @@ const readProvider = (value: string | undefined): Provider | null => {
 const readText = (value: unknown) =>
   typeof value === "string" && value.trim() ? value.trim() : null;
 
+const readOAuthIdentity = (user: User) => {
+  const oauthIdentities = (user.identities ?? []).filter(item =>
+    readProvider(item.provider),
+  );
+  if (oauthIdentities.length === 0) {
+    return null;
+  }
+  const sorted = [...oauthIdentities].sort((left, right) => {
+    const leftAt = left.last_sign_in_at ? Date.parse(left.last_sign_in_at) : 0;
+    const rightAt = right.last_sign_in_at
+      ? Date.parse(right.last_sign_in_at)
+      : 0;
+    return rightAt - leftAt;
+  });
+  const latest = sorted[0]!;
+  if (latest.last_sign_in_at) {
+    return latest;
+  }
+  const primary = readProvider(
+    typeof user.app_metadata?.provider === "string"
+      ? user.app_metadata.provider
+      : undefined,
+  );
+  if (primary) {
+    const matched = oauthIdentities.find(item => item.provider === primary);
+    if (matched) {
+      return matched;
+    }
+  }
+  return oauthIdentities[0];
+};
+
 const readProfileInput = (user: User): ProfileInput => {
-  const identity = user.identities?.find(item => readProvider(item.provider));
+  const identity = readOAuthIdentity(user);
   const provider = readProvider(identity?.provider);
   if (!identity || !provider) {
     throw new Error("로그인 계정을 확인하지 못했습니다.");
