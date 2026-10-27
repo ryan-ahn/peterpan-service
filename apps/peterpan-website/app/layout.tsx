@@ -2,6 +2,7 @@ import { type ReactNode, Suspense } from "react";
 
 import type { Metadata, Viewport } from "next";
 import { Montserrat, Nanum_Pen_Script } from "next/font/google";
+import Script from "next/script";
 
 import { getSessionProfile } from "@repo/auth/session";
 import { getSiteContact } from "@repo/db/siteContact";
@@ -10,6 +11,7 @@ import ToastProvider from "@repo/ui/components/toast";
 import SiteFooter from "@components/siteFooter";
 import SiteHeader from "@components/siteHeader";
 import {
+  GA_MEASUREMENT_ID,
   SITE_DESCRIPTION,
   SITE_KEYWORDS,
   SITE_LEGAL_NAME,
@@ -105,6 +107,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <ContactFooter />
           </Suspense>
         </ToastProvider>
+        {GA_MEASUREMENT_ID ? <GoogleAnalytics id={GA_MEASUREMENT_ID} /> : null}
       </body>
     </html>
   );
@@ -157,6 +160,28 @@ const ContactFooter = async () => {
           __html: JSON.stringify(organization).replace(/</g, "\\u003c"),
         }}
       />
+    </>
+  );
+};
+
+/**
+ * inner components
+ */
+
+/**
+ * GA4 태그. 하이드레이션 뒤에 불러오고, 페이지 이동은 GA4 향상된 측정이 기록 변화로 집계한다
+ */
+const GoogleAnalytics = ({ id }: { id: string }) => {
+  // render
+  return (
+    <>
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${id}`}
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${id}');`}
+      </Script>
     </>
   );
 };

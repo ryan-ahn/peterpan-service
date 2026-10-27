@@ -31,3 +31,7 @@ export const SITE_KEYWORDS = [
   "자폐인 후원",
   "발달장애인 기부",
 ];
+
+/** GA4 측정 ID. 미리보기·개발 방문이 섞이지 않게 Vercel 프로덕션 배포에서만 태그를 싣는다 */
+export const GA_MEASUREMENT_ID =
+  process.env.VERCEL_ENV === "production" ? "G-SQDW4RXGHC" : null;
