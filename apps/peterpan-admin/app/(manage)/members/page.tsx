@@ -131,7 +131,7 @@ const MembersScreen = () => {
     <div className="flex flex-col gap-5">
       <AdminPageHeader
         title="회원 관리"
-        description="카카오·구글로 로그인한 회원을 찾고 정리합니다. 관리자 지정은 권한 관리에서 합니다."
+        description="카카오·구글로 로그인한 회원을 관리해요. 관리자 지정은 권한 관리에서 할 수 있어요."
       />
       <div className="flex flex-wrap gap-2">
         {FILTERS.map(filter => (

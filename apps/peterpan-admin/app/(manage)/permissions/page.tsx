@@ -175,7 +175,7 @@ const PermissionsScreen = () => {
     <div className="flex flex-col gap-5">
       <AdminPageHeader
         title="권한 관리"
-        description="회원을 눌러 관리자로 등록하고 쓸 수 있는 메뉴를 고릅니다. 슈퍼 관리자는 모든 메뉴와 권한 관리를 쓰며, 슈퍼 관리자 지정·해제는 오너만 할 수 있어요."
+        description="슈퍼 관리자는 관리자를 지정할 수 있어요. 관리자는 부여 받은 권한에 맞게 화면을 관리할 수 있어요."
       />
       <div className="flex flex-wrap gap-2">
         {FILTERS.map(filter => (

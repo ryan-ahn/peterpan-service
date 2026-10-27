@@ -91,7 +91,7 @@ const SettingsScreen = () => {
     <div className="flex max-w-160 flex-col gap-5">
       <AdminPageHeader
         title="기본 정보"
-        description="웹사이트 하단에 보이는 재단 연락처입니다. 비워 두면 “준비 중”으로 보여요."
+        description="웹사이트 하단에 보이는 재단 연락처예요. 비워 두면 “준비 중”으로 보여요."
       />
       {error ? (
         <Text

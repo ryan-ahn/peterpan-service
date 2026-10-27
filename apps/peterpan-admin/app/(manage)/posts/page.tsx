@@ -151,7 +151,7 @@ const PostsScreen = () => {
     <div className="flex flex-col gap-5">
       <AdminPageHeader
         title="게시물 관리"
-        description="웹사이트 게시판에 회원이 올린 글입니다. 문제가 있는 글은 숨기거나 삭제하고, 댓글도 여기서 지울 수 있어요."
+        description="웹사이트 게시판에 회원이 올린 글이에요. 문제가 있는 글은 숨기거나 삭제하고, 댓글도 여기서 지울 수 있어요."
       />
       {list.error ? (
         <Text variant="caption-1" color={adminTextErrorColor}>

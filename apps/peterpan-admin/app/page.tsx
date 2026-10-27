@@ -63,7 +63,7 @@ const LoginScreen = async ({ searchParams }: Props) => {
             피터팬 재단 어드민
           </Text>
           <Text variant="body-3" color={adminTextLabelColor}>
-            운영자로 등록된 카카오·구글 계정으로 로그인하세요.
+            운영자로 등록된 카카오·구글 계정으로 로그인해 주세요.
           </Text>
         </div>
       </div>
@@ -100,7 +100,7 @@ const ProviderSection = () => (
     <SocialLoginButtons nextPath={LOGIN_NEXT_PATH} />
     <Text variant="caption-2" color={adminTextLabelColor}>
       관리자로 지정된 계정만 들어올 수 있어요. 처음이라면 한 번 로그인한 뒤 재단
-      담당자에게 지정을 요청하세요.
+      담당자에게 지정을 요청해 주세요.
     </Text>
   </>
 );

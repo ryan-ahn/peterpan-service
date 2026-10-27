@@ -126,7 +126,7 @@ const InquiriesScreen = () => {
     <div className="flex flex-col gap-5">
       <AdminPageHeader
         title="후원 관리"
-        description="웹사이트 후원하기에서 남긴 후원입니다. 입금 확인과 기록을 마친 후원 내역은 파기해 주세요."
+        description="웹사이트 후원하기에서 남긴 후원이에요. 입금 확인과 기록을 마친 후원 내역은 파기해 주세요."
       />
       {list.error ? (
         <Text variant="caption-1" color={adminTextErrorColor}>

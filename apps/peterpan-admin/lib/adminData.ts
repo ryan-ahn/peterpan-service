@@ -634,7 +634,7 @@ export const deleteMember = async (params: IdParams) => {
   const { id } = params;
   const self = await assertMenu("members");
   if (id === self.id) {
-    throw new Error("내 계정은 삭제할 수 없습니다.");
+    throw new Error("내 계정은 삭제할 수 없어요.");
   }
   const target = await readMemberRole({ id });
   if (target === "owner") {
@@ -1018,7 +1018,7 @@ export const saveNotice = async (params: SaveNoticeParams): Promise<Notice> => {
         .returning();
   const row = saved[0];
   if (!row) {
-    throw new Error("공지를 찾지 못했습니다.");
+    throw new Error("공지를 찾지 못했어요.");
   }
   await writeLog({
     self,
@@ -1067,7 +1067,7 @@ export const savePost = async (formData: FormData): Promise<Post> => {
     .filter((item): item is File => item instanceof File && item.size > 0);
   const tooLarge = files.find(file => file.size > MAX_FILE_SIZE);
   if (tooLarge) {
-    throw new Error(`${tooLarge.name}: 파일은 20MB까지 올릴 수 있습니다.`);
+    throw new Error(`${tooLarge.name}: 파일은 20MB까지 올릴 수 있어요.`);
   }
   const values = {
     board,
@@ -1104,7 +1104,7 @@ export const savePost = async (formData: FormData): Promise<Post> => {
         .returning();
   const row = saved[0];
   if (!row) {
-    throw new Error("글을 찾지 못했습니다.");
+    throw new Error("글을 찾지 못했어요.");
   }
   await uploadAttachments({ postId: row.id, files });
   await writeLog({
@@ -1309,7 +1309,7 @@ export const addBylaw = async (formData: FormData) => {
     throw new Error("정관 파일을 골라 주세요.");
   }
   if (file.size > MAX_FILE_SIZE) {
-    throw new Error("파일은 20MB까지 올릴 수 있습니다.");
+    throw new Error("파일은 20MB까지 올릴 수 있어요.");
   }
   const mime = file.type || "application/octet-stream";
   const path = `bylaws/${crypto.randomUUID()}`;

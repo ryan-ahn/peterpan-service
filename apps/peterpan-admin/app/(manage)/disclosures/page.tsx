@@ -151,7 +151,7 @@ const DisclosuresScreen = () => {
     <div className="flex flex-col gap-5">
       <AdminPageHeader
         title="공시 관리"
-        description="경영 공시와 기부금 공시를 올립니다. 공시 자료는 첨부파일로 웹사이트에 열려요."
+        description="경영 공시와 기부금 공시를 올려요. 공시 자료는 첨부파일로 웹사이트에 열려요."
         actions={
           <Button
             variant="solid"

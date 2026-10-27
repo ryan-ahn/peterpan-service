@@ -108,7 +108,7 @@ const LogsScreen = () => {
     <div className="flex flex-col gap-5">
       <AdminPageHeader
         title="관리 기록"
-        description="누가 언제 어떤 메뉴에서 무엇을 바꿨는지 쌓아 둡니다. 기록은 지우거나 고칠 수 없어요."
+        description="누가 언제 어떤 메뉴에서 무엇을 바꿨는지 쌓아 둬요. 기록은 지우거나 고칠 수 없어요."
       />
       <div className="flex flex-wrap gap-2">
         {FILTERS.map(filter => (

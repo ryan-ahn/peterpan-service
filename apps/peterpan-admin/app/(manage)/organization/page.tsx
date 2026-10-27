@@ -361,7 +361,7 @@ const OrganizationScreen = () => {
     <div className="flex flex-col gap-5">
       <AdminPageHeader
         title="조직도 관리"
-        description="웹사이트 재단소개 › 조직도에 보이는 구조입니다. 손잡이(⋮⋮)를 끌어 순서와 위아래를 바꾸고, 저장해야 반영돼요."
+        description="웹사이트 재단소개 › 조직도에 보이는 구조예요. 손잡이(⋮⋮)를 끌어 순서와 위아래를 바꿀 수 있고, 저장해야 반영돼요."
         actions={
           <>
             <Button
@@ -410,8 +410,7 @@ const OrganizationScreen = () => {
           />
         ) : null}
         <Text variant="caption-2" color={adminTextLabelColor}>
-          그룹 머리를 다른 그룹 머리에 놓으면 그 아래로, 그룹 사이 빈칸에 놓으면
-          그 자리로 갑니다. 인원은 다른 인원이나 그룹에 놓아요.
+          새로운 조직이 생기면 이 버튼으로 추가해 주세요.
         </Text>
       </div>
       {error ? (
@@ -432,7 +431,7 @@ const OrganizationScreen = () => {
                 variant="body-3"
                 color={adminTextLabelColor}
                 className="py-10 text-center">
-                그룹이 없어요. 그룹 추가로 시작하세요.
+                그룹이 없어요. 그룹 추가로 시작해 주세요.
               </Text>
             ) : (
               <GroupList parentId={null} actions={actions} />
@@ -577,8 +576,8 @@ const GroupCard = ({ group, actions }: GroupCardProps) => {
               variant="caption-2"
               color={adminTextLabelColor}
               className="px-2 py-2">
-              인원이 없어요. 인원 추가를 누르거나 다른 그룹의 인원을 끌어
-              오세요.
+              인원이 없어요. 인원 추가를 누르거나 다른 그룹의 인원을 끌어와
+              주세요.
             </Text>
           ) : (
             group.people.map(person => (

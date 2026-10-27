@@ -57,7 +57,7 @@ export const requireSuper = async (): Promise<AdminSelf> => {
 export const assertAdmin = async (): Promise<AdminSelf> => {
   const self = await readAdminSelf();
   if (!self) {
-    throw new Error("관리자 권한이 없습니다. 다시 로그인해 주세요.");
+    throw new Error("관리자 권한이 없어요. 다시 로그인해 주세요.");
   }
   return self;
 };

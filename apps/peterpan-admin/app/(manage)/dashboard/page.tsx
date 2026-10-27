@@ -177,7 +177,7 @@ const DashboardScreen = () => {
     <div className="flex flex-col gap-5">
       <AdminPageHeader
         title="대시보드"
-        description="회원, 게시판, 후원 흐름을 기간별로 봅니다. 날짜는 한국 시간 기준이에요."
+        description="회원, 게시판, 후원 흐름을 기간별로 봐요. 날짜는 한국 시간 기준이에요."
         actions={
           <Tab
             variant="segment"
