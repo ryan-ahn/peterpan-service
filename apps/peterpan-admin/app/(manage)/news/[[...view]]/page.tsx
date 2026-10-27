@@ -14,6 +14,7 @@ import Textarea from "@repo/ui/components/textarea";
 import { useToast } from "@repo/ui/components/toast";
 import Toggle from "@repo/ui/components/toggle";
 import Icon from "@repo/ui/icon";
+import cn from "@repo/ui/lib/cn";
 import Text from "@repo/ui/text";
 
 import AdminDrawer from "@components/adminDrawer";
@@ -346,7 +347,7 @@ const NewsScreen = () => {
           {list.error}
         </Text>
       ) : null}
-      <section className={adminPanelClass}>
+      <section className={cn(adminPanelClass, "flex flex-col")}>
         <Tab
           className="px-2"
           items={tabs}
@@ -355,7 +356,7 @@ const NewsScreen = () => {
           onChange={handleTabChange}
         />
         {isPressTab ? (
-          <div className="flex flex-wrap gap-2 px-4 pt-4">
+          <div className="mt-3 flex flex-wrap gap-2 px-4">
             {PRESS_FILTERS.map(filter => (
               <Chip
                 key={filter}
@@ -368,25 +369,28 @@ const NewsScreen = () => {
             ))}
           </div>
         ) : null}
-        <AdminTable
-          columns={isPressTab ? PRESS_COLUMNS : COLUMNS}
-          rows={list.result?.items ?? []}
-          emptyText={
-            isPressTab && pressFilter !== "all"
-              ? `${PRESS_STATUS[pressFilter].label} 기사가 없어요.`
-              : activeTab.empty
-          }
-          isLoading={list.isLoading}
-          readRowKey={item => item.id}
-          onRowClick={handleRowClick}
-        />
-        <AdminPager
-          page={list.page}
-          pageCount={pageCount}
-          total={total}
-          unit="건"
-          onChange={list.setPage}
-        />
+        <div
+          className={cn("flex flex-col gap-5", isPressTab ? "mt-2" : "mt-5")}>
+          <AdminTable
+            columns={isPressTab ? PRESS_COLUMNS : COLUMNS}
+            rows={list.result?.items ?? []}
+            emptyText={
+              isPressTab && pressFilter !== "all"
+                ? `${PRESS_STATUS[pressFilter].label} 기사가 없어요.`
+                : activeTab.empty
+            }
+            isLoading={list.isLoading}
+            readRowKey={item => item.id}
+            onRowClick={handleRowClick}
+          />
+          <AdminPager
+            page={list.page}
+            pageCount={pageCount}
+            total={total}
+            unit="건"
+            onChange={list.setPage}
+          />
+        </div>
       </section>
       {editor?.kind === "notice" ? (
         <NoticeEditorSection
