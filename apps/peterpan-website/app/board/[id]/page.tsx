@@ -9,7 +9,12 @@ import Icon from "@repo/ui/icon";
 import cn from "@repo/ui/lib/cn";
 
 import BrandText from "@components/brandText";
-import { getBoardPost, listBoardComments, readBoardLikes } from "@lib/board";
+import {
+  getBoardPost,
+  isUuid,
+  listBoardComments,
+  readBoardLikes,
+} from "@lib/board";
 import { formatDate, summarize } from "@lib/format";
 
 import {
@@ -68,20 +73,18 @@ export const generateMetadata = async ({
 const BoardDetailScreen = async ({ params }: Props) => {
   // variables
   const { id } = await params;
-  const [post, user] = await Promise.all([
+  const [post, user, comments] = await Promise.all([
     getBoardPost(id).catch(() => null),
     getSessionProfile(),
+    isUuid(id) ? listBoardComments(id).catch(() => []) : [],
   ]);
   if (!post) {
     notFound();
   }
-  const [comments, likes] = await Promise.all([
-    listBoardComments(post.id).catch(() => []),
-    readBoardLikes({ postId: post.id, userId: user?.id ?? null }).catch(() => ({
-      count: 0,
-      isLiked: false,
-    })),
-  ]);
+  const likes = await readBoardLikes({
+    postId: post.id,
+    userId: user?.id ?? null,
+  }).catch(() => ({ count: 0, isLiked: false }));
   const isAuthor = Boolean(user && post.authorId === user.id);
   const canDelete = isAuthor || Boolean(user?.role);
   const isEdited = post.updatedAt.getTime() - post.createdAt.getTime() > 1000;

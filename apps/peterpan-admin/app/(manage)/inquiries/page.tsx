@@ -97,7 +97,7 @@ const readInquiries = (params: ReadInquiriesParams) => {
 };
 
 /**
- * screen — 후원 문의. 후원하기 화면에서 남긴 후원 알림
+ * screen — 후원 관리. 웹사이트 후원하기에서 남긴 후원
  */
 const InquiriesScreen = () => {
   // hooks
@@ -125,8 +125,8 @@ const InquiriesScreen = () => {
   return (
     <div className="flex flex-col gap-5">
       <AdminPageHeader
-        title="후원 문의"
-        description="웹사이트 후원하기에서 남긴 후원 알림입니다. 입금 확인과 기록을 마친 문의는 파기해 주세요."
+        title="후원 관리"
+        description="웹사이트 후원하기에서 남긴 후원입니다. 입금 확인과 기록을 마친 후원 내역은 파기해 주세요."
       />
       {list.error ? (
         <Text variant="caption-1" color={adminTextErrorColor}>
@@ -137,7 +137,7 @@ const InquiriesScreen = () => {
         <AdminTable
           columns={COLUMNS}
           rows={list.result?.items ?? []}
-          emptyText="들어온 문의가 없어요."
+          emptyText="들어온 후원이 없어요."
           isLoading={list.isLoading}
           readRowKey={inquiry => inquiry.id}
           onRowClick={setSelected}
@@ -163,7 +163,7 @@ const InquiriesScreen = () => {
 };
 
 /**
- * section — 문의 상세·파기
+ * section — 후원 상세·파기
  */
 const InquiryDetailSection = ({
   inquiry,
@@ -181,7 +181,7 @@ const InquiryDetailSection = ({
     setIsDeleting(true);
     try {
       await deleteInquiry({ id: inquiry.id });
-      toast.show({ text: "문의를 파기했어요.", variant: "success" });
+      toast.show({ text: "후원 내역을 파기했어요.", variant: "success" });
       onChanged();
     } catch (deleteError) {
       setError(
@@ -211,7 +211,7 @@ const InquiryDetailSection = ({
             variant="ghost"
             color="danger"
             size="small"
-            text="문의 파기"
+            text="후원 내역 파기"
             className="ml-auto"
             onClick={handleDeleteOpen}
           />
@@ -250,8 +250,8 @@ const InquiryDetailSection = ({
       </AdminDrawer>
       <Modal
         isOpen={isDeleteOpen}
-        title="문의를 파기할까요?"
-        description={`${inquiry.name} 님의 연락처와 문의 내용이 지워지고 되돌릴 수 없어요.`}
+        title="후원 내역을 파기할까요?"
+        description={`${inquiry.name} 님의 연락처와 남긴 내용이 지워지고 되돌릴 수 없어요.`}
         secondaryButton={{
           text: "취소",
           isDisabled: isDeleting,

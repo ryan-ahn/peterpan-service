@@ -11,7 +11,7 @@ import type { Name as IconName } from "@repo/ui/icon";
  */
 export const ADMIN_MENUS = [
   { id: "members", href: "/members", label: "회원 관리", icon: "users" },
-  { id: "inquiries", href: "/inquiries", label: "후원 문의", icon: "mail" },
+  { id: "inquiries", href: "/inquiries", label: "후원 관리", icon: "mail" },
   { id: "news", href: "/news", label: "소식 관리", icon: "megaphone" },
   { id: "posts", href: "/posts", label: "게시물 관리", icon: "edit" },
   {
@@ -35,6 +35,15 @@ export const ADMIN_MENUS = [
   label: string;
   icon: IconName;
 }[];
+
+/**
+ * 홈. 메뉴 권한 없이 운영진 누구나 본다. 로고를 누르면 여기로 온다
+ */
+export const DASHBOARD_MENU = {
+  href: "/dashboard",
+  label: "대시보드",
+  icon: "chart",
+} as const satisfies { href: string; label: string; icon: IconName };
 
 export const PERMISSIONS_MENU = {
   href: "/permissions",
@@ -96,14 +105,14 @@ export const canUseMenu = (params: CanUseMenuParams) => {
 };
 
 /**
- * 로그인 뒤 처음 갈 화면. 쓸 수 있는 첫 메뉴, 하나도 없으면 null
+ * 로그인 뒤 처음 갈 화면. 쓸 수 있는 메뉴가 하나라도 있으면 대시보드, 없으면 null
  */
 export const readAdminHome = (params: MenuAccess) => {
   const { role, menus } = params;
-  const menu = ADMIN_MENUS.find(item =>
+  const hasMenu = ADMIN_MENUS.some(item =>
     canUseMenu({ role, menus, menu: item.id }),
   );
-  return menu?.href ?? null;
+  return hasMenu ? DASHBOARD_MENU.href : null;
 };
 
 /**

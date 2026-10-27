@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import { usePathname, useRouter } from "next/navigation";
 
 import Button from "@repo/ui/components/button";
 import Checkbox from "@repo/ui/components/checkbox";
@@ -222,8 +224,14 @@ const readNews = (params: ReadNewsParams) => {
  */
 const NewsScreen = () => {
   // hooks
+  const router = useRouter();
+  const pathname = usePathname();
   const toast = useToast();
-  const list = useAdminList({ initialFilter: "notice", load: readNews });
+  const pathFilter = readFilterFromPath(readNewsPathSegments(pathname));
+  const list = useAdminList({
+    initialFilter: pathFilter ?? "notice",
+    load: readNews,
+  });
   useAdminHeader({
     value: list.search,
     placeholder: "제목, 내용",
@@ -270,12 +278,28 @@ const NewsScreen = () => {
     setIsCollecting(false);
   };
   // handlers
+  const handleFilterNavigate = (filter: NewsFilter) => {
+    router.replace(readPathFromFilter(filter), { scroll: false });
+  };
   const handleTabChange = (kind: NewsKind) => {
-    list.handleFilterChange(kind === "press" ? "press-all" : kind);
+    handleFilterNavigate(kind === "press" ? "press-all" : kind);
   };
   const handlePressFilterChange = (filter: PressFilter) => {
-    list.handleFilterChange(`press-${filter}`);
+    handleFilterNavigate(`press-${filter}`);
   };
+  // effects
+  useEffect(() => {
+    const filter = readFilterFromPath(readNewsPathSegments(pathname));
+    if (filter === null) {
+      router.replace("/news");
+      return;
+    }
+    if (filter !== list.filter) {
+      list.handleFilterChange(filter);
+    }
+    // pathname이 바뀔 때만 맞춘다. 탭 클릭은 주소만 바꾸고 여기서 목록 필터를 갱신한다
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- list는 매 렌더 새 객체라 넣지 않는다
+  }, [pathname]);
   const handleActionClick = () => {
     if (isPressTab) {
       void collect();
@@ -694,6 +718,68 @@ const readPressFilter = (filter: NewsFilter): PressFilter => {
   if (filter === "press-approved") return "approved";
   if (filter === "press-hidden") return "hidden";
   return "all";
+};
+
+const PRESS_PATH_FILTERS = new Set<PressFilter>([
+  "pending",
+  "approved",
+  "hidden",
+]);
+
+/**
+ * `[[...view]]` 경로를 소식 목록 필터로 읽는다. 알 수 없는 주소는 null
+ */
+const readFilterFromPath = (segments: string[]): NewsFilter | null => {
+  if (segments.length === 0) {
+    return "notice";
+  }
+  if (segments.length === 1) {
+    if (segments[0] === "activity") {
+      return "activity";
+    }
+    if (segments[0] === "press") {
+      return "press-all";
+    }
+    return null;
+  }
+  if (
+    segments.length === 2 &&
+    segments[0] === "press" &&
+    PRESS_PATH_FILTERS.has(segments[1] as PressFilter)
+  ) {
+    return `press-${segments[1]}` as NewsFilter;
+  }
+  return null;
+};
+
+const readPathFromFilter = (filter: NewsFilter) => {
+  if (filter === "notice") {
+    return "/news";
+  }
+  if (filter === "activity") {
+    return "/news/activity";
+  }
+  if (filter === "press-all") {
+    return "/news/press";
+  }
+  if (filter === "press-pending") {
+    return "/news/press/pending";
+  }
+  if (filter === "press-approved") {
+    return "/news/press/approved";
+  }
+  if (filter === "press-hidden") {
+    return "/news/press/hidden";
+  }
+  return "/news";
+};
+
+const readNewsPathSegments = (pathname: string) => {
+  const rest = pathname.replace(/^\/news\/?/, "");
+  if (!rest) {
+    return [];
+  }
+  return rest.split("/").filter(Boolean);
 };
 
 export default NewsScreen;

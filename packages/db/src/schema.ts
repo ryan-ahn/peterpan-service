@@ -249,7 +249,7 @@ export const bylaws = pgTable("bylaws", {
 });
 
 /**
- * 후원 알림. 공식 계좌로 보낸 뒤 남긴다. 로그인한 회원이 남기면 user_id가 붙어 마이페이지 문의 내역에 보인다.
+ * 후원. 공식 계좌로 보낸 뒤 후원하기에서 남긴다. 로그인한 회원이 남기면 user_id가 붙어 마이페이지 후원 내역에 보인다.
  * wall_name은 재단 승인 뒤 이름 벽에 올릴 이름이다 (비우면 올리지 않는다).
  */
 export const donationInquiries = pgTable("donation_inquiries", {

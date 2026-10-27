@@ -21,7 +21,7 @@
 | 경로                          | 역할                                                       |
 | ----------------------------- | ---------------------------------------------------------- |
 | `apps/peterpan-website/`      | 재단 소개·소식·공시·기부하기·로그인                        |
-| `apps/peterpan-admin/`        | 운영 어드민 (게시물·공지·후원 문의·회원·기본정보)          |
+| `apps/peterpan-admin/`        | 운영 어드민 (게시물·공지·후원 관리·회원·기본정보)          |
 | `packages/ui/`                | 공용 디자인 시스템 (`@repo/ui`)                            |
 | `packages/tailwind-config/`   | `@theme` 토큰 CSS, 공용 유틸리티, JS용 `theme.ts`          |
 | `packages/db/`                | Drizzle 스키마·연결, 게시판 상수, 하단 연락처 (`@repo/db`) |

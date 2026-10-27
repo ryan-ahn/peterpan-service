@@ -23,6 +23,7 @@ import Text from "@repo/ui/text";
 import { adminTextHeadingColor, adminTextLabelColor } from "@constants/adminUi";
 import {
   ADMIN_MENUS,
+  DASHBOARD_MENU,
   PERMISSIONS_MENU,
   canUseMenu,
   findMenuByPath,
@@ -198,6 +199,7 @@ const AdminShell = ({ self, headerSearch, children }: Props) => {
   const [isNavOpen, setIsNavOpen] = useState(false);
   // variables
   const navItems: NavItem[] = [
+    { ...DASHBOARD_MENU, isAllowed: true },
     ...ADMIN_MENUS.map(menu => ({
       href: menu.href,
       label: menu.label,
@@ -258,7 +260,12 @@ const AdminShell = ({ self, headerSearch, children }: Props) => {
           isNavOpen ? "translate-x-0" : "-translate-x-full",
         )}>
         <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2">
+          <Link
+            className="flex items-center gap-2 self-start rounded-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400"
+            href={DASHBOARD_MENU.href}
+            prefetch={false}
+            aria-label="대시보드로 가기"
+            onClick={handleNavClose}>
             <Image
               src="/brand/logo-symbol.png"
               alt=""
@@ -269,7 +276,7 @@ const AdminShell = ({ self, headerSearch, children }: Props) => {
             <Text as="span" variant="heading-5" color={adminTextHeadingColor}>
               피터팬 재단
             </Text>
-          </div>
+          </Link>
           <div className="flex items-center gap-2.5 rounded-large border border-gray-200 bg-white px-3 py-2.5">
             <Avatar name={self.name} size="small" />
             <div className="flex min-w-0 flex-col">

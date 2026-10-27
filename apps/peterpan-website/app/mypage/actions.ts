@@ -168,7 +168,7 @@ export const deleteMyBoardPost = async (formData: FormData) => {
 };
 
 /**
- * 회원 탈퇴. 사진·문의·프로필을 지우고 Supabase Auth 계정(auth.users)도 DB에서 지운다. 게시글은 글쓴이 연결만 끊고 남는다.
+ * 회원 탈퇴. 사진·후원 내역·프로필을 지우고 Supabase Auth 계정(auth.users)도 DB에서 지운다. 게시글은 글쓴이 연결만 끊고 남는다.
  * 오너는 권한을 넘기기 전에는 탈퇴할 수 없다
  */
 export const withdrawMe = async (formData: FormData) => {

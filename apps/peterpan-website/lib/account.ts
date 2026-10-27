@@ -3,7 +3,7 @@ import { desc, eq, sql } from "drizzle-orm";
 import { boardPosts, donationInquiries, getDb, profiles } from "@repo/db";
 
 /**
- * 마이페이지 조회. 본인 profiles 행과 본인이 남긴 문의·게시글만 읽는다.
+ * 마이페이지 조회. 본인 profiles 행과 본인이 남긴 후원·게시글만 읽는다.
  */
 
 /**

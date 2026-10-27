@@ -14,7 +14,7 @@
 | `/news`, `/news/[slug]`                                  | 재단 소식 목록(공지·활동·언론 보도)·본문                   |
 | `/board`, `/board/[id]`, `/board/write`                  | 회원 게시판 목록·본문·글쓰기(`?id=` 고치기)                |
 | `/disclosure`, `/disclosure/{management,donations}`      | 경영 공시·기부금 공시                                      |
-| `/donate`                                                | 후원 안내·참여 의사 남기기 (`actions.ts`)                  |
+| `/donate`                                                | 후원 안내·후원 남기기 (`actions.ts`)                       |
 | `/login`                                                 | 카카오·구글 로그인. 로그인했으면 `/mypage`로 보낸다        |
 | `/mypage`                                                | 프로필·개인정보 설정·내 문의·내 게시글·탈퇴 (`actions.ts`) |
 | `/auth/{kakao,google}`, `/auth/callback`, `/auth/logout` | OAuth 라우트 핸들러. 실패하면 `/login?error=`              |
@@ -33,7 +33,7 @@
 - `page.tsx` 안의 진입 컴포넌트 이름은 `*Screen`. 본문은 `*Section`.
 - 서버 컴포넌트가 기본이다. 데이터가 필요하면 screen을 `async`로 두고 `@lib/posts`의 함수를 기다린다.
 - 메뉴 화면(재단소개·마을소개·소통·정보공개·후원하기)의 첫머리는 `FoundationHeader`(영문 overline·제목·금색 선·lead, 아래 선)이고 본문은 `page-article` 칼럼에 `py-10 lg:py-12`으로 놓는다. 글 본문·글쓰기도 `page-article`. 그 밖의 화면(로그인·마이페이지·처리방침)은 `PageIntro`(eyebrow·title·lead). 마을소개·후원하기 본문은 `BandSection` 띠 구역, 공시 목록은 `DisclosureList`.
-- 후원은 1구좌 단위 없이 공식 후원 계좌로 받는다. 계좌 정보는 `app/donate/page.tsx`의 `DONATION_ACCOUNT`에 적고, 비어 있으면 "공개 준비 중"으로 보인다. 양식은 보낸 후원을 알리는 후원 알림(`donation_inquiries`)이다. 지금은 계좌이체 일시 후원만 받고(`DONATION_FORM_KINDS`), 정기 후원·카드 결제는 재단 설립과 PG 심사 뒤 결제 연동과 함께 연다.
+- 후원은 1구좌 단위 없이 공식 후원 계좌로 받는다. 계좌 정보는 `app/donate/page.tsx`의 `DONATION_ACCOUNT`에 적고, 비어 있으면 "공개 준비 중"으로 보인다. 양식은 보낸 후원을 남기는 후원(`donation_inquiries`)이다. 지금은 계좌이체 일시 후원만 받고(`DONATION_FORM_KINDS`), 정기 후원·카드 결제는 재단 설립과 PG 심사 뒤 결제 연동과 함께 연다.
 - 스켈레톤은 새로고침 때 실제 화면과 1px도 어긋나지 않게 만든다. 데이터와 상관없는 머리·탭·검색칸·제목은 실제로 그리고, 데이터를 기다리는 부분만 `<Suspense>`로 감싼다. fallback은 실제와 같은 마크업·클래스에 글자 자리만 `SkeletonText`(대신 글을 투명하게 두고 배경만 칠함)로 바꾼다. 줄 높이·기준선·줄바꿈이 실제 글과 같아진다. 버튼 자리는 `buttonStyle`에 `animate-pulse border-transparent bg-beige text-transparent`를 얹는다. 세션에 따라 달라지는 양식은 같은 양식을 `inert`로 먼저 보인다. 목록 스켈레톤 줄 수는 한 쪽 크기(`NEWS_PAGE_SIZE`·`BOARD_PAGE_SIZE`)다.
 - 데이터가 없는 화면에는 `loading.tsx`를 두지 않는다. 화면 전체가 하나의 글에 달린 경우(소식·게시판 글 본문, 로그인)만 `loading.tsx`를 둔다. 헤더는 세션을 읽는 동안 로그아웃 상태 `SiteHeader`를 그대로 보인다.
 - 메뉴·캐러셀처럼 브라우저 상태가 필요한 UI만 `components/`에 `"use client"`로 둔다.
@@ -44,7 +44,7 @@
 ## 데이터
 
 - 회원 정보는 `profiles` 테이블이 기준이다. 이름·사진·이메일은 처음 가입할 때만 소셜 계정에서 채우고(`@repo/auth/oauth`), 이후 로그인은 덮어쓰지 않는다. 마이페이지 조회는 `@lib/account`, 쓰기는 `app/mypage/actions.ts`. 프로필 사진은 `avatars` 버킷(`AVATAR_UPLOAD`, 2MB)에 회원 세션으로 `{userId}/` 경로에 올린다(스토리지 정책이 자기 폴더만 허용).
-- 로그인한 회원이 남긴 후원 문의는 `donation_inquiries.user_id`로 이어져 마이페이지에 보인다.
+- 로그인한 회원이 남긴 후원은 `donation_inquiries.user_id`로 이어져 마이페이지 후원 내역에 보인다.
 - 게시물 조회는 `@lib/posts` (공개된 글만). 회원 게시판(`board_posts`·`board_comments`·`board_likes`)은 `@lib/board`, 글·댓글·좋아요 쓰기는 `app/board/actions.ts`. 날짜·빈 값 표기는 `@lib/format`.
 - 재단 고정 문구(설립취지서·미션·마을·가치·하는 일)는 `@lib/foundation`.
 - 조직도는 `@repo/db/organization`(site_settings JSON), 정관은 `bylaws` 테이블의 노출 1건. 둘 다 어드민에서 관리한다.

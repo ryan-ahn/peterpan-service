@@ -50,7 +50,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 const TABS = [
   { id: "settings", label: "개인정보 설정" },
-  { id: "inquiries", label: "내 문의 내역" },
+  { id: "inquiries", label: "내 후원 내역" },
   { id: "posts", label: "내 게시글" },
 ] as const;
 
@@ -151,7 +151,7 @@ type DeleteButtonProps = {
 };
 
 /**
- * screen — 마이페이지. 프로필 아래 탭(`?tab=`)으로 개인정보 설정(회원 탈퇴 포함)·내 문의·내 게시글 중 하나만 보인다
+ * screen — 마이페이지. 프로필 아래 탭(`?tab=`)으로 개인정보 설정(회원 탈퇴 포함)·내 후원·내 게시글 중 하나만 보인다
  */
 const MyPageScreen = async ({ searchParams }: Props) => {
   // variables
@@ -353,15 +353,15 @@ const SettingsSection = ({ profile, savedAt, error }: SettingsSectionProps) => (
 const InquirySection = ({ inquiries }: InquirySectionProps) => (
   <Block
     id="inquiries"
-    title="내 문의 내역"
-    description="로그인한 상태로 남긴 후원 알림입니다. 필요 없으면 직접 지울 수 있습니다.">
+    title="내 후원 내역"
+    description="로그인한 상태로 남긴 후원입니다. 필요 없으면 직접 지울 수 있습니다.">
     {inquiries === null ? (
       <ListSkeleton />
     ) : inquiries.length === 0 ? (
       <Empty>
-        남긴 문의가 없습니다.{" "}
+        남긴 후원이 없습니다.{" "}
         <Link href="/donate" className="text-pine underline">
-          후원 알림 남기기
+          후원 남기기
         </Link>
       </Empty>
     ) : (
@@ -393,7 +393,7 @@ const InquirySection = ({ inquiries }: InquirySectionProps) => (
             <DeleteButton
               id={inquiry.id}
               action={deleteMyInquiry}
-              question="이 문의를 지울까요?"
+              question="이 후원 내역을 지울까요?"
             />
           </li>
         ))}
@@ -461,7 +461,7 @@ const WithdrawSection = ({ error }: WithdrawSectionProps) => (
   <Block
     id="withdraw"
     title="회원 탈퇴"
-    description="탈퇴하면 프로필, 사진, 문의 내역이 바로 지워지고 되돌릴 수 없습니다. 게시판에 쓴 글과 댓글은 남고 글쓴이 연결만 끊깁니다.">
+    description="탈퇴하면 프로필, 사진, 후원 내역이 바로 지워지고 되돌릴 수 없습니다. 게시판에 쓴 글과 댓글은 남고 글쓴이 연결만 끊깁니다.">
     <form
       action={withdrawMe}
       className="flex flex-col gap-4 rounded-2xlarge border border-beige bg-white px-5 py-5 md:flex-row md:items-center md:justify-between">

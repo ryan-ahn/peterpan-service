@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 
 import { boardComments, boardLikes, boardPosts, getDb } from "@repo/db";
@@ -71,7 +73,10 @@ export const listBoardPosts = async (params: ListBoardPostsParams) => {
   };
 };
 
-export const getBoardPost = async (id: string) => {
+/**
+ * 메타데이터와 본문이 같은 글을 읽으므로 한 요청 안에서는 한 번만 조회한다
+ */
+export const getBoardPost = cache(async (id: string) => {
   if (!isUuid(id)) {
     return null;
   }
@@ -81,7 +86,7 @@ export const getBoardPost = async (id: string) => {
     .where(and(eq(boardPosts.id, id), eq(boardPosts.published, true)))
     .limit(1);
   return rows[0] ?? null;
-};
+});
 
 export const listBoardComments = async (postId: string) =>
   getDb()

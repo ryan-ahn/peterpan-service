@@ -64,7 +64,7 @@ npm run dev
 
 ## 데이터
 
-재단 소식(공지·활동·언론 보도), 경영 공시, 기부금 공시, 후원 문의, 하단 연락처는 Supabase Postgres에 있다. 공지는 `notices`, 나머지 글은 `posts` 테이블이다. 첨부는 `documents`, 이미지는 `media` 공개 버킷이다. 정관은 어드민 `/bylaws`에서 판마다 `documents` 버킷에 올리고, `bylaws` 테이블에서 노출 1건을 고른다. 조직도는 어드민 `/organization`에서 짜고 `site_settings`의 `organization_chart`에 JSON으로 저장한다.
+재단 소식(공지·활동·언론 보도), 경영 공시, 기부금 공시, 후원 관리, 하단 연락처는 Supabase Postgres에 있다. 공지는 `notices`, 나머지 글은 `posts` 테이블이다. 첨부는 `documents`, 이미지는 `media` 공개 버킷이다. 정관은 어드민 `/bylaws`에서 판마다 `documents` 버킷에 올리고, `bylaws` 테이블에서 노출 1건을 고른다. 조직도는 어드민 `/organization`에서 짜고 `site_settings`의 `organization_chart`에 JSON으로 저장한다.
 
 홈과 마을 사진 일부는 실제 마을 촬영본이 생기기 전의 예시다.
 
@@ -98,7 +98,7 @@ npm run dev
 | 경로                          | 내용                                                           |
 | ----------------------------- | -------------------------------------------------------------- |
 | `apps/peterpan-website/`      | 재단 소개·소식·공시·기부하기·로그인                            |
-| `apps/peterpan-admin/`        | 운영 어드민 (게시물·공지·후원 문의·회원·기본정보)              |
+| `apps/peterpan-admin/`        | 운영 어드민 (게시물·공지·후원 관리·회원·기본정보)              |
 | `packages/ui/`                | 공용 디자인 시스템 (Button, Chip, Input, Modal, Carousel 등)   |
 | `packages/tailwind-config/`   | 디자인 토큰 (`tokens.css`, `tailwind.css`, `theme.ts`)         |
 | `packages/db/`                | Drizzle 스키마·연결, 게시판 상수, 하단 연락처, 마이그레이션    |

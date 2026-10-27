@@ -41,7 +41,7 @@ export const DONATION_KINDS = [
 ] as const;
 
 /**
- * 후원 알림 양식에서 고를 수 있는 방식. 정기 후원은 재단 설립·PG 심사 뒤 결제 연동과 함께 연다.
+ * 후원 양식에서 고를 수 있는 방식. 정기 후원은 재단 설립·PG 심사 뒤 결제 연동과 함께 연다.
  * 나머지는 지난 기록 표시에만 쓴다
  */
 export const DONATION_FORM_KINDS = DONATION_KINDS.filter(

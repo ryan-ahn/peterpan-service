@@ -1,6 +1,6 @@
 "use server";
 
-import { type SQL, and, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { type SQL, and, desc, eq, gte, ilike, or, sql } from "drizzle-orm";
 
 import { readAdminRole } from "@repo/auth/session";
 import { createAdminClient } from "@repo/auth/supabase";
@@ -47,7 +47,12 @@ import {
   isSuperRole,
   readAdminMenus,
 } from "@lib/adminMenu";
-import { type AdminSelf, assertMenu, assertSuper } from "@lib/adminSession";
+import {
+  type AdminSelf,
+  assertAdmin,
+  assertMenu,
+  assertSuper,
+} from "@lib/adminSession";
 import { type CollectPressResult, collectPress } from "@lib/pressCollector";
 
 /**
@@ -62,9 +67,50 @@ const MAX_FILE_SIZE = 20 * 1024 * 1024;
 
 const LOG_TARGET_LIMIT = 200;
 
+const DASHBOARD_PERIODS: DashboardPeriod[] = [30, 90, 365];
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const seoulDate = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Seoul",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
 /**
  * types
  */
+export type DashboardPeriod = 30 | 90 | 365;
+
+/**
+ * 기간 지표. `current`는 고른 기간, `previous`는 바로 앞 같은 길이 기간
+ */
+export type DashboardMetric = {
+  total: number;
+  current: number;
+  previous: number;
+};
+
+export type DashboardDay = {
+  date: string;
+  members: number;
+  totalMembers: number;
+  posts: number;
+  comments: number;
+  inquiries: number;
+};
+
+export type Dashboard = {
+  members: DashboardMetric;
+  posts: DashboardMetric;
+  comments: DashboardMetric;
+  inquiries: DashboardMetric;
+  pendingPress: number;
+  providers: { provider: string; count: number }[];
+  days: DashboardDay[];
+};
+
 export type MemberRole = "owner" | "super" | "manager" | "member";
 
 export type Member = {
@@ -289,8 +335,30 @@ type CountRowsParams = {
     | typeof notices
     | typeof donationInquiries
     | typeof boardPosts
+    | typeof boardComments
+    | typeof profiles
     | typeof pressCandidates;
   where: SQL | undefined;
+};
+
+type ReadDashboardParams = {
+  period: DashboardPeriod;
+};
+
+type CountDailyParams = {
+  table:
+    | typeof profiles
+    | typeof boardPosts
+    | typeof boardComments
+    | typeof donationInquiries;
+  since: Date;
+};
+
+type ToMetricParams = {
+  daily: Map<string, number>;
+  dates: string[];
+  period: number;
+  total: number;
 };
 
 type CountByParams<F extends string> = {
@@ -353,6 +421,93 @@ type MemberTargetRow = {
 type ReadRoleActionParams = {
   current: MemberRole;
   role: MemberRoleFilter;
+};
+
+/**
+ * actions — 대시보드. 운영진 누구나 본다. 개인 정보 없이 개수만 모은다
+ */
+/**
+ * 날짜는 서울 기준. 이전 기간과 견주려고 고른 기간의 두 배를 읽는다
+ */
+export const readDashboard = async (
+  params: ReadDashboardParams,
+): Promise<Dashboard> => {
+  await assertAdmin();
+  const period = DASHBOARD_PERIODS.includes(params.period) ? params.period : 30;
+  const dates = readSeoulDates(period * 2);
+  const since = new Date(`${dates[0]}T00:00:00+09:00`);
+  const db = getDb();
+  const [
+    memberDaily,
+    postDaily,
+    commentDaily,
+    inquiryDaily,
+    memberTotal,
+    postTotal,
+    commentTotal,
+    inquiryTotal,
+    pendingPress,
+    providerRows,
+  ] = await Promise.all([
+    countDaily({ table: profiles, since }),
+    countDaily({ table: boardPosts, since }),
+    countDaily({ table: boardComments, since }),
+    countDaily({ table: donationInquiries, since }),
+    countRows({ table: profiles, where: undefined }),
+    countRows({ table: boardPosts, where: undefined }),
+    countRows({ table: boardComments, where: undefined }),
+    countRows({ table: donationInquiries, where: undefined }),
+    countRows({
+      table: pressCandidates,
+      where: eq(pressCandidates.status, "pending"),
+    }),
+    db
+      .select({
+        provider: profiles.provider,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(profiles)
+      .groupBy(profiles.provider)
+      .orderBy(desc(sql`count(*)`)),
+  ]);
+  const members = toMetric({
+    daily: memberDaily,
+    dates,
+    period,
+    total: memberTotal,
+  });
+  let totalMembers = memberTotal - members.current;
+  const days = dates.slice(period).map(date => {
+    const joined = memberDaily.get(date) ?? 0;
+    totalMembers += joined;
+    return {
+      date,
+      members: joined,
+      totalMembers,
+      posts: postDaily.get(date) ?? 0,
+      comments: commentDaily.get(date) ?? 0,
+      inquiries: inquiryDaily.get(date) ?? 0,
+    };
+  });
+  return {
+    members,
+    posts: toMetric({ daily: postDaily, dates, period, total: postTotal }),
+    comments: toMetric({
+      daily: commentDaily,
+      dates,
+      period,
+      total: commentTotal,
+    }),
+    inquiries: toMetric({
+      daily: inquiryDaily,
+      dates,
+      period,
+      total: inquiryTotal,
+    }),
+    pendingPress,
+    providers: providerRows,
+    days,
+  };
 };
 
 /**
@@ -1036,7 +1191,7 @@ export const deletePostFile = async (params: IdParams) => {
 };
 
 /**
- * actions — 후원 문의
+ * actions — 후원 관리. 웹사이트 후원하기에서 남긴 후원
  */
 export const listInquiries = async (
   params: ListInquiriesParams,
@@ -1093,7 +1248,7 @@ export const deleteInquiry = async (params: IdParams) => {
   await writeLog({
     self,
     menu: "inquiries",
-    action: "후원 문의 삭제",
+    action: "후원 내역 파기",
     target: row
       ? `${row.name} (${row.createdAt.toISOString().slice(0, 10)} 접수)`
       : "",
@@ -1407,6 +1562,41 @@ const countRows = async (params: CountRowsParams) => {
     .from(table)
     .where(where);
   return rows[0]?.count ?? 0;
+};
+
+/**
+ * 서울 날짜(`YYYY-MM-DD`)별 생성 개수
+ */
+const countDaily = async (params: CountDailyParams) => {
+  const { table, since } = params;
+  const day = sql<string>`to_char(${table.createdAt} at time zone 'Asia/Seoul', 'YYYY-MM-DD')`;
+  const rows = await getDb()
+    .select({ day, count: sql<number>`count(*)::int` })
+    .from(table)
+    .where(gte(table.createdAt, since))
+    .groupBy(day);
+  return new Map(rows.map(row => [row.day, row.count]));
+};
+
+/**
+ * 오늘까지 `count`일의 서울 날짜. 오래된 날부터
+ */
+const readSeoulDates = (count: number) => {
+  const today = Date.parse(`${seoulDate.format(new Date())}T00:00:00Z`);
+  return Array.from({ length: count }, (_, index) =>
+    new Date(today - (count - 1 - index) * DAY_MS).toISOString().slice(0, 10),
+  );
+};
+
+const toMetric = (params: ToMetricParams): DashboardMetric => {
+  const { daily, dates, period, total } = params;
+  const sum = (range: string[]) =>
+    range.reduce((acc, date) => acc + (daily.get(date) ?? 0), 0);
+  return {
+    total,
+    current: sum(dates.slice(period)),
+    previous: sum(dates.slice(0, period)),
+  };
 };
 
 const countBy = <F extends string>(

@@ -33,7 +33,7 @@ const DONATION_ACCOUNT = {
 
 const ACCOUNT_NOTES = [
   "구글폼으로 약정해 주신 분도 이 계좌로 보내 주세요. 남겨 주신 이메일과 문자로 개별 안내드립니다.",
-  "보내신 뒤 후원 알림을 남겨 주시면 입금 내역과 성함을 맞춰 기록합니다.",
+  "보내신 뒤 아래 양식으로 후원을 남겨 주시면 입금 내역과 성함을 맞춰 기록합니다.",
 ];
 
 const BEFORE_NOTES = [
@@ -41,7 +41,7 @@ const BEFORE_NOTES = [
   "후원금은 「재단법인 피터팬 설립추진위원회」가 관리합니다.",
   "후원금은 재단 설립을 위한 출연재산으로 쓰이며, 모금과 사용 내역을 공개하겠습니다.",
   "기부금 영수증은 발급 가능 여부와 시점이 확정되면 따로 안내드리겠습니다.",
-  "후원을 취소하거나 돌려받아야 하면 후원 알림이나 문의로 알려 주세요. 확인한 뒤 개별로 안내드리겠습니다.",
+  "후원을 취소하거나 돌려받아야 하면 재단 연락처로 알려 주세요. 확인한 뒤 개별로 안내드리겠습니다.",
 ];
 
 const SEPARATE_ACCOUNTS = [
@@ -112,7 +112,7 @@ type FieldProps = {
 };
 
 /**
- * screen — 후원하기. 공식 후원 계좌, 나뉜 세 계좌, 이름 벽, 후원 알림. 회원 정보를 채우는 알림 양식만 따로 들어온다
+ * screen — 후원하기. 공식 후원 계좌, 나뉜 세 계좌, 이름 벽, 후원 남기기. 회원 정보를 채우는 후원 양식만 따로 들어온다
  */
 const DonateScreen = async ({ searchParams }: Props) => {
   // variables
@@ -218,8 +218,8 @@ const WallSection = () => (
       })}
     </div>
     <BrandText variant="bodyCompact" color="muted" className="mt-6">
-      이름을 올리고 싶으시면 후원 알림에 이름 벽에 올릴 이름을 적어 주세요. 적어
-      주신 이름만 공개합니다. 출연과 후원금의 쓰임은{" "}
+      이름을 올리고 싶으시면 후원을 남길 때 이름 벽에 올릴 이름을 적어 주세요.
+      적어 주신 이름만 공개합니다. 출연과 후원금의 쓰임은{" "}
       <Link href="/disclosure/donations" className="text-pine underline">
         기부금 공시
       </Link>
@@ -231,8 +231,8 @@ const WallSection = () => (
 const NoticeSection = ({ isSent }: NoticeSectionProps) => (
   <BandSection
     id="notice"
-    overline="Donation notice"
-    title="후원 알림 남기기"
+    overline="Donation"
+    title="후원 남기기"
     description="보내신 후원을 알려 주시면 입금 내역과 맞춰 기록하고, 이름 벽과 이후 기부금 영수증 안내에 씁니다. 영수증은 발급 가능 여부와 시점이 확정되면 안내드리겠습니다."
     tone="paper">
     <Suspense
@@ -247,7 +247,7 @@ const NoticeSection = ({ isSent }: NoticeSectionProps) => (
  */
 
 /**
- * 로그인한 회원이면 이름·이메일·휴대전화를 채운 알림 양식
+ * 로그인한 회원이면 이름·이메일·휴대전화를 채운 후원 양식
  */
 const ProfileNoticeForm = async ({ isSent }: NoticeSectionProps) => {
   // variables
@@ -258,7 +258,7 @@ const ProfileNoticeForm = async ({ isSent }: NoticeSectionProps) => {
 };
 
 /**
- * 후원 알림 양식. `isLoading`이면 회원 정보를 읽는 중이라 같은 양식을 누를 수 없게 보인다
+ * 후원 양식. `isLoading`이면 회원 정보를 읽는 중이라 같은 양식을 누를 수 없게 보인다
  */
 const NoticeForm = ({
   isSent,
@@ -271,12 +271,12 @@ const NoticeForm = ({
     className="rounded-xlarge border border-beige bg-white p-6 md:p-8">
     {isSent ? (
       <p className="mb-6 rounded-xlarge bg-paper px-4 py-3 text-4 leading-5 text-pine">
-        후원 알림을 남겼습니다. 입금 내역을 확인한 뒤 연락드리겠습니다.
+        후원을 남겼습니다. 입금 내역을 확인한 뒤 연락드리겠습니다.
         {profile ? (
           <>
             {" "}
             <Link href="/mypage?tab=inquiries" className="underline">
-              내 문의 내역
+              내 후원 내역
             </Link>
             에서 볼 수 있습니다.
           </>
@@ -361,7 +361,7 @@ const NoticeForm = ({
         variant="solid"
         color="pine"
         type="submit"
-        text="후원 알림 남기기"
+        text="후원 남기기"
         isRound
         isFullWidth
         className="md:col-span-2"

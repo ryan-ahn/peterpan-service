@@ -11,7 +11,7 @@ import { isDonationFormKind } from "@repo/db/boards";
  * actions
  */
 /**
- * 공식 계좌로 보낸 후원을 알린다. 로그인했으면 회원에 연결해 마이페이지 문의 내역에 보인다
+ * 공식 계좌로 보낸 후원을 알린다. 로그인했으면 회원에 연결해 마이페이지 후원 내역에 보인다
  */
 export const submitDonationInquiry = async (formData: FormData) => {
   const name = String(formData.get("name") ?? "").trim();

@@ -1,4 +1,6 @@
-import { type SQL, and, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { cache } from "react";
+
+import { type SQL, and, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { unionAll } from "drizzle-orm/pg-core";
 
 import { getDb, notices, postFiles, posts } from "@repo/db";
@@ -67,17 +69,19 @@ export const listPosts = async (params: ListPostsParams) => {
   }
   const where = and(...filters);
   const db = getDb();
-  const rows = await db
-    .select()
-    .from(posts)
-    .where(where)
-    .orderBy(desc(posts.pinned), desc(posts.createdAt))
-    .limit(NEWS_PAGE_SIZE)
-    .offset((page - 1) * NEWS_PAGE_SIZE);
-  const countRows = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(posts)
-    .where(where);
+  const [rows, countRows] = await Promise.all([
+    db
+      .select()
+      .from(posts)
+      .where(where)
+      .orderBy(desc(posts.pinned), desc(posts.createdAt))
+      .limit(NEWS_PAGE_SIZE)
+      .offset((page - 1) * NEWS_PAGE_SIZE),
+    db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(posts)
+      .where(where),
+  ]);
   const total = countRows[0]?.count ?? 0;
   return {
     posts: rows,
@@ -127,21 +131,29 @@ export const listLatestNews = async (limit: number) =>
   listNewsRows({ category: "all", query: "", limit, offset: 0 });
 
 /**
- * 재단 소식 본문. 활동·언론 보도를 먼저 찾고, 없으면 공지에서 찾는다
+ * 재단 소식 본문. 활동·언론 보도를 먼저 보고, 없으면 공지를 본다. 두 곳은 함께 읽는다.
+ * 메타데이터와 본문이 같은 글을 읽으므로 한 요청 안에서는 한 번만 조회한다
  */
-export const getNewsBySlug = async (slug: string) => {
+export const getNewsBySlug = cache(async (slug: string) => {
   const db = getDb();
-  const postRows = await db
-    .select()
-    .from(posts)
-    .where(
-      and(
-        eq(posts.slug, slug),
-        eq(posts.board, "news"),
-        eq(posts.published, true),
-      ),
-    )
-    .limit(1);
+  const [postRows, noticeRows] = await Promise.all([
+    db
+      .select()
+      .from(posts)
+      .where(
+        and(
+          eq(posts.slug, slug),
+          eq(posts.board, "news"),
+          eq(posts.published, true),
+        ),
+      )
+      .limit(1),
+    db
+      .select()
+      .from(notices)
+      .where(and(eq(notices.slug, slug), eq(notices.published, true)))
+      .limit(1),
+  ]);
   const post = postRows[0];
   if (post) {
     return {
@@ -154,11 +166,6 @@ export const getNewsBySlug = async (slug: string) => {
       createdAt: post.createdAt,
     };
   }
-  const noticeRows = await db
-    .select()
-    .from(notices)
-    .where(and(eq(notices.slug, slug), eq(notices.published, true)))
-    .limit(1);
   const notice = noticeRows[0];
   if (!notice) {
     return null;
@@ -172,7 +179,7 @@ export const getNewsBySlug = async (slug: string) => {
     externalUrl: null,
     createdAt: notice.createdAt,
   };
-};
+});
 
 export const listPostFiles = async (postId: string) =>
   getDb()
@@ -199,11 +206,21 @@ export const listDisclosureRows = async (params: ListDisclosureRowsParams) => {
   const { board, year } = params;
   const result = await listPosts({ board, year, page: 1 }).catch(() => null);
   const rows = result?.posts ?? [];
-  const files = await Promise.all(
-    rows.map(post => listPostFiles(post.id).catch(() => [])),
-  );
-  return rows.map((post, index) => {
-    const file = files[index]?.[0];
+  const files = rows.length
+    ? await getDb()
+        .select()
+        .from(postFiles)
+        .where(
+          inArray(
+            postFiles.postId,
+            rows.map(post => post.id),
+          ),
+        )
+        .orderBy(desc(postFiles.createdAt))
+        .catch(() => [])
+    : [];
+  return rows.map(post => {
+    const file = files.find(item => item.postId === post.id);
     return {
       post,
       href: file
