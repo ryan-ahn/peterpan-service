@@ -79,24 +79,12 @@ const HeroSection = () => (
             후원하기
           </Link>
         </div>
-        <ul className="mt-8 flex flex-col gap-2 border-t border-beige pt-8 sm:flex-row sm:flex-wrap sm:gap-x-6">
-          <li>
-            <Link
-              href="/village"
-              className="inline-flex items-center gap-1 text-4 leading-5 font-medium text-pine hover:text-pine-deep">
-              피터팬 마을 소개
-              <Icon name="chevron-right" size={16} />
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/village/spaces"
-              className="inline-flex items-center gap-1 text-4 leading-5 font-medium text-pine hover:text-pine-deep">
-              조감과 공간
-              <Icon name="chevron-right" size={16} />
-            </Link>
-          </li>
-        </ul>
+        <Link
+          href="/village"
+          className="mt-8 inline-flex items-center gap-1 border-t border-beige pt-8 text-4 leading-5 font-medium text-pine hover:text-pine-deep">
+          피터팬 마을 소개
+          <Icon name="chevron-right" size={16} />
+        </Link>
       </div>
     </div>
   </section>
