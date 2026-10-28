@@ -5,15 +5,11 @@ import Link from "next/link";
 import { categoryLabel } from "@repo/db/boards";
 import { buttonStyle } from "@repo/ui/components/button";
 import Icon from "@repo/ui/icon";
-import cn from "@repo/ui/lib/cn";
 
 import BrandText from "@components/brandText";
-import LogoEmblem from "@components/logoEmblem";
 import SkeletonText from "@components/skeletonText";
-import VillageAerial from "@components/villageAerial";
-import WorkCarousel from "@components/workCarousel";
 import { formatDate } from "@lib/format";
-import { VALUES } from "@lib/foundation";
+import { FOUNDING_LEAD, FOUNDING_PREAMBLE } from "@lib/foundation";
 import { listLatestNews } from "@lib/posts";
 
 /**
@@ -35,13 +31,11 @@ const DISCLOSURE_LINKS = [
 ];
 
 /**
- * screen — 홈. 첫 화면, 가치, 하는 일, 소식과 정보공개. 소식 목록만 스켈레톤 뒤에서 따로 들어온다
+ * screen — 홈. 비전·소식과 정보공개. 소식 목록만 스켈레톤 뒤에서 따로 들어온다
  */
 const HomeScreen = () => (
   <>
     <HeroSection />
-    <ValuesSection />
-    <WorkCarousel />
     <NewsSection />
   </>
 );
@@ -50,9 +44,9 @@ const HomeScreen = () => (
  * section
  */
 const HeroSection = () => (
-  <section className="border-b border-beige">
-    <div className="page-wide grid items-center gap-10 py-14 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-12 lg:py-20">
-      <div>
+  <section className="border-b border-beige bg-white">
+    <div className="page-wide py-14 lg:py-20">
+      <div className="max-w-3xl">
         <BrandText variant="overline" color="pine">
           Peter Pan Foundation
         </BrandText>
@@ -67,12 +61,13 @@ const HeroSection = () => (
           존엄이 지켜지는 안전한 삶,
           <br />그 삶을 함께 지키는 작은 마을
         </BrandText>
-        <BrandText variant="body" color="muted" className="mt-6 max-w-md">
-          피터팬 재단은 성인 중증 자폐성장애인이 가족의 돌봄 여건과 관계없이
-          안전하고 존엄한 삶을 이어 갈 수 있도록, 지속 가능한 주거와 돌봄의
-          기반을 만들어 갑니다.
+        <BrandText variant="body" color="inkSoft" className="mt-8">
+          {FOUNDING_LEAD}
         </BrandText>
-        <div className="mt-8 flex flex-wrap gap-3">
+        <BrandText variant="bodyCompact" color="muted" className="mt-5">
+          {FOUNDING_PREAMBLE}
+        </BrandText>
+        <div className="mt-10 flex flex-wrap gap-3">
           <Link
             href="/about"
             className={buttonStyle({ variant: "solid", color: "pine" })}>
@@ -84,69 +79,24 @@ const HeroSection = () => (
             후원하기
           </Link>
         </div>
-      </div>
-      <div className="group/aerial flex flex-col items-center gap-1 lg:pt-12">
-        <VillageAerial />
-        <Link
-          href="/village/spaces"
-          className="inline-flex items-center gap-1 text-4 leading-5 font-medium text-pine transition-[opacity,visibility] duration-50 hover:text-pine-deep max-md:group-has-data-spot-open/aerial:invisible max-md:group-has-data-spot-open/aerial:opacity-0">
-          조감도 자세히
-          <Icon name="chevron-right" size={16} />
-        </Link>
-      </div>
-    </div>
-  </section>
-);
-
-const ValuesSection = () => (
-  <section className="bg-paper">
-    <div className="page-wide py-16 lg:py-20">
-      <BrandText variant="overline" color="pine">
-        What we stand for
-      </BrandText>
-      <BrandText as="h2" variant="section" color="pine" className="mt-2">
-        재단이 지키는 가치
-      </BrandText>
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {VALUES.map(value => (
-          <div
-            key={value.title}
-            className="group relative flex flex-col overflow-hidden rounded-xlarge border border-beige bg-white px-6 pt-7 pb-8 transition-[translate,border-color] duration-300 hover:-translate-y-1 hover:border-sage">
-            <span className="absolute inset-x-0 top-0 h-1 origin-left scale-x-0 bg-gold transition-transform duration-300 group-hover:scale-x-100" />
-            <span
-              aria-hidden
-              className="pointer-events-none absolute top-3 right-5 font-en text-19 leading-none font-semibold text-beige/60">
-              {value.index}
-            </span>
-            <span
-              className={cn(
-                "relative grid size-14 place-items-center rounded-full bg-paper",
-                value.emblem === "star" ? "text-gold-deep" : "text-pine",
-              )}>
-              <LogoEmblem name={value.emblem} className="size-8" />
-            </span>
-            <BrandText variant="caption" color="goldDeep" className="mt-6">
-              {value.keywords.join(" · ")}
-            </BrandText>
-            <h3 className="mt-1 text-6 leading-8 font-semibold text-pine">
-              {value.title}
-            </h3>
-            <div className="mt-3 w-8 border-t-2 border-gold" />
-            <BrandText variant="smallCompact" color="muted" className="mt-3">
-              {value.body}
-            </BrandText>
-            {"link" in value ? (
-              <a
-                href={value.link.href}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-4 inline-flex items-center gap-1 text-4 leading-5 font-medium text-pine hover:text-pine-deep">
-                {value.link.label}
-                <Icon name="external-link" size={16} />
-              </a>
-            ) : null}
-          </div>
-        ))}
+        <ul className="mt-8 flex flex-col gap-2 border-t border-beige pt-8 sm:flex-row sm:flex-wrap sm:gap-x-6">
+          <li>
+            <Link
+              href="/village"
+              className="inline-flex items-center gap-1 text-4 leading-5 font-medium text-pine hover:text-pine-deep">
+              피터팬 마을 소개
+              <Icon name="chevron-right" size={16} />
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/village/spaces"
+              className="inline-flex items-center gap-1 text-4 leading-5 font-medium text-pine hover:text-pine-deep">
+              조감과 공간
+              <Icon name="chevron-right" size={16} />
+            </Link>
+          </li>
+        </ul>
       </div>
     </div>
   </section>

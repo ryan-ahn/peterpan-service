@@ -13,9 +13,9 @@ import LogoEmblem from "@components/logoEmblem";
 import { CREED_HORIZON, CREED_STATEMENT, VALUES } from "@lib/foundation";
 
 export const metadata: Metadata = {
-  title: "상징과 미션",
+  title: "미션·가치·상징",
   description:
-    "피터팬 재단 로고에 담긴 상징과 재단이 지키는 가치를 소개합니다.",
+    "피터팬 재단의 미션과 비전, 지키는 네 가지 가치, 로고·색·글꼴 등 브랜드 상징을 소개합니다.",
 };
 
 /**
@@ -28,8 +28,6 @@ const SYMBOL = {
   width: 926,
   height: 1034,
 };
-
-const KEYWORDS = VALUES.flatMap(value => value.keywords);
 
 const COLORS = [
   {
@@ -85,17 +83,18 @@ type LogoCardProps = {
 };
 
 /**
- * screen — 상징과 미션. 미션·비전, 로고와 그 뜻, 색·글꼴
+ * screen — 미션·가치·상징. 미션·비전, 네 가지 가치, 로고와 색·글꼴
  */
 const BrandScreen = () => (
   <article>
     <FoundationHeader
-      overline="Symbol & Values"
-      title="상징과 미션"
-      lead="피터팬 재단이 지향하는 가치와 그 가치를 담은 상징과 디자인입니다."
+      overline="Mission, values & symbol"
+      title="미션·가치·상징"
+      lead="재단이 하려는 일과 지키는 가치, 그리고 그 뜻을 담은 로고와 디자인을 한곳에서 소개합니다."
     />
     <div className="page-article flex flex-col divide-y divide-beige py-10 lg:py-12">
-      <IdentitySection />
+      <MissionSection />
+      <ValuesSection />
       <LogoSection />
       <ColorSection />
       <TypeSection />
@@ -106,7 +105,7 @@ const BrandScreen = () => (
 /**
  * section
  */
-const IdentitySection = () => (
+const MissionSection = () => (
   <section className={SECTION_CLASS}>
     <FoundationHeading
       title="미션과 비전"
@@ -125,25 +124,57 @@ const IdentitySection = () => (
           {CREED_HORIZON}
         </dd>
       </div>
-      <div className="flex flex-col gap-1 py-4 md:flex-row md:gap-4">
-        <dt className="w-20 shrink-0 text-4 leading-7 text-muted">핵심 가치</dt>
-        <dd className="text-4 leading-7 font-medium text-ink">
-          {VALUES.map(value => value.title).join(" · ")}
-        </dd>
-      </div>
-      <div className="flex flex-col gap-2 py-4 md:flex-row md:gap-4">
-        <dt className="w-20 shrink-0 text-4 leading-7 text-muted">키워드</dt>
-        <dd className="flex flex-wrap gap-2">
-          {KEYWORDS.map(keyword => (
-            <span
-              key={keyword}
-              className="rounded-full bg-white px-3 py-0.5 text-4 leading-6 font-medium text-pine">
-              {keyword}
-            </span>
-          ))}
-        </dd>
-      </div>
     </dl>
+  </section>
+);
+
+const ValuesSection = () => (
+  <section className={SECTION_CLASS}>
+    <FoundationHeading
+      title="재단이 지키는 가치"
+      description="네 가지 가치는 로고 심볼의 네 모양과 맞닿아 있습니다."
+    />
+    <div className="grid gap-4 sm:grid-cols-2">
+      {VALUES.map(value => (
+        <div
+          key={value.title}
+          className="group relative flex flex-col overflow-hidden rounded-xlarge border border-beige bg-white px-6 pt-7 pb-8 transition-[translate,border-color] duration-300 hover:-translate-y-1 hover:border-sage">
+          <span className="absolute inset-x-0 top-0 h-1 origin-left scale-x-0 bg-gold transition-transform duration-300 group-hover:scale-x-100" />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute top-3 right-5 font-en text-19 leading-none font-semibold text-beige/60">
+            {value.index}
+          </span>
+          <span
+            className={cn(
+              "relative grid size-14 place-items-center rounded-full bg-paper",
+              value.emblem === "star" ? "text-gold-deep" : "text-pine",
+            )}>
+            <LogoEmblem name={value.emblem} className="size-8" />
+          </span>
+          <BrandText variant="caption" color="goldDeep" className="mt-6">
+            {value.keywords.join(" · ")}
+          </BrandText>
+          <h3 className="mt-1 text-6 leading-8 font-semibold text-pine">
+            {value.title}
+          </h3>
+          <div className="mt-3 w-8 border-t-2 border-gold" />
+          <BrandText variant="smallCompact" color="muted" className="mt-3">
+            {value.body}
+          </BrandText>
+          {"link" in value ? (
+            <a
+              href={value.link.href}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-4 inline-flex items-center gap-1 text-4 leading-5 font-medium text-pine hover:text-pine-deep">
+              {value.link.label}
+              <Icon name="external-link" size={16} />
+            </a>
+          ) : null}
+        </div>
+      ))}
+    </div>
   </section>
 );
 
@@ -151,7 +182,7 @@ const LogoSection = () => (
   <section className={SECTION_CLASS}>
     <FoundationHeading
       title="로고"
-      description="심볼과 국문·영문 글자를 쓰임에 맞게 조합합니다."
+      description="심볼 네 모양은 위 가치를 담고, 국문·영문 글자와 함께 쓰임에 맞게 조합합니다."
     />
     <div className="grid gap-4 md:grid-cols-3">
       <LogoCard label="기본형 · 세로">
@@ -200,30 +231,6 @@ const LogoSection = () => (
         />
       </LogoCard>
     </div>
-    <ul className="grid gap-px overflow-hidden rounded-xlarge border border-beige bg-beige md:grid-cols-2">
-      {VALUES.map(value => (
-        <li key={value.emblem} className="flex gap-4 bg-white px-5 py-5">
-          <span
-            className={cn(
-              "grid size-12 shrink-0 place-items-center rounded-full bg-paper",
-              value.emblem === "star" ? "text-gold-deep" : "text-pine",
-            )}>
-            <LogoEmblem name={value.emblem} className="size-6" />
-          </span>
-          <div>
-            <BrandText variant="caption" color="goldDeep">
-              {value.keywords.join(" · ")}
-            </BrandText>
-            <p className="mt-1 text-5 leading-7 font-semibold text-pine">
-              {value.title}
-            </p>
-            <BrandText variant="smallCompact" color="muted" className="mt-1">
-              {value.body}
-            </BrandText>
-          </div>
-        </li>
-      ))}
-    </ul>
     <a
       href={SYMBOL.src}
       download="peterpan-symbol.png"

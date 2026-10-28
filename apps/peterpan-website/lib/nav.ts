@@ -11,7 +11,7 @@ export const NAV: NavItem[] = [
     children: [
       { label: "설립 배경과 목적", href: "/about" },
       { label: "대표 인사말", href: "/about/greeting" },
-      { label: "상징과 미션", href: "/about/brand" },
+      { label: "미션·가치·상징", href: "/about/brand" },
       { label: "조직도", href: "/about/organization" },
       { label: "정관", href: "/about/bylaws" },
     ],

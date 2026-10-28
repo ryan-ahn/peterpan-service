@@ -8,8 +8,8 @@
 
 | 경로                                                     | 화면                                                       |
 | -------------------------------------------------------- | ---------------------------------------------------------- |
-| `/`                                                      | 홈 (비전·가치·하는 일·최근 소식)                           |
-| `/about`, `/about/{greeting,brand,organization,bylaws}`  | 설립 배경과 목적·대표 인사말·상징과 미션·조직도·정관       |
+| `/`                                                      | 홈 (비전·최근 소식·정보공개)                                |
+| `/about`, `/about/{greeting,brand,organization,bylaws}`  | 설립 배경과 목적·대표 인사말·미션·가치·상징·조직도·정관       |
 | `/village`, `/village/{spaces,operation}`                | 피터팬 마을 소개·공간·운영                                 |
 | `/news`, `/news/[slug]`                                  | 재단 소식 목록(공지·활동·언론 보도)·본문                   |
 | `/board`, `/board/[id]`, `/board/write`                  | 회원 게시판 목록·본문·글쓰기(`?id=` 고치기)                |
@@ -43,7 +43,7 @@
 
 ## 데이터
 
-- 회원 정보는 `profiles` 테이블이 기준이다. 이름·사진·이메일은 처음 가입할 때만 소셜 계정에서 채우고(`@repo/auth/oauth`), 이후 로그인은 덮어쓰지 않는다. 마이페이지 조회는 `@lib/account`, 쓰기는 `app/mypage/actions.ts`. 프로필 사진은 `avatars` 버킷(`AVATAR_UPLOAD`, 2MB)에 회원 세션으로 `{userId}/` 경로에 올린다(스토리지 정책이 자기 폴더만 허용).
+- 회원 정보는 `profiles` 테이블이 기준이다. 이름·사진·이메일은 처음 가입할 때만 소셜 계정에서 채우고(`@repo/auth/oauth`), 이후 로그인은 덮어쓰지 않는다. 마이페이지 조회는 `@lib/account`, 쓰기는 `app/mypage/actions.ts`. 프로필 사진은 `avatars` 버킷(`AVATAR_UPLOAD`, 2MB)에 회원 세션으로 `{userId}/` 경로에 올린다(스토리지 정책이 자기 폴더만 허용). 사진이 없으면 `@repo/ui` `Avatar`가 `public/default.png`를 쓴다.
 - 로그인한 회원이 남긴 후원은 `donation_inquiries.user_id`로 이어져 마이페이지 후원 내역에 보인다.
 - 게시물 조회는 `@lib/posts` (공개된 글만). 회원 게시판(`board_posts`·`board_comments`·`board_likes`)은 `@lib/board`, 글·댓글·좋아요 쓰기는 `app/board/actions.ts`. 날짜·빈 값 표기는 `@lib/format`.
 - 재단 고정 문구(설립취지서·미션·마을·가치·하는 일)는 `@lib/foundation`.
@@ -64,17 +64,17 @@
 | `components/bandSection.tsx`       | 마을소개 가로 띠 구역 (영문 소제목·제목)                                    |
 | `components/infoCard.tsx`          | 마을소개 흰 카드 (분류·제목·설명)                                           |
 | `components/numberedList.tsx`      | 01·02 번호 제목·설명 목록                                                   |
-| `components/villageAerial.tsx`     | 치유 마을 조감도 (자리 이름·설명 창, client). 홈 첫 화면·조감과 공간        |
+| `components/villageAerial.tsx`     | 치유 마을 조감도 (자리 이름·설명 창, client). 조감과 공간 페이지           |
 | `components/siteHeader.tsx`        | 상단 메뉴·모바일 메뉴·후원하기. 로그인하면 사진·닉네임(마이페이지 링크)     |
 | `components/avatarPicker.tsx`      | 마이페이지 프로필 사진. 눌러서 골라 바로 올림 (client)                      |
 | `components/flashToast.tsx`        | 서버 액션이 쿼리로 넘긴 결과를 토스트로 한 번 띄우고 쿼리를 지움 (client)   |
 | `components/siteFooter.tsx`        | 하단 재단 정보·개인정보처리방침 링크                                        |
 | `components/logo.tsx`              | 로고 링크 (`horizontal`·`symbol`)                                           |
-| `components/logoEmblem.tsx`        | 로고 네 모양 선 아이콘 (상징과 미션)                                        |
+| `components/logoEmblem.tsx`        | 로고 네 모양 선 아이콘 (미션·가치·상징)                                     |
 | `components/introSplash.tsx`       | 초록 스플래시. 로고 조각이 뜻대로 모이는 애니메이션 (client, 지금은 미사용) |
 | `components/skeletonText.tsx`      | 글자 자리 스켈레톤. 투명한 대신 글에 배경만 칠한다                          |
 | `components/articleSkeleton.tsx`   | 소식·게시판 글 본문 스켈레톤 (`variant`)                                    |
-| `components/workCarousel.tsx`      | 홈 하는 일 캐러셀                                                           |
+| `components/workCarousel.tsx`      | 하는 일 캐러셀 (client). 홈에서는 현재 숨김                                 |
 | `components/disclosureList.tsx`    | 연도별 공시 목록                                                            |
 
 - 글자는 `BrandText`의 `variant`로 고른다. `display`·`title`·`section`·`heading`·`cardTitle`·`lead`·`body`·`bodyCompact`·`small`·`smallCompact`·`caption`·`overline`·`pen`(손글씨).
