@@ -14,6 +14,7 @@ import {
   donationInquiries,
   getDb,
   profiles,
+  runTransaction,
 } from "@repo/db";
 import { AVATAR_UPLOAD, PROFILE_LIMIT, isAvatarType } from "@repo/db/boards";
 
@@ -60,7 +61,7 @@ export const updateMyProfile = async (formData: FormData) => {
   if (birthDate && !isBirthDate(birthDate)) {
     redirect(`${MYPAGE_PATH}?error=birthDate`);
   }
-  await getDb().transaction(async tx => {
+  await runTransaction(async tx => {
     await tx
       .update(profiles)
       .set({ name, phone, birthDate: birthDate || null, updatedAt: new Date() })
@@ -186,8 +187,7 @@ export const withdrawMe = async (formData: FormData) => {
   if (files.data && files.data.length > 0) {
     await storage.remove(files.data.map(file => `${user.id}/${file.name}`));
   }
-  const db = getDb();
-  await db.transaction(async tx => {
+  await runTransaction(async tx => {
     await tx
       .delete(donationInquiries)
       .where(eq(donationInquiries.userId, user.id));

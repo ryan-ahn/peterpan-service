@@ -17,6 +17,7 @@ import {
   posts,
   pressCandidates,
   profiles,
+  runTransaction,
 } from "@repo/db";
 import {
   type BoardId,
@@ -878,7 +879,7 @@ export const approvePress = async (params: IdParams) => {
   if (candidate.status === "approved" && candidate.postId) {
     return;
   }
-  await db.transaction(async tx => {
+  await runTransaction(async tx => {
     const saved = await tx
       .insert(posts)
       .values({
@@ -919,7 +920,7 @@ export const hidePress = async (params: IdParams) => {
     .where(eq(pressCandidates.id, id))
     .limit(1);
   const postId = rows[0]?.postId;
-  await db.transaction(async tx => {
+  await runTransaction(async tx => {
     if (postId) {
       await tx.delete(posts).where(eq(posts.id, postId));
     }
@@ -1526,7 +1527,7 @@ const readMemberRole = async (params: IdParams): Promise<MemberRole> => {
 
 const markBylawPublished = async (params: IdParams) => {
   const { id } = params;
-  await getDb().transaction(async tx => {
+  await runTransaction(async tx => {
     await tx
       .update(bylaws)
       .set({ published: false })
